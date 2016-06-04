@@ -1,23 +1,23 @@
 {
-  "name": "datatables_serverside_pagination",
+  "name": "datatable",
   "version": "1.0.0",
-  "description": "Wrapper for server side pagination of datatables",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VladimirDimov/DataTablesServerSidePagination.git"
   },
-  "author": "VladimirDimov",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/VladimirDimov/DataTablesServerSidePagination/issues"
   },
   "homepage": "https://github.com/VladimirDimov/DataTablesServerSidePagination#readme",
   "dependencies": {
-    "datatables": "^1.10.12",
+    "bootstrap": "^3.3.6",
     "jquery": "^2.2.4"
   }
 }

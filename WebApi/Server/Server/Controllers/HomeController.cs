@@ -14,6 +14,7 @@ namespace Server.Controllers
     {
         public ActionResult Index()
         {
+            var reqData = Request.Params;
             string jsonData = null;
             using (var reader = new StreamReader(this.Server.MapPath("~/app_data/data.txt")))
             {
