@@ -20,9 +20,12 @@ vDataTable = (function () {
             this._pageSize = settings.pageSize || defaultSettings.pageSize;
             this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
             this._paginator.$paginator = setPaginator(1, this._paginator.length, 1);
+            this._columnPropertyNames = setColumnPropertyNames();
 
             setPageClickEvents();
             setFilterEvent();
+            formatSortables();
+            ajax(1);
         },
 
         get settings() {
@@ -47,13 +50,39 @@ vDataTable = (function () {
         }
     };
 
+    function formatSortables() {
+        var $sortables = table.$table.find('thead tr:last-child th[sortable]');
+
+        $sortables.on('click', function (e) {
+            var name = $(e.target).attr('data-colName');
+            table.orderBy = {
+                Name: name,
+                Asc: (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true
+            };
+
+            ajax(1);
+        });
+    };
+
+    function setColumnPropertyNames() {
+        var colPropNames = [];
+        var $columns = table.$table.find('thead tr:last-child').children();
+        for (var i = 0; i < $columns.length; i++) {
+            colPropNames.push($($columns[i]).attr('data-colName'));
+        }
+
+        return colPropNames;
+    };
+
     function ajax(page) {
         $.ajax({
             url: table.settings.ajax.url,
             data: {
                 page: page,
                 pageSize: table.pageSize,
-                filter: table.filter
+                filter: table.filter,
+                orderBy: table.orderBy ? table.orderBy.Name : null,
+                asc: table.orderBy ? table.orderBy.Asc : true
             },
             success: function (data) {
                 refreshPageData(data.data);
@@ -115,8 +144,8 @@ vDataTable = (function () {
             var element = data[row];
             var $row = $('<tr>');
 
-            for (var col = 0; col < element.length; col++) {
-                var $col = $('<td>').html(element[col]);
+            for (var col = 0; col < table._columnPropertyNames.length; col++) {
+                var $col = $('<td>').html(element[table._columnPropertyNames[col]]);
                 $row.append($col);
             }
 
