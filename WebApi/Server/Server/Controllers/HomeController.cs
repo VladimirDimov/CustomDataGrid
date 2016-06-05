@@ -12,8 +12,9 @@ namespace Server.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(int page, int pageSize, string filter, string orderBy)
         {
+            // Get data
             var reqData = Request.Params;
             string jsonData = null;
             using (var reader = new StreamReader(this.Server.MapPath("~/app_data/data.txt")))
@@ -22,7 +23,15 @@ namespace Server.Controllers
             }
 
             var data = JsonConvert.DeserializeObject<Data>(jsonData);
-            return this.Json(data, JsonRequestBehavior.AllowGet);
+
+            // Set page
+            var pagedData = data.data.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return this.Json(new
+            {
+                data = pagedData
+            },
+            JsonRequestBehavior.AllowGet);
         }
     }
 
