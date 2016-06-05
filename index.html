@@ -3,7 +3,7 @@
 
 <head>
     <!--CSS-->
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css"> 
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
     <!--JS-->
     <script src="./node_modules/jquery/dist/jquery.js"></script>
 </head>
@@ -11,7 +11,7 @@
 <body>
     <table id="table" class="display table" cellspacing="0" width="100%">
         <thead>
-            <tr><span>Search:</span><input type="text"></tr>
+            <tr><th><span>Search:</span><input type="text" class="filter"></th></tr>
             <tr>
                 <th data-colName="FirstName">First Name</th>
                 <th data-colName="LastName">Last Name</th>
@@ -23,7 +23,7 @@
         </thead>
         <tbody>
         </tbody>
-    <tfoot></tfoot>
+        <tfoot></tfoot>
     </table>
     <script src="./js/v-data-table.js"></script>
     <script src="./js/app.js"></script>

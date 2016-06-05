@@ -1,4 +1,14 @@
 vDataTable = (function () {
+    var defaultSettings = {
+        pageSize: 5,
+        paginator: {
+            length: 5
+        },
+        filter: {
+            enabled: true
+        }
+    };
+
     var table = {
         init: function (selector, settings) {
             this._$table = $(selector).first();
@@ -7,11 +17,12 @@ vDataTable = (function () {
 
             // Paginator settings
             this._paginator = {};
-            this._pageSize = settings.pageSize || 5;
-            this._paginator.paginatorLength = settings.paginatorLength || 5;
-            this._paginator.$paginator = setPaginator(1, this._paginator.paginatorLength, 1);
+            this._pageSize = settings.pageSize || defaultSettings.pageSize;
+            this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
+            this._paginator.$paginator = setPaginator(1, this._paginator.length, 1);
 
             setPageClickEvents();
+            setFilterEvent();
         },
 
         get settings() {
@@ -30,28 +41,35 @@ vDataTable = (function () {
             return this._pageSize;
         },
 
-        updatePaginator: function () {
-
+        get filter() {
+            var $filter = $(table.$table[0]).find('.filter');
+            return $filter.val();
         }
     };
 
     function ajax(page) {
         $.ajax({
             url: table.settings.ajax.url,
-            data: { page: page, pageSize: table.pageSize },
+            data: {
+                page: page,
+                pageSize: table.pageSize,
+                filter: table.filter
+            },
             success: function (data) {
                 refreshPageData(data.data);
-                updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.paginatorLength));
+                updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
             }
         });
     };
 
     function updatePaginator(page, numberOfPages) {
-        var length = table.paginator.paginatorLength;
-        var halfLength = Math.floor((table.paginator.paginatorLength - 1) / 2);
+        var length = table.paginator.length;
+        var halfLength = Math.floor((table.paginator.length - 1) / 2);
+        table.paginator.length = Math.min(table.paginator.length, numberOfPages);
+
         var start = Math.max(Math.floor(page - halfLength), 1);
-        start = Math.min(numberOfPages - table.paginator.paginatorLength, start);
-        var end = Math.min(start + table.paginator.paginatorLength - 1, numberOfPages);
+        start = Math.min(numberOfPages - table.paginator.length, start);
+        var end = Math.min(start + table.paginator.length - 1, numberOfPages);
 
         table.paginator.$paginator = setPaginator(start, end, page);
         setPageClickEvents();
@@ -66,6 +84,13 @@ vDataTable = (function () {
             ajax(page);
         });
     };
+
+    function setFilterEvent() {
+        var $filter = $(table.$table[0]).find('.filter');
+        $filter.on('change', function () {
+            ajax(1);
+        });
+    }
 
     function setPaginator(start, end, activePage) {
         var $footer = table._$table.children('tfoot').first();

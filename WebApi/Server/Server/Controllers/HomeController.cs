@@ -24,13 +24,18 @@ namespace Server.Controllers
 
             var data = JsonConvert.DeserializeObject<Data>(jsonData);
 
+
             // Set page
-            var pagedData = data.data.Skip((page - 1) * pageSize).Take(pageSize);
+            var filteredData = data.data
+                .Where(x => filter == null ? true : string.Join(string.Empty, x.ToArray()).Contains(filter));
+
+            var resultData = filteredData
+                .Skip((page - 1) * pageSize).Take(pageSize);
 
             return this.Json(new
             {
-                data = pagedData,
-                rowsNumber = data.data.Count
+                data = resultData,
+                rowsNumber = filteredData.Count()
             },
             JsonRequestBehavior.AllowGet);
         }
