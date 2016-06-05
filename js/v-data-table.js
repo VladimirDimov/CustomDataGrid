@@ -6,46 +6,28 @@ vDataTable = (function () {
             this._settings = settings;
 
             // Paginator settings
+            this._paginator = {};
             this._pageSize = settings.pageSize || 5;
-            this._paginatorLength = settings.paginatorLength || 5;
+            this._paginator.paginatorLength = settings.paginatorLength || 5;
+            this._paginator.$paginator = setPaginator(1, this._paginator.paginatorLength, 1);
 
-            this._$paginator = setPaginator(1, this._paginatorLength);
-            this.setPageClickEvents(this._$paginator, settings.ajax.url, this._pageSize, this._$table);
+            setPageClickEvents();
         },
 
-        refreshPageData: function (data, $table) {
-            var $tbody = $table.children('tbody').empty();
-            for (var row = 0; row < data.length; row++) {
-                var element = data[row];
-                var $row = $('<tr>');
-
-                for (var col = 0; col < element.length; col++) {
-                    var $col = $('<td>').html(element[col]);
-                    $row.append($col);
-                }
-
-                $tbody.append($row);
-            }
+        get settings() {
+            return this._settings;
         },
 
-        ajax: function (page) {
-            $.ajax({
-                url: this._settings.ajax.url,
-                data: { page: page, pageSize: this._pageSize },
-                success: function (data) {
-                    table.refreshPageData(data.data, this._$table);
-                }
-            });
+        get paginator() {
+            return this._paginator;
         },
 
-        setPageClickEvents: function () {
-            this._$paginator.on('click', 'li>a', function (e) {
-                var page = $(e.target).html();
-                $(this).children('li').removeClass('active');
-                $(e.target).parent().addClass('active');
+        get $table() {
+            return this._$table;
+        },
 
-                table.ajax(page);
-            });
+        get pageSize() {
+            return this._pageSize;
         },
 
         updatePaginator: function () {
@@ -53,8 +35,41 @@ vDataTable = (function () {
         }
     };
 
-    function setPaginator(start, end) {
+    function ajax(page) {
+        $.ajax({
+            url: table.settings.ajax.url,
+            data: { page: page, pageSize: table.pageSize },
+            success: function (data) {
+                refreshPageData(data.data);
+                updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.paginatorLength));
+            }
+        });
+    };
+
+    function updatePaginator(page, numberOfPages) {
+        var length = table.paginator.paginatorLength;
+        var halfLength = Math.floor((table.paginator.paginatorLength - 1) / 2);
+        var start = Math.max(Math.floor(page - halfLength), 1);
+        start = Math.min(numberOfPages - table.paginator.paginatorLength, start);
+        var end = Math.min(start + table.paginator.paginatorLength - 1, numberOfPages);
+
+        table.paginator.$paginator = setPaginator(start, end, page);
+        setPageClickEvents();
+    };
+
+    function setPageClickEvents() {
+        table.paginator.$paginator.on('click', 'li>a', function (e) {
+            var page = $(e.target).html();
+            table.paginator.$paginator.children('li').removeClass('active');
+            $(e.target).parent().addClass('active');
+
+            ajax(page);
+        });
+    };
+
+    function setPaginator(start, end, activePage) {
         var $footer = table._$table.children('tfoot').first();
+        $footer.children('.pagination').remove();
         var $paginator = $('<ul></ul>')
             .addClass('pagination');
 
@@ -63,11 +78,26 @@ vDataTable = (function () {
         for (var i = start; i <= end; i++) {
             var $currentPageElement = $('<li><a href="#">' + i + '</a></li>');
             $paginator.append($currentPageElement);
-            if (i == start) $currentPageElement.addClass('active');
+            if (i == activePage) $currentPageElement.addClass('active');
         }
 
         return $paginator;
-    }
+    };
+
+    function refreshPageData(data) {
+        var $tbody = table.$table.children('tbody').empty();
+        for (var row = 0; row < data.length; row++) {
+            var element = data[row];
+            var $row = $('<tr>');
+
+            for (var col = 0; col < element.length; col++) {
+                var $col = $('<td>').html(element[col]);
+                $row.append($col);
+            }
+
+            $tbody.append($row);
+        }
+    };
 
     return table;
 });

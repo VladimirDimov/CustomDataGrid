@@ -29,7 +29,8 @@ namespace Server.Controllers
 
             return this.Json(new
             {
-                data = pagedData
+                data = pagedData,
+                rowsNumber = data.data.Count
             },
             JsonRequestBehavior.AllowGet);
         }
