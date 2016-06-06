@@ -55,10 +55,18 @@ vDataTable = (function () {
 
         $sortables.on('click', function (e) {
             var name = $(e.target).attr('data-colName');
+            var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
             table.orderBy = {
                 Name: name,
-                Asc: (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true
+                Asc: isAsc
             };
+
+            $sortables.removeAttr('asc desc');
+            if (isAsc) {
+              $(e.target).attr('asc', '')
+            } else {
+              $(e.target).attr('desc', '')
+            }
 
             ajax(1);
         });

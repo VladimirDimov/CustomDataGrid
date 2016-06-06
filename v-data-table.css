@@ -1,0 +1,20 @@
+
+
+th[asc]::after {
+  content: url('/img/asc.png');
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+th[desc]::after {
+  content: url('/img/desc.png');
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+th[sortable] {
+  cursor: pointer;
+  color: gray;
+}
