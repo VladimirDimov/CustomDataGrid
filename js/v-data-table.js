@@ -148,17 +148,26 @@ vDataTable = (function () {
 
     function refreshPageData(data) {
         var $tbody = table.$table.children('tbody').empty();
+        // TODO: To foreach the table._columnPropertyNames instead of the response data columns
         for (var row = 0; row < data.length; row++) {
             var element = data[row];
             var $row = $('<tr>');
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
-                var $col = $('<td>').html(element[table._columnPropertyNames[col]]);
+                var $col = $('<td>').html(render(table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
 
             $tbody.append($row);
         }
+    };
+
+    function render(colName, content) {
+      if(table.settings && table.settings.columns && table.settings.columns[colName] &&table.settings.columns[colName].render) {
+        return table.settings.columns[colName].render(content);
+      };
+
+      return content;
     };
 
     return table;
