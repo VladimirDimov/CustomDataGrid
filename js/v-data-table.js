@@ -4,8 +4,9 @@ vDataTable = (function() {
     paginator: {
       length: 5
     },
-    filter: {
-      enabled: true
+    features: {
+      enableFilter: true,
+      selectable: true
     }
   };
 
@@ -17,7 +18,7 @@ vDataTable = (function() {
 
       // Paginator settings
       this._paginator = {};
-      this.settings.pageSize = settings.pageSize || defaultSettings.pageSize;
+      this._settings.pageSize = settings.pageSize || defaultSettings.pageSize;
       this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
       this._paginator.$paginator = setPaginator(1, this._paginator.length, 1);
       this._columnPropertyNames = setColumnPropertyNames();
@@ -26,6 +27,10 @@ vDataTable = (function() {
       setFilterEvent();
       formatSortables();
       loadData(1);
+
+      if (settings.features) {
+        processFeatures(settings.features);
+      };
     },
 
     get settings() {
@@ -45,6 +50,22 @@ vDataTable = (function() {
       return $filter.val();
     }
   };
+
+  function processFeatures(features) {
+    if (features.selectable) {
+      makeSelectable();
+    };
+  }
+
+  function makeSelectable() {
+    var $tbody = table.$table.find('tbody');
+    $tbody.on('click', function(e) {
+      $row = $(e.target).parentsUntil('tbody');
+
+      $tbody.find('tr').css('background-color', 'white');
+      $row.css('background-color', 'gray');
+    });
+  }
 
   function formatSortables() {
     var $sortables = table.$table.find('thead tr:last-child th[sortable]');
@@ -109,8 +130,8 @@ vDataTable = (function() {
       start = Math.max(Math.floor(page - halfLength), 1);
       end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
       if (end - start + 1 < currentPaginatorLength) {
-          end = page;
-          start = Math.max(1, end - length + 1);
+        end = page;
+        start = Math.max(1, end - length + 1);
       };
     } else {
       start = 0;

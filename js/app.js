@@ -9,5 +9,8 @@ var tb = vDataTable().init('#table', {
           return '**' + content + '**';
         }
       }
+    },
+    features: {
+      selectable: true
     }
 });
