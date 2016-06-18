@@ -1,6 +1,6 @@
 // // Some code
 var vDataTable = require('../js/v-data-table.js');
-var $ = require('jquery');
+// var $ = require('jquery');
 
 var tb = vDataTable().init('#table', {
     ajax: {

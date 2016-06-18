@@ -1,4 +1,4 @@
-var $ = require('jquery');
+// var $ = require('jquery');
 
 var selectable = (function () {
     return {
@@ -7,23 +7,28 @@ var selectable = (function () {
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').first();
 
-                if (!e.ctrlKey) {
+                if (!e.ctrlKey && !isSelected(table, $row)) {
                     $tbody.find('tr').css('background-color', 'white');
-                    table.data.selectedRows = [];
+                    table.store.selectedRows = [];
 
                     $row.css('background-color', 'gray');
                 }
 
-                if (table.data.selectedRows.includes($row[0])) {
-                    RemoveFromArray($row[0], table.data.selectedRows);
+                debugger;
+                if (isSelected(table, $row)) {
+                    RemoveFromArray($row[0], table.store.selectedRows);
                     $row.css('background-color', 'white');
                 } else {
-                    table.data.selectedRows.push($row[0]);
+                    table.store.selectedRows.push($row[0]);
                     $row.css('background-color', 'gray');
                 }
             });
         }
     };
+
+    function isSelected(table, $row) {
+        return table.store.selectedRows.includes($row[0])
+    }
 
     function RemoveFromArray(element, arr) {
         var index = arr.indexOf(element);

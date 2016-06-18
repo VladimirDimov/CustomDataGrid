@@ -1,4 +1,4 @@
-var $ = require('jquery');
+// var $ = require('jquery');
 var selectable = require('../js/selectable.js');
 
 vDataTable = function () {
@@ -19,19 +19,28 @@ vDataTable = function () {
     init: function (selector, settings) {
       this._$table = $(selector).first();
       this._$table._currentPage = 1;
-      this._settings = settings;
 
       // Paginator settings
       this._paginator = {};
-      this._settings.pageSize = settings.pageSize || defaultSettings.pageSize;
       this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
       this._paginator.$paginator = setPaginator(1, this._paginator.length, 1);
       this._columnPropertyNames = setColumnPropertyNames();
 
       // Data
-      this.data = {
-        selectedRows: [],
+      this.store = {
+        selectedRows: []
       };
+
+      // Settings
+      this._settings = {
+        ajax: {
+          url: settings.ajax.url
+        },
+        colors: {
+          selectedRow: 'gray',
+        },
+        pageSize: settings.pageSize || defaultSettings.pageSize
+      }
 
       setPageClickEvents();
       setFilterEvent();
@@ -66,19 +75,6 @@ vDataTable = function () {
       selectable.makeSelectable(table);
     };
   }
-
-  // function makeSelectable() {
-  //   var $tbody = table.$table.find('tbody');
-  //   $tbody.on('click', function (e) {
-  //     $row = $(e.target).parentsUntil('tbody');
-
-  //     if (!e.ctrlKey) {
-  //       $tbody.find('tr').css('background-color', 'white');
-  //     }
-
-  //     $row.css('background-color', 'gray');
-  //   });
-  // }
 
   function formatSortables() {
     var $sortables = table.$table.find('thead tr:last-child th[sortable]');
