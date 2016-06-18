@@ -14,7 +14,6 @@ var selectable = (function () {
                     $row.css('background-color', 'gray');
                 }
 
-                debugger;
                 if (isSelected(table, $row)) {
                     RemoveFromArray($row[0], table.store.selectedRows);
                     $row.css('background-color', 'white');
