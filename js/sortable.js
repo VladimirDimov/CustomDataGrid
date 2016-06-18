@@ -1,6 +1,7 @@
-var dataLoader = require('../js/dataLoader.js');
-
 var sortable = (function () {
+    'use strict';
+    var dataLoader = require('../js/dataLoader.js');
+
     return {
         formatSortables: function (table) {
             var $sortables = table.$table.find('thead tr:last-child th[sortable]');
@@ -20,7 +21,7 @@ var sortable = (function () {
                     $(e.target).attr('desc', '')
                 }
 
-                dataLoader(table).loadData(1);
+                dataLoader.loadData(table, 1);
             });
         },
     }

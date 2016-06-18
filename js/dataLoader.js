@@ -1,8 +1,9 @@
-var paginator = require('../js/paginator.js');
 
-var dataLoader = function (table) {
-    return {
-        loadData: function (page, isUpdatePaginator) {
+var dataLoader = (function () {
+    var paginator = require('../js/paginator.js');
+
+    var dataLoader = {
+        loadData: function (table, page, isUpdatePaginator) {
             paginator(table).updatePaginator = paginator(table).updatePaginator || true;
 
             $.ajax({
@@ -15,7 +16,7 @@ var dataLoader = function (table) {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(data.data);
+                    refreshPageData(table, data.data);
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
@@ -24,7 +25,7 @@ var dataLoader = function (table) {
         }
     };
 
-    function refreshPageData(data) {
+    function refreshPageData(table, data) {
         table.data = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
@@ -33,21 +34,35 @@ var dataLoader = function (table) {
             var $row = $('<tr>');
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
-                var $col = $('<td>').html(render(table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
+                var $col = $('<td>').html(render(table, table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
+
+            formatRow(table, $row);
 
             $tbody.append($row);
         }
     }
 
-    function render(colName, content) {
+    function render(table, colName, content) {
         if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
             return table.settings.columns[colName].render(content);
         };
 
         return content;
     }
-};
+
+    function formatRow(table, $row) {
+        if (isSelected(table, $row)) {
+            $row.css('backgroundColor', table.settings.colors.selectedRow);
+        }
+    }
+
+    function isSelected(table, $row) {
+        return table.store.selectedRows.includes($row[0])
+    }
+
+    return dataLoader;
+} ());
 
 module.exports = dataLoader;

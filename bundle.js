@@ -1,38 +1,41 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // // Some code
 var vDataTable = require('../js/v-data-table.js');
-// var $ = require('jquery');
 
 var tb = vDataTable().init('#table', {
-    ajax: {
-        url: 'http://localhost:65219/home/index'
-    },
-    columns: {
-      Salary: {
-        render: function(content) {
-          return '**' + content + '$$$**';
-        }
-      },
-      Actions: {
-          render: function() {
-            return '<button>button</button>';
-          }
+  ajax: {
+    url: 'http://localhost:65219/home/index'
+  },
+  columns: {
+    Salary: {
+      render: function (content) {
+        return '**' + content + '$$$**';
       }
     },
-    features: {
-      // selectable: true
-      selectable: function($row) {
-        return $row.html();
+    Actions: {
+      render: function () {
+        return '<button>button</button>';
       }
     }
+  },
+  features: {
+    // selectable: true
+    selectable: function ($row) {
+      return $row.children().first('td').html();
+    }
+  }
 });
 
+$('#btnGetSelected').on('click', function () {
+  tb.getSelected();
+});
 },{"../js/v-data-table.js":7}],2:[function(require,module,exports){
-var paginator = require('../js/paginator.js');
 
-var dataLoader = function (table) {
-    return {
-        loadData: function (page, isUpdatePaginator) {
+var dataLoader = (function () {
+    var paginator = require('../js/paginator.js');
+
+    var dataLoader = {
+        loadData: function (table, page, isUpdatePaginator) {
             paginator(table).updatePaginator = paginator(table).updatePaginator || true;
 
             $.ajax({
@@ -45,7 +48,7 @@ var dataLoader = function (table) {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(data.data);
+                    refreshPageData(table, data.data);
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
@@ -54,7 +57,7 @@ var dataLoader = function (table) {
         }
     };
 
-    function refreshPageData(data) {
+    function refreshPageData(table, data) {
         table.data = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
@@ -63,35 +66,48 @@ var dataLoader = function (table) {
             var $row = $('<tr>');
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
-                var $col = $('<td>').html(render(table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
+                var $col = $('<td>').html(render(table, table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
+
+            formatRow(table, $row);
 
             $tbody.append($row);
         }
     }
 
-    function render(colName, content) {
+    function render(table, colName, content) {
         if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
             return table.settings.columns[colName].render(content);
         };
 
         return content;
     }
-};
+
+    function formatRow(table, $row) {
+        if (isSelected(table, $row)) {
+            $row.css('backgroundColor', table.settings.colors.selectedRow);
+        }
+    }
+
+    function isSelected(table, $row) {
+        return table.store.selectedRows.includes($row[0])
+    }
+
+    return dataLoader;
+} ());
 
 module.exports = dataLoader;
 },{"../js/paginator.js":4}],3:[function(require,module,exports){
-var dataLoader = require('../js/dataLoader.js');
-
 var filter = (function () {
     'use strict';
+    var dataLoader = require('../js/dataLoader.js');
 
     return {
         setFilterEvent: function (table) {
             var $filter = $(table.$table[0]).find('.filter');
             $filter.on('change', function () {
-                dataLoader(table).loadData(1, true);
+                dataLoader.loadData(table, 1, true);
             });
         }
     };
@@ -100,6 +116,8 @@ var filter = (function () {
 module.exports = filter;
 },{"../js/dataLoader.js":2}],4:[function(require,module,exports){
 var paginator = function (table) {
+    var dataLoader = require('../js/dataLoader.js');
+
     var paginator = {
         setPaginator: function (start, end, activePage) {
             table.paginator.start = start;
@@ -140,7 +158,7 @@ var paginator = function (table) {
             }
 
             table.paginator.$paginator = paginator.setPaginator(start, end, page);
-            paginator.setPageClickEvents();
+            paginator.setPageClickEvents(this);
         },
 
         setPageClickEvents: function () {
@@ -149,7 +167,7 @@ var paginator = function (table) {
                 table.paginator.$paginator.children('li').removeClass('active');
                 $(e.target).parent().addClass('active');
 
-                loadData(page, page == table.paginator.start || page == table.paginator.end);
+                dataLoader.loadData(table, page, page == table.paginator.start || page == table.paginator.end);
             });
         }
     };
@@ -158,13 +176,14 @@ var paginator = function (table) {
 };
 
 module.exports = paginator;
-},{}],5:[function(require,module,exports){
+},{"../js/dataLoader.js":2}],5:[function(require,module,exports){
 // var $ = require('jquery');
 
 var selectable = (function () {
-    return {
+    var selectable = {
         makeSelectable: function (table) {
             var $tbody = table.$table.find('tbody');
+
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').first();
 
@@ -183,6 +202,22 @@ var selectable = (function () {
                     $row.css('background-color', 'gray');
                 }
             });
+        },
+
+        getSelected: function (table) {
+            var result = [];
+            var selectedRows = table.store.selectedRows;
+            var delegate = table.settings.features.selectable;
+
+            if (selectedRows == null || selectedRows.length == 0) {
+                return null;
+            }
+
+            for (var i = 0, l = selectedRows.length; i < l; i += 1) {
+                result.push(delegate($(selectedRows[i])));
+            }
+
+            console.log(result);
         }
     };
 
@@ -195,13 +230,15 @@ var selectable = (function () {
         arr.splice(index, 1);
     }
 
+    return selectable;
 })();
 
 module.exports = selectable;
 },{}],6:[function(require,module,exports){
-var dataLoader = require('../js/dataLoader.js');
-
 var sortable = (function () {
+    'use strict';
+    var dataLoader = require('../js/dataLoader.js');
+
     return {
         formatSortables: function (table) {
             var $sortables = table.$table.find('thead tr:last-child th[sortable]');
@@ -221,7 +258,7 @@ var sortable = (function () {
                     $(e.target).attr('desc', '')
                 }
 
-                dataLoader(table).loadData(1);
+                dataLoader.loadData(table, 1);
             });
         },
     }
@@ -229,7 +266,6 @@ var sortable = (function () {
 
 module.exports = sortable;
 },{"../js/dataLoader.js":2}],7:[function(require,module,exports){
-// var $ = require('jquery');
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -274,17 +310,23 @@ vDataTable = function () {
         colors: {
           selectedRow: 'gray',
         },
-        pageSize: settings.pageSize || defaultSettings.pageSize
+        pageSize: settings.pageSize || defaultSettings.pageSize,
+        features: {
+          selectable: settings.features.selectable
+        },
+        columns: settings.columns || {}
       }
 
       paginator(this).setPageClickEvents(this);
       filter.setFilterEvent(this);
       sortable.formatSortables(this);
-      dataLoader(table).loadData(1);
+      dataLoader.loadData(table, 1);
 
       if (settings.features) {
         processFeatures(settings.features);
       };
+
+      return this;
     },
 
     get settings() {
@@ -302,6 +344,10 @@ vDataTable = function () {
     get filter() {
       var $filter = $(table.$table[0]).find('.filter');
       return $filter.val();
+    },
+
+    getSelected: function () {
+      return selectable.getSelected(this);
     }
   };
 

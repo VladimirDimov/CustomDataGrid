@@ -1,4 +1,3 @@
-// var $ = require('jquery');
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -43,17 +42,23 @@ vDataTable = function () {
         colors: {
           selectedRow: 'gray',
         },
-        pageSize: settings.pageSize || defaultSettings.pageSize
+        pageSize: settings.pageSize || defaultSettings.pageSize,
+        features: {
+          selectable: settings.features.selectable
+        },
+        columns: settings.columns || {}
       }
 
       paginator(this).setPageClickEvents(this);
       filter.setFilterEvent(this);
       sortable.formatSortables(this);
-      dataLoader(table).loadData(1);
+      dataLoader.loadData(table, 1);
 
       if (settings.features) {
         processFeatures(settings.features);
       };
+
+      return this;
     },
 
     get settings() {
@@ -71,6 +76,10 @@ vDataTable = function () {
     get filter() {
       var $filter = $(table.$table[0]).find('.filter');
       return $filter.val();
+    },
+
+    getSelected: function () {
+      return selectable.getSelected(this);
     }
   };
 

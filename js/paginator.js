@@ -1,4 +1,6 @@
 var paginator = function (table) {
+    var dataLoader = require('../js/dataLoader.js');
+
     var paginator = {
         setPaginator: function (start, end, activePage) {
             table.paginator.start = start;
@@ -39,7 +41,7 @@ var paginator = function (table) {
             }
 
             table.paginator.$paginator = paginator.setPaginator(start, end, page);
-            paginator.setPageClickEvents();
+            paginator.setPageClickEvents(this);
         },
 
         setPageClickEvents: function () {
@@ -48,7 +50,7 @@ var paginator = function (table) {
                 table.paginator.$paginator.children('li').removeClass('active');
                 $(e.target).parent().addClass('active');
 
-                loadData(page, page == table.paginator.start || page == table.paginator.end);
+                dataLoader.loadData(table, page, page == table.paginator.start || page == table.paginator.end);
             });
         }
     };
