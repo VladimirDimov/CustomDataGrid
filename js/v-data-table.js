@@ -1,4 +1,9 @@
-vDataTable = (function() {
+var $ = require('jquery');
+var selectable = require('../js/selectable.js');
+
+vDataTable = function () {
+  'use strict'
+
   var defaultSettings = {
     pageSize: 5,
     paginator: {
@@ -11,7 +16,7 @@ vDataTable = (function() {
   };
 
   var table = {
-    init: function(selector, settings) {
+    init: function (selector, settings) {
       this._$table = $(selector).first();
       this._$table._currentPage = 1;
       this._settings = settings;
@@ -22,6 +27,11 @@ vDataTable = (function() {
       this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
       this._paginator.$paginator = setPaginator(1, this._paginator.length, 1);
       this._columnPropertyNames = setColumnPropertyNames();
+
+      // Data
+      this.data = {
+        selectedRows: [],
+      };
 
       setPageClickEvents();
       setFilterEvent();
@@ -53,24 +63,27 @@ vDataTable = (function() {
 
   function processFeatures(features) {
     if (features.selectable) {
-      makeSelectable();
+      selectable.makeSelectable(table);
     };
   }
 
-  function makeSelectable() {
-    var $tbody = table.$table.find('tbody');
-    $tbody.on('click', function(e) {
-      $row = $(e.target).parentsUntil('tbody');
+  // function makeSelectable() {
+  //   var $tbody = table.$table.find('tbody');
+  //   $tbody.on('click', function (e) {
+  //     $row = $(e.target).parentsUntil('tbody');
 
-      $tbody.find('tr').css('background-color', 'white');
-      $row.css('background-color', 'gray');
-    });
-  }
+  //     if (!e.ctrlKey) {
+  //       $tbody.find('tr').css('background-color', 'white');
+  //     }
+
+  //     $row.css('background-color', 'gray');
+  //   });
+  // }
 
   function formatSortables() {
     var $sortables = table.$table.find('thead tr:last-child th[sortable]');
 
-    $sortables.on('click', function(e) {
+    $sortables.on('click', function (e) {
       var name = $(e.target).attr('data-colName');
       var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
       table.orderBy = {
@@ -111,7 +124,7 @@ vDataTable = (function() {
         orderBy: table.orderBy ? table.orderBy.Name : null,
         asc: table.orderBy ? table.orderBy.Asc : true
       },
-      success: function(data) {
+      success: function (data) {
         refreshPageData(data.data);
         if (isUpdatePaginator) {
           updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
@@ -143,7 +156,7 @@ vDataTable = (function() {
   };
 
   function setPageClickEvents() {
-    table.paginator.$paginator.on('click', 'li>a', function(e) {
+    table.paginator.$paginator.on('click', 'li>a', function (e) {
       var page = $(e.target).html();
       table.paginator.$paginator.children('li').removeClass('active');
       $(e.target).parent().addClass('active');
@@ -158,7 +171,7 @@ vDataTable = (function() {
 
   function setFilterEvent() {
     var $filter = $(table.$table[0]).find('.filter');
-    $filter.on('change', function() {
+    $filter.on('change', function () {
       loadData(1, true);
     });
   }
@@ -209,4 +222,6 @@ vDataTable = (function() {
   };
 
   return table;
-});
+};
+
+module.exports = vDataTable;
