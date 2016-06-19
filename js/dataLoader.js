@@ -1,6 +1,7 @@
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
+    var selectable = require('../js/selectable.js');
 
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
@@ -9,6 +10,8 @@ var dataLoader = (function () {
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
+                    identifierPropName: table.settings.features.selectable.identifier,
+                    getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
                     filter: table.filter,
@@ -16,7 +19,8 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(table, data.data);
+                    refreshPageData(table, data.data, data.identifiers);
+
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
@@ -25,7 +29,7 @@ var dataLoader = (function () {
         }
     };
 
-    function refreshPageData(table, data) {
+    function refreshPageData(table, data, identifiers) {
         table.data = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
@@ -39,6 +43,11 @@ var dataLoader = (function () {
             }
 
             formatRow(table, $row);
+            $row.attr('data-identifier', data[row][table.settings.features.selectable.identifier]);
+
+            if(table.store.identifiers === null) {
+                selectable.initIdentifiers(table, identifiers);
+            }
 
             $tbody.append($row);
         }

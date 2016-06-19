@@ -31,7 +31,8 @@ vDataTable = function () {
 
       // Data
       this.store = {
-        selectedRows: []
+        selectedRows: [],
+        identifiers: null,
       };
 
       // Settings
@@ -84,7 +85,7 @@ vDataTable = function () {
   };
 
   function processFeatures(features) {
-    if (features.selectable) {
+    if (features.selectable.active && features.selectable.active == true) {
       selectable.makeSelectable(table);
     };
   }

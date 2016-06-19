@@ -1,5 +1,3 @@
-// var $ = require('jquery');
-
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -39,6 +37,17 @@ var selectable = (function () {
             }
 
             console.log(result);
+        },
+
+        initIdentifiers(table, identifiers) {
+            table.store.identifiers = [];
+
+            for (var i = 0, l = identifiers.length; i < l; i += 1) {
+                table.store.identifiers.push({
+                    selected: false,
+                    identifier: identifiers[i]
+                });
+            }
         }
     };
 

@@ -18,9 +18,12 @@ var tb = vDataTable().init('#table', {
     }
   },
   features: {
-    // selectable: true
-    selectable: function ($row) {
-      return $row.children().first('td').html();
+    selectable: {
+      active: true,
+      identifier: 'Id',
+      selectFunction: function ($row) {
+        return $row.children().first('td').html();
+      }
     }
   }
 });

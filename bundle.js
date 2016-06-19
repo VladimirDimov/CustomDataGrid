@@ -19,9 +19,12 @@ var tb = vDataTable().init('#table', {
     }
   },
   features: {
-    // selectable: true
-    selectable: function ($row) {
-      return $row.children().first('td').html();
+    selectable: {
+      active: true,
+      identifier: 'Id',
+      selectFunction: function ($row) {
+        return $row.children().first('td').html();
+      }
     }
   }
 });
@@ -33,6 +36,7 @@ $('#btnGetSelected').on('click', function () {
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
+    var selectable = require('../js/selectable.js');
 
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
@@ -41,6 +45,8 @@ var dataLoader = (function () {
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
+                    identifierPropName: table.settings.features.selectable.identifier,
+                    getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
                     filter: table.filter,
@@ -48,7 +54,8 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(table, data.data);
+                    refreshPageData(table, data.data, data.identifiers);
+
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
@@ -57,7 +64,7 @@ var dataLoader = (function () {
         }
     };
 
-    function refreshPageData(table, data) {
+    function refreshPageData(table, data, identifiers) {
         table.data = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
@@ -71,6 +78,11 @@ var dataLoader = (function () {
             }
 
             formatRow(table, $row);
+            $row.attr('data-identifier', data[row][table.settings.features.selectable.identifier]);
+
+            if(table.store.identifiers === null) {
+                selectable.initIdentifiers(table, identifiers);
+            }
 
             $tbody.append($row);
         }
@@ -98,7 +110,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":4}],3:[function(require,module,exports){
+},{"../js/paginator.js":4,"../js/selectable.js":5}],3:[function(require,module,exports){
 var filter = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -177,8 +189,6 @@ var paginator = function (table) {
 
 module.exports = paginator;
 },{"../js/dataLoader.js":2}],5:[function(require,module,exports){
-// var $ = require('jquery');
-
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -218,6 +228,17 @@ var selectable = (function () {
             }
 
             console.log(result);
+        },
+
+        initIdentifiers(table, identifiers) {
+            table.store.identifiers = [];
+
+            for (var i = 0, l = identifiers.length; i < l; i += 1) {
+                table.store.identifiers.push({
+                    selected: false,
+                    identifier: identifiers[i]
+                });
+            }
         }
     };
 
@@ -299,7 +320,8 @@ vDataTable = function () {
 
       // Data
       this.store = {
-        selectedRows: []
+        selectedRows: [],
+        identifiers: null,
       };
 
       // Settings
@@ -352,7 +374,7 @@ vDataTable = function () {
   };
 
   function processFeatures(features) {
-    if (features.selectable) {
+    if (features.selectable.active && features.selectable.active == true) {
       selectable.makeSelectable(table);
     };
   }

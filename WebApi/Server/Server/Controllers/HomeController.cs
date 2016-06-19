@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Http.Cors;
 using System.Web.Mvc;
@@ -12,7 +13,14 @@ namespace Server.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HomeController : Controller
     {
-        public ActionResult Index(int page, int pageSize, string filter, string orderBy, bool asc)
+        public ActionResult Index(
+            int page,
+            int pageSize,
+            string filter,
+            string orderBy,
+            bool asc,
+            string identifierPropName,
+            bool getIdentifiers = false)
         {
             // Get data
             var reqData = Request.Params;
@@ -24,6 +32,15 @@ namespace Server.Controllers
 
             var data = JsonConvert.DeserializeObject<Data>(jsonData);
 
+            PropertyInfo identifierPropInfo = null;
+            if (getIdentifiers && !string.IsNullOrEmpty(identifierPropName))
+            {
+                var val = data.data.GetType()
+                    .GetGenericArguments().FirstOrDefault();
+
+                identifierPropInfo = val
+                   .GetProperty(identifierPropName);
+            }
 
             // Set page
             var filteredData = data.data
@@ -47,6 +64,9 @@ namespace Server.Controllers
 
             return this.Json(new
             {
+                identifiers = getIdentifiers && identifierPropInfo != null ?
+                                data.data.Select(x => identifierPropInfo.GetValue(x)) :
+                                null,
                 data = resultData,
                 rowsNumber = filteredData.Count()
             },
@@ -69,11 +89,13 @@ namespace Server.Controllers
 
         public string recordsFiltered { get; set; }
 
-        public ICollection<Person> data { get; set; }
+        public List<Person> data { get; set; }
     }
 
     public class Person
     {
+        public int Id { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
