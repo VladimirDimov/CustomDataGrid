@@ -71,16 +71,20 @@ var dataLoader = (function () {
         for (var row = 0; row < data.length; row++) {
             var element = data[row];
             var $row = $('<tr>');
+            var identifier = data[row][table.settings.features.selectable.identifier];
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
                 var $col = $('<td>').html(render(table, table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
 
-            formatRow(table, $row);
-            $row.attr('data-identifier', data[row][table.settings.features.selectable.identifier]);
+            if (table.store.identifiers != null) {
+                formatRowSelected(table, $row, identifier);
+            }
 
-            if(table.store.identifiers === null) {
+            $row.attr('data-identifier', identifier);
+
+            if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
 
@@ -96,14 +100,19 @@ var dataLoader = (function () {
         return content;
     }
 
-    function formatRow(table, $row) {
-        if (isSelected(table, $row)) {
+    function formatRowSelected(table, $row, identifier) {
+        if (isSelected(table, identifier)) {
             $row.css('backgroundColor', table.settings.colors.selectedRow);
         }
     }
 
-    function isSelected(table, $row) {
-        return table.store.selectedRows.includes($row[0])
+    function isSelected(table, identifier) {
+        var identifiers = table.store.identifiers;
+        var status = identifiers.filter(function (element) {
+            return element.identifier == identifier;
+        })[0].selected;
+
+        return status;
     }
 
     return dataLoader;
@@ -196,19 +205,22 @@ var selectable = (function () {
 
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').first();
+                var identifier = $row.attr('data-identifier');
 
                 if (!e.ctrlKey && !isSelected(table, $row)) {
                     $tbody.find('tr').css('background-color', 'white');
                     table.store.selectedRows = [];
-
-                    $row.css('background-color', 'gray');
+                    selectable.unselectAll(table);
+                    // $row.css('background-color', 'gray');
                 }
 
                 if (isSelected(table, $row)) {
                     RemoveFromArray($row[0], table.store.selectedRows);
+                    setIdentifierSelectStatus(table, identifier, false);
                     $row.css('background-color', 'white');
                 } else {
                     table.store.selectedRows.push($row[0]);
+                    setIdentifierSelectStatus(table, identifier, true);
                     $row.css('background-color', 'gray');
                 }
             });
@@ -239,6 +251,16 @@ var selectable = (function () {
                     identifier: identifiers[i]
                 });
             }
+        },
+
+        unselectAll: function (table) {
+            if (table.store.identifiers) {
+                table.store.identifiers.map(function (elem) {
+                    elem.selected = false;
+
+                    return elem;
+                });
+            }
         }
     };
 
@@ -249,6 +271,16 @@ var selectable = (function () {
     function RemoveFromArray(element, arr) {
         var index = arr.indexOf(element);
         arr.splice(index, 1);
+    }
+
+    function setIdentifierSelectStatus(table, identifier, selected) {
+        var identifiers = table.store.identifiers;
+
+        var element = identifiers.filter(function (element) {
+            return element.identifier == identifier;
+        })[0];
+
+        element.selected = selected;
     }
 
     return selectable;

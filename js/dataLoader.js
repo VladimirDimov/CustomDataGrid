@@ -36,16 +36,20 @@ var dataLoader = (function () {
         for (var row = 0; row < data.length; row++) {
             var element = data[row];
             var $row = $('<tr>');
+            var identifier = data[row][table.settings.features.selectable.identifier];
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
                 var $col = $('<td>').html(render(table, table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
 
-            formatRow(table, $row);
-            $row.attr('data-identifier', data[row][table.settings.features.selectable.identifier]);
+            if (table.store.identifiers != null) {
+                formatRowSelected(table, $row, identifier);
+            }
 
-            if(table.store.identifiers === null) {
+            $row.attr('data-identifier', identifier);
+
+            if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
 
@@ -61,14 +65,19 @@ var dataLoader = (function () {
         return content;
     }
 
-    function formatRow(table, $row) {
-        if (isSelected(table, $row)) {
+    function formatRowSelected(table, $row, identifier) {
+        if (isSelected(table, identifier)) {
             $row.css('backgroundColor', table.settings.colors.selectedRow);
         }
     }
 
-    function isSelected(table, $row) {
-        return table.store.selectedRows.includes($row[0])
+    function isSelected(table, identifier) {
+        var identifiers = table.store.identifiers;
+        var status = identifiers.filter(function (element) {
+            return element.identifier == identifier;
+        })[0].selected;
+
+        return status;
     }
 
     return dataLoader;

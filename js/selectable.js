@@ -5,19 +5,22 @@ var selectable = (function () {
 
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').first();
+                var identifier = $row.attr('data-identifier');
 
                 if (!e.ctrlKey && !isSelected(table, $row)) {
                     $tbody.find('tr').css('background-color', 'white');
                     table.store.selectedRows = [];
-
-                    $row.css('background-color', 'gray');
+                    selectable.unselectAll(table);
+                    // $row.css('background-color', 'gray');
                 }
 
                 if (isSelected(table, $row)) {
                     RemoveFromArray($row[0], table.store.selectedRows);
+                    setIdentifierSelectStatus(table, identifier, false);
                     $row.css('background-color', 'white');
                 } else {
                     table.store.selectedRows.push($row[0]);
+                    setIdentifierSelectStatus(table, identifier, true);
                     $row.css('background-color', 'gray');
                 }
             });
@@ -48,6 +51,16 @@ var selectable = (function () {
                     identifier: identifiers[i]
                 });
             }
+        },
+
+        unselectAll: function (table) {
+            if (table.store.identifiers) {
+                table.store.identifiers.map(function (elem) {
+                    elem.selected = false;
+
+                    return elem;
+                });
+            }
         }
     };
 
@@ -58,6 +71,16 @@ var selectable = (function () {
     function RemoveFromArray(element, arr) {
         var index = arr.indexOf(element);
         arr.splice(index, 1);
+    }
+
+    function setIdentifierSelectStatus(table, identifier, selected) {
+        var identifiers = table.store.identifiers;
+
+        var element = identifiers.filter(function (element) {
+            return element.identifier == identifier;
+        })[0];
+
+        element.selected = selected;
     }
 
     return selectable;
