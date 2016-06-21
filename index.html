@@ -13,13 +13,17 @@
     <table id="table" class="display table table-hover" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th><span>Search:</span><input type="text" class="filter"></th>
+                <th colspan="7">
+                    <span>Search:</span><input type="text" class="filter">
+                    <button id="selectAll">Select All</button>
+                    <button id="unselectAll">Unselect All</button>
+                </th>
             </tr>
             <tr>
                 <th data-colName="FirstName" sortable>First Name</th>
                 <th data-colName="LastName" sortable>Last Name</th>
                 <th data-ColName="Position">Position</th>
-                <th data-colName="Occupation">Occupation</th>
+                <th data-colName="Occupation" sortable>Occupation</th>
                 <th data-colName="StartDate">Start Date</th>
                 <th data-colName="Salary">Salary</th>
                 <th data-colName="Actions">Actions</th>
@@ -31,8 +35,7 @@
     </table>
 
     <button id="btnGetSelected">Get Selected</button>
-    <!--<script src="./js/v-data-table.js"></script>
-    <script src="./js/app.js"></script>-->
+
     <script src="bundle.js"></script>-->
 </body>
 

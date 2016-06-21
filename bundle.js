@@ -30,7 +30,16 @@ var tb = vDataTable().init('#table', {
 });
 
 $('#btnGetSelected').on('click', function () {
-  tb.getSelected();
+  var selectedIdentifiers = tb.getSelected();
+  console.log(selectedIdentifiers);
+});
+
+$('#selectAll').on('click', function () {
+  tb.selectAll();
+});
+
+$('#unselectAll').on('click', function () {
+  tb.unselectAll();
 });
 },{"../js/v-data-table.js":7}],2:[function(require,module,exports){
 
@@ -209,7 +218,6 @@ var selectable = (function () {
 
                 if (!e.ctrlKey && !isSelected(table, $row)) {
                     $tbody.find('tr').css('background-color', 'white');
-                    table.store.selectedRows = [];
                     selectable.unselectAll(table);
                     // $row.css('background-color', 'gray');
                 }
@@ -219,27 +227,29 @@ var selectable = (function () {
                     setIdentifierSelectStatus(table, identifier, false);
                     $row.css('background-color', 'white');
                 } else {
-                    table.store.selectedRows.push($row[0]);
                     setIdentifierSelectStatus(table, identifier, true);
                     $row.css('background-color', 'gray');
                 }
             });
+
+            table.selectAll = function () {
+                selectable.selectAll(table);
+                refreshPageSelection(table);
+            };
+
+            table.unselectAll = function () {
+                selectable.unselectAll(table);
+            };
         },
 
         getSelected: function (table) {
-            var result = [];
-            var selectedRows = table.store.selectedRows;
-            var delegate = table.settings.features.selectable;
+            var selectedIdentifiers = table.store.identifiers.filter(function (elem) {
+                return elem.selected === true;
+            }).map(function (elem) {
+                return elem.identifier;
+            });
 
-            if (selectedRows == null || selectedRows.length == 0) {
-                return null;
-            }
-
-            for (var i = 0, l = selectedRows.length; i < l; i += 1) {
-                result.push(delegate($(selectedRows[i])));
-            }
-
-            console.log(result);
+            console.log(selectedIdentifiers);
         },
 
         initIdentifiers(table, identifiers) {
@@ -260,9 +270,34 @@ var selectable = (function () {
 
                     return elem;
                 });
+
+                refreshPageSelection(table);
+            }
+        },
+
+        selectAll: function (table) {
+            if (table.store.identifiers) {
+                table.store.identifiers.map(function (elem) {
+                    elem.selected = true;
+
+                    return elem;
+                });
             }
         }
     };
+
+    function refreshPageSelection(table) {
+        var tableRows = table.$table.find('tbody tr').slice();
+        for (var i = 0, l = tableRows.length; i < l; i += 1) {
+            var $row = $(tableRows[i]);
+            var rowIdentifier = $row.attr('data-identifier');
+            if (table.store.identifiers[rowIdentifier].selected) {
+                $row.css('background-color', 'gray');
+            } else {
+                $row.css('background-color', '');
+            }
+        }
+    }
 
     function isSelected(table, $row) {
         return table.store.selectedRows.includes($row[0])

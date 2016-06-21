@@ -29,5 +29,14 @@ var tb = vDataTable().init('#table', {
 });
 
 $('#btnGetSelected').on('click', function () {
-  tb.getSelected();
+  var selectedIdentifiers = tb.getSelected();
+  console.log(selectedIdentifiers);
+});
+
+$('#selectAll').on('click', function () {
+  tb.selectAll();
+});
+
+$('#unselectAll').on('click', function () {
+  tb.unselectAll();
 });
