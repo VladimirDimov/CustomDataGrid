@@ -20,6 +20,7 @@ vDataTable = function () {
 
   var table = {
     init: function (selector, settings) {
+      var tb = {};
       this._$table = $(selector).first();
       this._$table._currentPage = 1;
 

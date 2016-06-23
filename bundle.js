@@ -25,6 +25,9 @@ var tb = vDataTable().init('#table', {
       selectFunction: function ($row) {
         return $row.children().first('td').html();
       }
+    },
+    filter: {
+      
     }
   }
 });
@@ -77,6 +80,7 @@ var dataLoader = (function () {
         table.data = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
+        debugger;
         for (var row = 0; row < data.length; row++) {
             var element = data[row];
             var $row = $('<tr>');
@@ -376,6 +380,7 @@ vDataTable = function () {
 
   var table = {
     init: function (selector, settings) {
+      var tb = {};
       this._$table = $(selector).first();
       this._$table._currentPage = 1;
 

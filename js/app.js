@@ -24,6 +24,9 @@ var tb = vDataTable().init('#table', {
       selectFunction: function ($row) {
         return $row.children().first('td').html();
       }
+    },
+    filter: {
+      
     }
   }
 });

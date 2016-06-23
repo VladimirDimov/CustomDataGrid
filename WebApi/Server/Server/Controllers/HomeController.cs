@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Web;
 using System.Web.Http.Cors;
 using System.Web.Mvc;
@@ -44,7 +45,7 @@ namespace Server.Controllers
 
             // Set page
             var filteredData = data.data
-                .Where(x => filter == null ? true : x.FirstName.Contains(filter));
+                .Where(x => filter == null ? true : this.ConcatProperties(x).ToLower().Contains(filter.ToLower()));
 
             if (!string.IsNullOrEmpty(orderBy))
             {
@@ -71,6 +72,18 @@ namespace Server.Controllers
                 rowsNumber = filteredData.Count()
             },
             JsonRequestBehavior.AllowGet);
+        }
+
+        private string ConcatProperties(object obj)
+        {
+            var propInfos = obj.GetType().GetProperties();
+            var builder = new StringBuilder();
+            foreach (var propInfo in propInfos)
+            {
+                builder.Append(propInfo.GetValue(obj));
+            }
+
+            return builder.ToString();
         }
     }
 
