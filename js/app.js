@@ -13,7 +13,7 @@ var tb = vDataTable().init('#table', {
     },
     Actions: {
       render: function () {
-        return '<button>button</button>';
+        return '<button class="btn-edit">Edit</button>';
       }
     }
   },
@@ -35,6 +35,14 @@ var tb = vDataTable().init('#table', {
       }
     }
   }
+});
+
+$('table').on('click', function (e) {
+  if (!$(e.target).hasClass('btn-edit')) return;
+  var $row = $(e.target).parent().parent();
+  var $cols = $row.find('td');
+
+  tb.edit($row);
 });
 
 $('#btnGetSelected').on('click', function () {

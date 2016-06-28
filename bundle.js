@@ -14,7 +14,7 @@ var tb = vDataTable().init('#table', {
     },
     Actions: {
       render: function () {
-        return '<button>button</button>';
+        return '<button class="btn-edit">Edit</button>';
       }
     }
   },
@@ -36,6 +36,14 @@ var tb = vDataTable().init('#table', {
       }
     }
   }
+});
+
+$('table').on('click', function (e) {
+  if (!$(e.target).hasClass('btn-edit')) return;
+  var $row = $(e.target).parent().parent();
+  var $cols = $row.find('td');
+
+  tb.edit($row);
 });
 
 $('#btnGetSelected').on('click', function () {
@@ -144,7 +152,14 @@ var editable = (function () {
     var editable = {
         init: function (table) {
             table.edit = function ($row) {
+                var $tds = $row.find('td');
 
+                for (var editObj in table.settings.features.editable) {
+                    var colIndex = getColumnIndex(table, editObj);
+                    table.settings.features.editable[editObj]($($tds[colIndex]));
+                }
+
+                debugger;
             }
         }
     };
@@ -242,7 +257,7 @@ var selectable = (function () {
             var $tbody = table.$table.find('tbody');
 
             $tbody.on('click', function (e) {
-                $row = $(e.target).parentsUntil('tbody').first();
+                $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');
 
                 if (!e.ctrlKey && !isSelected(table, $row)) {

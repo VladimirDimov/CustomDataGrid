@@ -4,7 +4,7 @@ var selectable = (function () {
             var $tbody = table.$table.find('tbody');
 
             $tbody.on('click', function (e) {
-                $row = $(e.target).parentsUntil('tbody').first();
+                $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');
 
                 if (!e.ctrlKey && !isSelected(table, $row)) {
