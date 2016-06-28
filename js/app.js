@@ -25,8 +25,14 @@ var tb = vDataTable().init('#table', {
         return $row.children().first('td').html();
       }
     },
-    filter: {
-      
+    // filter:  [names of the columns to be filtered]
+    editable: {
+      FirstName: function ($td) {
+        var val = $td.html();
+        var $input = $('<input>');
+        $input.val(val);
+        $td.html($input);
+      }
     }
   }
 });

@@ -3,6 +3,7 @@ var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
 var paginator = require('../js/paginator.js');
 var filter = require('../js/filter.js');
+var editable = require('../js/editable');
 
 vDataTable = function () {
   'use strict'
@@ -46,7 +47,8 @@ vDataTable = function () {
         },
         pageSize: settings.pageSize || defaultSettings.pageSize,
         features: {
-          selectable: settings.features.selectable
+          selectable: settings.features.selectable,
+          editable: settings.features.editable
         },
         columns: settings.columns || {}
       }
@@ -82,6 +84,10 @@ vDataTable = function () {
 
     getSelected: function () {
       return selectable.getSelected(this);
+    },
+
+    get columnPropertyNames() {
+      return this._columnPropertyNames;
     }
   };
 
@@ -89,6 +95,10 @@ vDataTable = function () {
     if (features.selectable.active && features.selectable.active == true) {
       selectable.makeSelectable(table);
     };
+
+    if (features.editable) {
+      editable.init(table);
+    }
   }
 
   function setColumnPropertyNames() {

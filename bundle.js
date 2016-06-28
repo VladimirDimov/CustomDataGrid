@@ -26,8 +26,14 @@ var tb = vDataTable().init('#table', {
         return $row.children().first('td').html();
       }
     },
-    filter: {
-      
+    // filter:  [names of the columns to be filtered]
+    editable: {
+      FirstName: function ($td) {
+        var val = $td.html();
+        var $input = $('<input>');
+        $input.val(val);
+        $td.html($input);
+      }
     }
   }
 });
@@ -44,7 +50,7 @@ $('#selectAll').on('click', function () {
 $('#unselectAll').on('click', function () {
   tb.unselectAll();
 });
-},{"../js/v-data-table.js":7}],2:[function(require,module,exports){
+},{"../js/v-data-table.js":8}],2:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
@@ -80,7 +86,7 @@ var dataLoader = (function () {
         table.data = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
-        debugger;
+
         for (var row = 0; row < data.length; row++) {
             var element = data[row];
             var $row = $('<tr>');
@@ -132,7 +138,26 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":4,"../js/selectable.js":5}],3:[function(require,module,exports){
+},{"../js/paginator.js":5,"../js/selectable.js":6}],3:[function(require,module,exports){
+var editable = (function () {
+    'use strict';
+    var editable = {
+        init: function (table) {
+            table.edit = function ($row) {
+
+            }
+        }
+    };
+
+    function getColumnIndex(table, colName) {
+        return table.columnPropertyNames.indexOf(colName);
+    }
+
+    return editable;
+} ());
+
+module.exports = editable;
+},{}],4:[function(require,module,exports){
 var filter = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -148,7 +173,7 @@ var filter = (function () {
 } ());
 
 module.exports = filter;
-},{"../js/dataLoader.js":2}],4:[function(require,module,exports){
+},{"../js/dataLoader.js":2}],5:[function(require,module,exports){
 var paginator = function (table) {
     var dataLoader = require('../js/dataLoader.js');
 
@@ -210,7 +235,7 @@ var paginator = function (table) {
 };
 
 module.exports = paginator;
-},{"../js/dataLoader.js":2}],5:[function(require,module,exports){
+},{"../js/dataLoader.js":2}],6:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -326,7 +351,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var sortable = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -357,12 +382,13 @@ var sortable = (function () {
 })();
 
 module.exports = sortable;
-},{"../js/dataLoader.js":2}],7:[function(require,module,exports){
+},{"../js/dataLoader.js":2}],8:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
 var paginator = require('../js/paginator.js');
 var filter = require('../js/filter.js');
+var editable = require('../js/editable');
 
 vDataTable = function () {
   'use strict'
@@ -406,7 +432,8 @@ vDataTable = function () {
         },
         pageSize: settings.pageSize || defaultSettings.pageSize,
         features: {
-          selectable: settings.features.selectable
+          selectable: settings.features.selectable,
+          editable: settings.features.editable
         },
         columns: settings.columns || {}
       }
@@ -442,6 +469,10 @@ vDataTable = function () {
 
     getSelected: function () {
       return selectable.getSelected(this);
+    },
+
+    get columnPropertyNames() {
+      return this._columnPropertyNames;
     }
   };
 
@@ -449,6 +480,10 @@ vDataTable = function () {
     if (features.selectable.active && features.selectable.active == true) {
       selectable.makeSelectable(table);
     };
+
+    if (features.editable) {
+      editable.init(table);
+    }
   }
 
   function setColumnPropertyNames() {
@@ -465,4 +500,4 @@ vDataTable = function () {
 };
 
 module.exports = vDataTable;
-},{"../js/dataLoader.js":2,"../js/filter.js":3,"../js/paginator.js":4,"../js/selectable.js":5,"../js/sortable.js":6}]},{},[1]);
+},{"../js/dataLoader.js":2,"../js/editable":3,"../js/filter.js":4,"../js/paginator.js":5,"../js/selectable.js":6,"../js/sortable.js":7}]},{},[1]);
