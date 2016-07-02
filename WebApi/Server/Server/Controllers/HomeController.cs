@@ -35,6 +35,28 @@ namespace Server.Controllers
 
             var data = JsonConvert.DeserializeObject<Data>(jsonData);
 
+            return View(data.data.AsQueryable());
+        }
+
+        public ActionResult IndexOld(
+            int page,
+            int pageSize,
+            string filter,
+            string orderBy,
+            bool asc,
+            string identifierPropName,
+            bool getIdentifiers = false)
+        {
+            // Get data
+            var reqData = Request.Params;
+            string jsonData = null;
+            using (var reader = new StreamReader(this.Server.MapPath("~/app_data/data.txt")))
+            {
+                jsonData = reader.ReadToEnd();
+            }
+
+            var data = JsonConvert.DeserializeObject<Data>(jsonData);
+
             PropertyInfo identifierPropInfo = null;
             if (getIdentifiers && !string.IsNullOrEmpty(identifierPropName))
             {
@@ -75,6 +97,7 @@ namespace Server.Controllers
             },
             JsonRequestBehavior.AllowGet);
         }
+
 
         private string ConcatProperties(object obj)
         {
