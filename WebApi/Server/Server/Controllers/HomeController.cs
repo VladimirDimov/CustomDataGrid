@@ -16,14 +16,7 @@ namespace Server.Controllers
     public class HomeController : Controller
     {
         [DataTableFilter]
-        public ActionResult Index(
-            int page,
-            int pageSize,
-            string filter,
-            string orderBy,
-            bool asc,
-            string identifierPropName,
-            bool getIdentifiers = false)
+        public ActionResult Index()
         {
             // Get data
             var reqData = Request.Params;

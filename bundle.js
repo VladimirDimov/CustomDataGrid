@@ -456,7 +456,7 @@ vDataTable = function () {
       paginator(this).setPageClickEvents(this);
       filter.setFilterEvent(this);
       sortable.formatSortables(this);
-      dataLoader.loadData(table, 1);
+      dataLoader.loadData(table, 1, true);
 
       if (settings.features) {
         processFeatures(settings.features);
