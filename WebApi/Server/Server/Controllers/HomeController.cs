@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Server.filters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ namespace Server.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HomeController : Controller
     {
+        [DataTableFilter]
         public ActionResult Index(
             int page,
             int pageSize,
@@ -96,11 +98,11 @@ namespace Server.Controllers
 
     public class Data
     {
-        public string draw { get; set; }
+        //public string draw { get; set; }
 
-        public string recordsTotal { get; set; }
+        //public string recordsTotal { get; set; }
 
-        public string recordsFiltered { get; set; }
+        //public string recordsFiltered { get; set; }
 
         public List<Person> data { get; set; }
     }
