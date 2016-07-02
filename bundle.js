@@ -28,11 +28,29 @@ var tb = vDataTable().init('#table', {
     },
     // filter:  [names of the columns to be filtered]
     editable: {
-      FirstName: function ($td) {
-        var val = $td.html();
-        var $input = $('<input>');
-        $input.val(val);
-        $td.html($input);
+      FirstName: {
+        edit: function ($td) {
+          var val = $td.html();
+          var $input = $('<input>');
+          $input.val(val);
+          $td.html($input);
+        },
+
+        save: function ($td) {
+          // TODO: Return {value: ..., render: 'html to render to'}
+        }
+      },
+      LastName: {
+        edit: function ($td) {
+          var val = $td.html();
+          var $input = $('<input>');
+          $input.val(val);
+          $td.html($input);
+        },
+
+        save: function ($td) {
+          // TODO: Return {value: ..., render: 'html to render to'}
+        }
       }
     }
   }
@@ -153,14 +171,19 @@ var editable = (function () {
         init: function (table) {
             table.edit = function ($row) {
                 var $tds = $row.find('td');
-
                 for (var editObj in table.settings.features.editable) {
                     var colIndex = getColumnIndex(table, editObj);
-                    table.settings.features.editable[editObj]($($tds[colIndex]));
+                    table.settings.features.editable[editObj].edit($($tds[colIndex]));
                 }
+            };
 
-                debugger;
-            }
+            table.save = function ($row) {
+                var $tds = $row.find('td');
+                for (var editObj in table.settings.features.editable) {
+                    var colIndex = getColumnIndex(table, editObj);
+                    table.settings.features.editable[editObj].save($($tds[colIndex]));
+                }
+            };
         }
     };
 
