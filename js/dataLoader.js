@@ -2,6 +2,7 @@
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
     var selectable = require('../js/selectable.js');
+    var tableRenderer = require('../js/table-renderer.js');
 
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
@@ -10,7 +11,7 @@ var dataLoader = (function () {
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
-                    identifierPropName: table.settings.features.selectable.identifier,
+                    identifierPropName: table.settings.features.identifier,
                     getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
@@ -30,17 +31,17 @@ var dataLoader = (function () {
     };
 
     function refreshPageData(table, data, identifiers) {
-        table.data = data;
+        table.store.pageData = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
 
         for (var row = 0; row < data.length; row++) {
-            var element = data[row];
+            var rowData = data[row];
             var $row = $('<tr>');
-            var identifier = data[row][table.settings.features.selectable.identifier];
+            var identifier = rowData[table.settings.features.identifier];
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
-                var $col = $('<td>').html(render(table, table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
+                var $col = $('<td>').html(tableRenderer.renderCell(table, table._columnPropertyNames[col], rowData[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
 
@@ -53,17 +54,9 @@ var dataLoader = (function () {
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
-
+            // var $row = tableRenderer.renderRow(table, rowData, identifiers);
             $tbody.append($row);
         }
-    }
-
-    function render(table, colName, content) {
-        if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-            return table.settings.columns[colName].render(content);
-        };
-
-        return content;
     }
 
     function formatRowSelected(table, $row, identifier) {

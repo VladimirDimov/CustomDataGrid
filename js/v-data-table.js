@@ -1,12 +1,12 @@
-var selectable = require('../js/selectable.js');
-var sortable = require('../js/sortable.js');
-var dataLoader = require('../js/dataLoader.js');
-var paginator = require('../js/paginator.js');
-var filter = require('../js/filter.js');
-var editable = require('../js/editable');
-
 vDataTable = function () {
   'use strict'
+  var selectable = require('../js/selectable.js');
+  var sortable = require('../js/sortable.js');
+  var dataLoader = require('../js/dataLoader.js');
+  var paginator = require('../js/paginator.js');
+  var filter = require('../js/filter.js');
+  var editable = require('../js/editable');
+
 
   var defaultSettings = {
     pageSize: 5,
@@ -35,6 +35,7 @@ vDataTable = function () {
       this.store = {
         selectedRows: [],
         identifiers: null,
+        pageData: null
       };
 
       // Settings
@@ -47,6 +48,7 @@ vDataTable = function () {
         },
         pageSize: settings.pageSize || defaultSettings.pageSize,
         features: {
+          identifier: settings.features.identifier,
           selectable: settings.features.selectable,
           editable: settings.features.editable
         },

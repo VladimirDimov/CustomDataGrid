@@ -14,14 +14,15 @@ var tb = vDataTable().init('#table', {
     },
     Actions: {
       render: function () {
-        return '<button class="btn-edit">Edit</button>';
+        return '<button class="btn-edit">Edit</button>' +
+          '<button class="btn-save">Save</button>';
       }
     }
   },
   features: {
+    identifier: 'Id',
     selectable: {
       active: true,
-      identifier: 'Id',
       selectFunction: function ($row) {
         return $row.children().first('td').html();
       }
@@ -37,7 +38,9 @@ var tb = vDataTable().init('#table', {
         },
 
         save: function ($td) {
-          // TODO: Return {value: ..., render: 'html to render to'}
+          var val = $td.find('input').first().val();
+          debugger;
+          return val;
         }
       },
       LastName: {
@@ -59,9 +62,14 @@ var tb = vDataTable().init('#table', {
 $('table').on('click', function (e) {
   if (!$(e.target).hasClass('btn-edit')) return;
   var $row = $(e.target).parent().parent();
-  var $cols = $row.find('td');
 
   tb.edit($row);
+});
+
+$('table').on('click', function (e) {
+  if (!$(e.target).hasClass('btn-save')) return;
+  var $row = $(e.target).parent().parent();
+  tb.save($row)
 });
 
 $('#btnGetSelected').on('click', function () {
@@ -76,11 +84,12 @@ $('#selectAll').on('click', function () {
 $('#unselectAll').on('click', function () {
   tb.unselectAll();
 });
-},{"../js/v-data-table.js":8}],2:[function(require,module,exports){
+},{"../js/v-data-table.js":9}],2:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
     var selectable = require('../js/selectable.js');
+    var tableRenderer = require('../js/table-renderer.js');
 
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
@@ -89,7 +98,7 @@ var dataLoader = (function () {
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
-                    identifierPropName: table.settings.features.selectable.identifier,
+                    identifierPropName: table.settings.features.identifier,
                     getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
@@ -109,17 +118,17 @@ var dataLoader = (function () {
     };
 
     function refreshPageData(table, data, identifiers) {
-        table.data = data;
+        table.store.pageData = data;
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
 
         for (var row = 0; row < data.length; row++) {
-            var element = data[row];
+            var rowData = data[row];
             var $row = $('<tr>');
-            var identifier = data[row][table.settings.features.selectable.identifier];
+            var identifier = rowData[table.settings.features.identifier];
 
             for (var col = 0; col < table._columnPropertyNames.length; col++) {
-                var $col = $('<td>').html(render(table, table._columnPropertyNames[col], element[table._columnPropertyNames[col]]));
+                var $col = $('<td>').html(tableRenderer.renderCell(table, table._columnPropertyNames[col], rowData[table._columnPropertyNames[col]]));
                 $row.append($col);
             }
 
@@ -132,17 +141,9 @@ var dataLoader = (function () {
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
-
+            // var $row = tableRenderer.renderRow(table, rowData, identifiers);
             $tbody.append($row);
         }
-    }
-
-    function render(table, colName, content) {
-        if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-            return table.settings.columns[colName].render(content);
-        };
-
-        return content;
     }
 
     function formatRowSelected(table, $row, identifier) {
@@ -164,8 +165,10 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":5,"../js/selectable.js":6}],3:[function(require,module,exports){
+},{"../js/paginator.js":5,"../js/selectable.js":6,"../js/table-renderer.js":8}],3:[function(require,module,exports){
 var editable = (function () {
+    var tableRenderer = require('../js/table-renderer.js');
+
     'use strict';
     var editable = {
         init: function (table) {
@@ -179,13 +182,30 @@ var editable = (function () {
 
             table.save = function ($row) {
                 var $tds = $row.find('td');
+                var pageData = table.store.pageData;
+                var identifierName = table.settings.features.identifier;
+                var identifierVal = $row.attr('data-identifier');
+                var rowData = pageData.filter(function (item) {
+                    return item[identifierName] == identifierVal;
+                })[0];
+
                 for (var editObj in table.settings.features.editable) {
                     var colIndex = getColumnIndex(table, editObj);
-                    table.settings.features.editable[editObj].save($($tds[colIndex]));
+                    var content = table.settings.features.editable[editObj].save($($tds[colIndex]));
+                    rowData[editObj] = content;
                 }
+
+                renderRow(table, rowData);
             };
         }
     };
+
+    function renderRow(table, rowData) {
+        var identifierName = table.settings.features.identifier;
+        var identifierVal = rowData[identifierName];
+        var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
+        debugger;
+    }
 
     function getColumnIndex(table, colName) {
         return table.columnPropertyNames.indexOf(colName);
@@ -195,7 +215,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{}],4:[function(require,module,exports){
+},{"../js/table-renderer.js":8}],4:[function(require,module,exports){
 var filter = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -422,14 +442,47 @@ var sortable = (function () {
 module.exports = sortable;
 },{"../js/dataLoader.js":2}],8:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
-var sortable = require('../js/sortable.js');
-var dataLoader = require('../js/dataLoader.js');
-var paginator = require('../js/paginator.js');
-var filter = require('../js/filter.js');
-var editable = require('../js/editable');
 
+var renderer = {
+
+    renderCell: function (table, colName, content) {
+        if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
+            return table.settings.columns[colName].render(content);
+        };
+
+        return content;
+    },
+
+    renderRow: function (table, rowData) {
+        var $row = $('<tr>');
+        var identifier = rowData[table.settings.features.identifier];
+
+        for (var col = 0; col < table._columnPropertyNames.length; col++) {
+            var $col = $('<td>').html(renderer.renderCell(table, table._columnPropertyNames[col], rowData[table._columnPropertyNames[col]]));
+            $row.append($col);
+        }
+
+        // if (table.store.identifiers != null) {
+        //     formatRowSelected(table, $row, identifier);
+        // }
+
+        $row.attr('data-identifier', identifier);
+
+        return $row;
+    }
+};
+
+module.exports = renderer;
+},{"../js/selectable.js":6}],9:[function(require,module,exports){
 vDataTable = function () {
   'use strict'
+  var selectable = require('../js/selectable.js');
+  var sortable = require('../js/sortable.js');
+  var dataLoader = require('../js/dataLoader.js');
+  var paginator = require('../js/paginator.js');
+  var filter = require('../js/filter.js');
+  var editable = require('../js/editable');
+
 
   var defaultSettings = {
     pageSize: 5,
@@ -458,6 +511,7 @@ vDataTable = function () {
       this.store = {
         selectedRows: [],
         identifiers: null,
+        pageData: null
       };
 
       // Settings
@@ -470,6 +524,7 @@ vDataTable = function () {
         },
         pageSize: settings.pageSize || defaultSettings.pageSize,
         features: {
+          identifier: settings.features.identifier,
           selectable: settings.features.selectable,
           editable: settings.features.editable
         },

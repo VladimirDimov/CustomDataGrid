@@ -13,14 +13,15 @@ var tb = vDataTable().init('#table', {
     },
     Actions: {
       render: function () {
-        return '<button class="btn-edit">Edit</button>';
+        return '<button class="btn-edit">Edit</button>' +
+          '<button class="btn-save">Save</button>';
       }
     }
   },
   features: {
+    identifier: 'Id',
     selectable: {
       active: true,
-      identifier: 'Id',
       selectFunction: function ($row) {
         return $row.children().first('td').html();
       }
@@ -36,7 +37,9 @@ var tb = vDataTable().init('#table', {
         },
 
         save: function ($td) {
-          // TODO: Return {value: ..., render: 'html to render to'}
+          var val = $td.find('input').first().val();
+          debugger;
+          return val;
         }
       },
       LastName: {
@@ -58,9 +61,14 @@ var tb = vDataTable().init('#table', {
 $('table').on('click', function (e) {
   if (!$(e.target).hasClass('btn-edit')) return;
   var $row = $(e.target).parent().parent();
-  var $cols = $row.find('td');
 
   tb.edit($row);
+});
+
+$('table').on('click', function (e) {
+  if (!$(e.target).hasClass('btn-save')) return;
+  var $row = $(e.target).parent().parent();
+  tb.save($row)
 });
 
 $('#btnGetSelected').on('click', function () {
