@@ -36,6 +36,8 @@ var editable = (function () {
         var identifierName = table.settings.features.identifier;
         var identifierVal = rowData[identifierName];
         var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
+        var $newRow = tableRenderer.renderRow(table, rowData);
+        $row = $newRow;
         debugger;
     }
 

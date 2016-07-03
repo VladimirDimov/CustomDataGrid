@@ -37,25 +37,18 @@ var dataLoader = (function () {
 
         for (var row = 0; row < data.length; row++) {
             var rowData = data[row];
-            var $row = $('<tr>');
             var identifier = rowData[table.settings.features.identifier];
-
-            for (var col = 0; col < table._columnPropertyNames.length; col++) {
-                var $col = $('<td>').html(tableRenderer.renderCell(table, table._columnPropertyNames[col], rowData[table._columnPropertyNames[col]]));
-                $row.append($col);
-            }
+            var $row = tableRenderer.renderRow(table, rowData);
+            $tbody.append($row);
 
             if (table.store.identifiers != null) {
                 formatRowSelected(table, $row, identifier);
             }
 
-            $row.attr('data-identifier', identifier);
-
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
             // var $row = tableRenderer.renderRow(table, rowData, identifiers);
-            $tbody.append($row);
         }
     }
 

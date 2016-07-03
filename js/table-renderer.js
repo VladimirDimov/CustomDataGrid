@@ -11,17 +11,12 @@ var renderer = {
     },
 
     renderRow: function (table, rowData) {
-        var $row = $('<tr>');
         var identifier = rowData[table.settings.features.identifier];
-
+        var $row = $('<tr>');
         for (var col = 0; col < table._columnPropertyNames.length; col++) {
             var $col = $('<td>').html(renderer.renderCell(table, table._columnPropertyNames[col], rowData[table._columnPropertyNames[col]]));
             $row.append($col);
         }
-
-        // if (table.store.identifiers != null) {
-        //     formatRowSelected(table, $row, identifier);
-        // }
 
         $row.attr('data-identifier', identifier);
 
