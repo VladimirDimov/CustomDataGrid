@@ -40,7 +40,7 @@
 
             // Set page
             var filteredData = data
-                .Where(x => filter == null ? true : this.ConcatProperties(x).ToLower().Contains(filter.ToLower()));
+                .Where(x => filter == null ? true : this.ConcatPropertyValues(x).ToLower().Contains(filter.ToLower()));
 
             if (!string.IsNullOrEmpty(orderBy))
             {
@@ -71,7 +71,7 @@
             filterContext.Result = json;
         }
 
-        private string ConcatProperties(object obj)
+        private string ConcatPropertyValues(object obj)
         {
             var propInfos = obj.GetType().GetProperties();
             var builder = new StringBuilder();
