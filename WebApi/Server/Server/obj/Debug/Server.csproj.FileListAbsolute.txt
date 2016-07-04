@@ -47,3 +47,5 @@ C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\o
 C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\System.Web.Cors.dll
 C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\System.Web.Http.Cors.dll
 C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\System.Web.Http.Cors.xml
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\DataTables.dll
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\DataTables.pdb

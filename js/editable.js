@@ -6,9 +6,9 @@ var editable = (function () {
         init: function (table) {
             table.edit = function ($row) {
                 var $tds = $row.find('td');
-                for (var editObj in table.settings.features.editable) {
+                for (var editObj in table.settings.features.editable.columns) {
                     var colIndex = getColumnIndex(table, editObj);
-                    table.settings.features.editable[editObj].edit($($tds[colIndex]));
+                    table.settings.features.editable.columns[editObj].edit($($tds[colIndex]));
                 }
             };
 
@@ -21,24 +21,30 @@ var editable = (function () {
                     return item[identifierName] == identifierVal;
                 })[0];
 
-                for (var editObj in table.settings.features.editable) {
+                for (var editObj in table.settings.features.editable.columns) {
                     var colIndex = getColumnIndex(table, editObj);
-                    var content = table.settings.features.editable[editObj].save($($tds[colIndex]));
+                    var content = table.settings.features.editable.columns[editObj].save($($tds[colIndex]));
                     rowData[editObj] = content;
                 }
 
+                update(table, rowData);
                 renderRow(table, rowData);
             };
-        }
+        },
     };
+
+
+    function update(table, rowData) {
+        table.settings.features.editable.update(rowData);
+    }
+
 
     function renderRow(table, rowData) {
         var identifierName = table.settings.features.identifier;
         var identifierVal = rowData[identifierName];
         var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
         var $newRow = tableRenderer.renderRow(table, rowData);
-        $row = $newRow;
-        debugger;
+        $row.html($newRow.html());
     }
 
     function getColumnIndex(table, colName) {

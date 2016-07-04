@@ -28,31 +28,39 @@ var tb = vDataTable().init('#table', {
     },
     // filter:  [names of the columns to be filtered]
     editable: {
-      FirstName: {
-        edit: function ($td) {
-          var val = $td.html();
-          var $input = $('<input>');
-          $input.val(val);
-          $td.html($input);
-        },
+      columns: {
+        FirstName: {
+          edit: function ($td) {
+            var val = $td.html();
+            var $input = $('<input>');
+            $input.val(val);
+            $td.html($input);
+          },
 
-        save: function ($td) {
-          var val = $td.find('input').first().val();
-          debugger;
-          return val;
+          save: function ($td) {
+            var val = $td.find('input').first().val();
+
+            return val;
+          }
+        },
+        LastName: {
+          edit: function ($td) {
+            var val = $td.html();
+            var $input = $('<input>');
+            $input.val(val);
+            $td.html($input);
+          },
+
+          save: function ($td) {
+            var val = $td.find('input').first().val();
+
+            return val;
+          }
         }
       },
-      LastName: {
-        edit: function ($td) {
-          var val = $td.html();
-          var $input = $('<input>');
-          $input.val(val);
-          $td.html($input);
-        },
 
-        save: function ($td) {
-          // TODO: Return {value: ..., render: 'html to render to'}
-        }
+      update: function (data) {
+        console.log(data);
       }
     }
   }
