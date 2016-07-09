@@ -31,16 +31,10 @@
             var data = (IQueryable<object>)filterContext.Controller.ViewData.Model;
             var collectionDataType = data.GetType().GetGenericArguments().FirstOrDefault();
 
-            PropertyInfo identifierPropInfo = null;
-            if (getIdentifiers && !string.IsNullOrEmpty(identifierPropName))
-            {
-                identifierPropInfo = collectionDataType
-                   .GetProperty(identifierPropName);
-            }
+            IQueryable<object> identifiers = getIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
 
             // Set page
-            var filteredData = data
-                .Where(x => filter == null ? true : this.ConcatPropertyValues(x).ToLower().Contains(filter.ToLower()));
+            IQueryable<object> filteredData = this.FilterData(data, filter);
 
             if (!string.IsNullOrEmpty(orderBy))
             {
@@ -57,18 +51,52 @@
 
             var resultData = filteredData
                 .Skip((page - 1) * pageSize).Take(pageSize);
+
             var json = new JsonResult();
             json.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
             json.Data = new
             {
-                identifiers = getIdentifiers && identifierPropInfo != null ?
-                                data.Select(x => identifierPropInfo.GetValue(x)) :
-                                null,
+                identifiers = identifiers,
                 data = resultData,
                 rowsNumber = filteredData.Count()
             };
 
             filterContext.Result = json;
+        }
+
+        private IQueryable<object> FilterData(IQueryable<object> data, string filter)
+        {
+            if (string.IsNullOrEmpty(filter))
+            {
+                return data;
+            }
+
+            var filteredData = data
+               .Where(x => this.ConcatPropertyValues(x).ToLower().Contains(filter.ToLower()));
+
+            return filteredData;
+        }
+
+        private IQueryable<object> GetIdentifiersCollection(string identifierPropName, IQueryable<object> data)
+        {
+            if (string.IsNullOrEmpty(identifierPropName))
+            {
+                throw new ArgumentNullException("Identifiers property name must be provided");
+            }
+
+            if (data == null)
+            {
+                throw new ArgumentNullException("Invalid null data");
+            }
+
+            var collectionDataType = data.GetType().GetGenericArguments().FirstOrDefault();
+
+            var identifierPropInfo = collectionDataType
+                .GetProperty(identifierPropName);
+
+            var identifiers = data.Select(x => identifierPropInfo.GetValue(x));
+
+            return identifiers;
         }
 
         private string ConcatPropertyValues(object obj)
