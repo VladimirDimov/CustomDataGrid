@@ -49,3 +49,9 @@ C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\b
 C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\System.Web.Http.Cors.xml
 C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\DataTables.dll
 C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\DataTables.pdb
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\EntityFramework.dll
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\EntityFramework.SqlServer.dll
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\EntityFramework.xml
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\EntityFramework.SqlServer.xml
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\Data.dll
+C:\Users\vladko_sz\Desktop\DataTablesServerSidePagination\WebApi\Server\Server\bin\Data.pdb

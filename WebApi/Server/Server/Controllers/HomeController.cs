@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Data;
+using Newtonsoft.Json;
 using Server.filters;
 using System;
 using System.Collections.Generic;
@@ -31,66 +32,12 @@ namespace Server.Controllers
             return View(data.data.AsQueryable());
         }
 
-        public ActionResult IndexOld(
-            int page,
-            int pageSize,
-            string filter,
-            string orderBy,
-            bool asc,
-            string identifierPropName,
-            bool getIdentifiers = false)
+        public IQueryable<Employee> IndexDb()
         {
-            // Get data
-            var reqData = Request.Params;
-            string jsonData = null;
-            using (var reader = new StreamReader(this.Server.MapPath("~/app_data/data.txt")))
-            {
-                jsonData = reader.ReadToEnd();
-            }
+            var dbContext = new ApplicationDbContext();
 
-            var data = JsonConvert.DeserializeObject<Data>(jsonData);
-
-            PropertyInfo identifierPropInfo = null;
-            if (getIdentifiers && !string.IsNullOrEmpty(identifierPropName))
-            {
-                var val = data.data.GetType()
-                    .GetGenericArguments().FirstOrDefault();
-
-                identifierPropInfo = val
-                   .GetProperty(identifierPropName);
-            }
-
-            // Set page
-            var filteredData = data.data
-                .Where(x => filter == null ? true : this.ConcatProperties(x).ToLower().Contains(filter.ToLower()));
-
-            if (!string.IsNullOrEmpty(orderBy))
-            {
-                var prop = typeof(Person).GetProperty(orderBy);
-                if (asc)
-                {
-                    filteredData = filteredData.OrderBy(x => prop.GetValue(x));
-                }
-                else
-                {
-                    filteredData = filteredData.OrderByDescending(x => prop.GetValue(x));
-                }
-            }
-
-            var resultData = filteredData
-                .Skip((page - 1) * pageSize).Take(pageSize);
-
-            return this.Json(new
-            {
-                identifiers = getIdentifiers && identifierPropInfo != null ?
-                                data.data.Select(x => identifierPropInfo.GetValue(x)) :
-                                null,
-                data = resultData,
-                rowsNumber = filteredData.Count()
-            },
-            JsonRequestBehavior.AllowGet);
+            return dbContext.Employees;
         }
-
 
         private string ConcatProperties(object obj)
         {
