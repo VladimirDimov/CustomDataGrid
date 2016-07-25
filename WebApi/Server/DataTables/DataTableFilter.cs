@@ -1,10 +1,14 @@
 ﻿namespace Server.filters
 {
+    using Data;
     using System;
+    using System.Collections.Generic;
+    using System.Data.Entity;
     using System.Linq;
     using System.Reflection;
     using System.Text;
     using System.Web.Mvc;
+    using System.Linq.Dynamic;
 
     public class DataTableFilter : ActionFilterAttribute
     {
@@ -31,7 +35,7 @@
             var data = (IQueryable<object>)filterContext.Controller.ViewData.Model;
             var collectionDataType = data.GetType().GetGenericArguments().FirstOrDefault();
 
-            IQueryable<object> identifiers = getIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
+            IQueryable identifiers = getIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
 
             // Set page
             IQueryable<object> filteredData = this.FilterData(data, filter);
@@ -41,12 +45,21 @@
                 var prop = collectionDataType.GetProperty(orderBy);
                 if (asc)
                 {
-                    filteredData = filteredData.OrderBy(x => prop.GetValue(x));
+                    //filteredData = filteredData.OrderBy(x => prop.GetValue(x));
+                    filteredData = filteredData.OrderBy(orderBy);
                 }
                 else
                 {
-                    filteredData = filteredData.OrderByDescending(x => prop.GetValue(x));
+                    filteredData = filteredData.OrderBy(orderBy).Reverse();
                 }
+            }
+            else
+            {
+                var identifierPropInfo = collectionDataType
+                .GetProperty(identifierPropName);
+
+                filteredData = filteredData
+                    .OrderBy(identifierPropName);
             }
 
             var resultData = filteredData
@@ -77,7 +90,7 @@
             return filteredData;
         }
 
-        private IQueryable<object> GetIdentifiersCollection(string identifierPropName, IQueryable<object> data)
+        private IQueryable GetIdentifiersCollection(string identifierPropName, IQueryable<object> data)
         {
             if (string.IsNullOrEmpty(identifierPropName))
             {
@@ -94,7 +107,8 @@
             var identifierPropInfo = collectionDataType
                 .GetProperty(identifierPropName);
 
-            var identifiers = data.Select(x => identifierPropInfo.GetValue(x));
+            //var identifiers = data.Select(x => identifierPropInfo.GetValue(x));
+            var identifiers = data.Select($"{identifierPropName}");
 
             return identifiers;
         }

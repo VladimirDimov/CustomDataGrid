@@ -32,11 +32,12 @@ namespace Server.Controllers
             return View(data.data.AsQueryable());
         }
 
-        public IQueryable<Employee> IndexDb()
+        [DataTableFilter]
+        public ActionResult IndexDb()
         {
             var dbContext = new ApplicationDbContext();
 
-            return dbContext.Employees;
+            return View("Index", dbContext.Employees);
         }
 
         private string ConcatProperties(object obj)

@@ -3,7 +3,7 @@ var vDataTable = require('../js/v-data-table.js');
 
 var tb = vDataTable().init('#table', {
   ajax: {
-    url: 'http://localhost:65219/home/index'
+    url: 'http://localhost:65219/home/indexDB'
   },
   columns: {
     Salary: {
