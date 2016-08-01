@@ -9,6 +9,8 @@
     using System.Text;
     using System.Web.Mvc;
     using System.Linq.Dynamic;
+    using System.Linq.Expressions;
+    using DataTables.Models;
 
     public class DataTableFilter : ActionFilterAttribute
     {
@@ -84,11 +86,31 @@
                 return data;
             }
 
+            var dataType = data.GetType().GetGenericArguments().First();
+            var queries = dataType.GetProperties().Select(x => $"Convert.ToString({x.Name}).Contains(@0)");
+            var query = $"FirstName.Contains(@0)";
             var filteredData = data
-               .Where(x => this.ConcatPropertyValues(x).ToLower().Contains(filter.ToLower()));
+                //.Where(x => this.ConcatPropertyValues(x).ToLower().Contains(filter.ToLower()));
+                .Where("FirstName.ToString().Contains(@0) or LastName.ToString().Contains(@0)", filter);
 
             return filteredData;
         }
+
+        //public static IQueryable<T> Like<T>(this IQueryable<T> source, string propertyName, string keyword)
+        //{
+        //    var type = typeof(T);
+        //    var property = type.GetProperty(propertyName);
+        //    string number = "Int";
+        //    if (property.PropertyType.Name.StartsWith(number))
+        //        return source;
+
+        //    var parameter = Expression.Parameter(type, "p");
+        //    var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+        //    var constant = Expression.Constant("%" + keyword + "%");
+        //    MethodCallExpression methodExp = Expression.Call(null, typeof(SqlMethods).GetMethod("Like", new Type[] { typeof(string), typeof(string) }), propertyAccess, constant);
+        //    Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(methodExp, parameter);
+        //    return source.Where(lambda);
+        //}
 
         private IQueryable GetIdentifiersCollection(string identifierPropName, IQueryable<object> data)
         {
@@ -113,16 +135,16 @@
             return identifiers;
         }
 
-        private string ConcatPropertyValues(object obj)
+        private string ConcatPropertyValues(Type type)
         {
-            var propInfos = obj.GetType().GetProperties();
-            var builder = new StringBuilder();
+            var propInfos = type.GetProperties();
+            var propNames = new List<string>();
             foreach (var propInfo in propInfos)
             {
-                builder.Append(propInfo.GetValue(obj));
+                propNames.Add(propInfo.Name);
             }
 
-            return builder.ToString();
+            return string.Join(", ", propNames);
         }
 
         private string GetRequestParameter(string param, ActionExecutedContext filterContext)
