@@ -52,7 +52,7 @@
                 }
                 else
                 {
-                    filteredData = filteredData.OrderBy(orderBy).Reverse();
+                    filteredData = filteredData.OrderBy($"{orderBy} descending");
                 }
             }
             else
