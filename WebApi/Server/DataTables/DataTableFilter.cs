@@ -11,6 +11,7 @@
     using System.Linq.Dynamic;
     using System.Linq.Expressions;
     using DataTables.Models;
+    using Newtonsoft.Json;
 
     public class DataTableFilter : ActionFilterAttribute
     {
@@ -26,7 +27,7 @@
             var pageSize = int.Parse(pageSizeString);
             var pageString = this.GetRequestParameter("page", filterContext);
             var page = int.Parse(pageString);
-            var filter = this.GetRequestParameter("filter", filterContext);
+            var filter = this.GetFilterDictionary(filterContext);
             var orderBy = this.GetRequestParameter("orderBy", filterContext);
             var ascString = this.GetRequestParameter("asc", filterContext);
             var asc = this.StringAsBool(ascString);
@@ -39,7 +40,6 @@
 
             IQueryable identifiers = getIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
 
-            // Set page
             IQueryable<object> filteredData = this.FilterData(data, filter);
 
             if (!string.IsNullOrEmpty(orderBy))
@@ -79,19 +79,35 @@
             filterContext.Result = json;
         }
 
-        private IQueryable<object> FilterData(IQueryable<object> data, string filter)
+        private IQueryable<object> FilterData(IQueryable<object> data, IDictionary<string, string> filterDict)
         {
-            if (string.IsNullOrEmpty(filter))
+            if (filterDict == null || filterDict.Keys.Count == 0)
             {
                 return data;
             }
 
-            var dataType = data.GetType().GetGenericArguments().First();
-            var queries = dataType.GetProperties().Select(x => $"Convert.ToString({x.Name}).Contains(@0)");
-            var query = $"FirstName.Contains(@0)";
+            var filterQueries = new List<string>();
+            foreach (var filter in filterDict)
+            {
+                if (string.IsNullOrEmpty(filter.Value))
+                {
+                    continue;
+                }
+
+                var keyProps = filter.Key.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var currentQueries = (keyProps.Select(x => $"{x}.Contains(\"{filter.Value}\")"));
+                filterQueries.Add($"{string.Join(" or ", currentQueries)}");
+            }
+
+            var query = string.Join(" and ", filterQueries);
+            if (string.IsNullOrEmpty(query))
+            {
+                return data;
+            }
+
             var filteredData = data
                 //.Where(x => this.ConcatPropertyValues(x).ToLower().Contains(filter.ToLower()));
-                .Where("FirstName.ToString().Contains(@0) or LastName.ToString().Contains(@0)", filter);
+                .Where(query);
 
             return filteredData;
         }
@@ -151,6 +167,14 @@
         {
             var requestParams = filterContext.Controller.ValueProvider.GetValue(param).AttemptedValue;
             return requestParams;
+        }
+
+        private Dictionary<string, string> GetFilterDictionary(ActionExecutedContext filterContext)
+        {
+            var dictAsObject = filterContext.Controller.ValueProvider.GetValue("filter").AttemptedValue;
+            var dictObj = JsonConvert.DeserializeObject<Dictionary<string, string>>(dictAsObject);
+            var dict = dictObj as Dictionary<string, string>;
+            return dict;
         }
 
         private bool StringAsBool(string val)

@@ -33,6 +33,7 @@ vDataTable = function () {
 
       // Data
       this.store = {
+        filter: new Object(),
         selectedRows: [],
         identifiers: null,
         pageData: null
@@ -80,8 +81,7 @@ vDataTable = function () {
     },
 
     get filter() {
-      var $filter = $(table.$table[0]).find('.filter');
-      return $filter.val();
+      return table.store.filter;
     },
 
     getSelected: function () {

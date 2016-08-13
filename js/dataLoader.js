@@ -7,7 +7,6 @@ var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
             paginator(table).updatePaginator = paginator(table).updatePaginator || true;
-
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
@@ -15,7 +14,7 @@ var dataLoader = (function () {
                     getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
-                    filter: table.filter,
+                    filter: JSON.stringify(table.store.filter),
                     orderBy: table.orderBy ? table.orderBy.Name : null,
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },

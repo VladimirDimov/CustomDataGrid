@@ -102,7 +102,6 @@ var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
             paginator(table).updatePaginator = paginator(table).updatePaginator || true;
-
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
@@ -110,7 +109,7 @@ var dataLoader = (function () {
                     getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
-                    filter: table.filter,
+                    filter: JSON.stringify(table.store.filter),
                     orderBy: table.orderBy ? table.orderBy.Name : null,
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
@@ -233,6 +232,10 @@ var filter = (function () {
         setFilterEvent: function (table) {
             var $filter = $(table.$table[0]).find('.filter');
             $filter.on('change', function () {
+                var $target = $(this);
+                var dictKey = $target.attr('data-props');
+                var dictValue = $target.val();
+                table.store.filter[dictKey] = dictValue;
                 dataLoader.loadData(table, 1, true);
             });
         }
@@ -513,6 +516,7 @@ vDataTable = function () {
 
       // Data
       this.store = {
+        filter: new Object(),
         selectedRows: [],
         identifiers: null,
         pageData: null
@@ -560,8 +564,7 @@ vDataTable = function () {
     },
 
     get filter() {
-      var $filter = $(table.$table[0]).find('.filter');
-      return $filter.val();
+      return table.store.filter;
     },
 
     getSelected: function () {
