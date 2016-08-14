@@ -37,7 +37,7 @@ namespace Server.Controllers
         {
             var dbContext = new ApplicationDbContext();
 
-            return View("Index", dbContext.Employees);
+            return View("Index", dbContext.Employees.OrderBy(x => x.Id));
         }
 
         private string ConcatProperties(object obj)

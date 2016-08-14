@@ -35,33 +35,26 @@
             var getIdentifiersString = this.GetRequestParameter("getIdentifiers", filterContext);
             var getIdentifiers = this.StringAsBool(getIdentifiersString);
 
-            var data = (IQueryable<object>)filterContext.Controller.ViewData.Model;
+            var data = (IOrderedQueryable<object>)filterContext.Controller.ViewData.Model;
             var collectionDataType = data.GetType().GetGenericArguments().FirstOrDefault();
 
             IQueryable identifiers = getIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
 
-            IQueryable<object> filteredData = this.FilterData(data, filter);
+            IQueryable<object> filteredData = this.FilterDataWithExpressions(collectionDataType, data, filter);
 
             if (!string.IsNullOrEmpty(orderBy))
             {
                 var prop = collectionDataType.GetProperty(orderBy);
                 if (asc)
                 {
-                    //filteredData = filteredData.OrderBy(x => prop.GetValue(x));
-                    filteredData = filteredData.OrderBy(orderBy);
+                    //filteredData = filteredData.OrderBy(orderBy);
+                    filteredData = filteredData.OrderBy((Expression<Func<object, string>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType));
                 }
                 else
                 {
-                    filteredData = filteredData.OrderBy($"{orderBy} descending");
+                    //filteredData = filteredData.OrderBy($"{orderBy} descending");
+                    filteredData = filteredData.OrderByDescending((Expression<Func<object, string>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType));
                 }
-            }
-            else
-            {
-                var identifierPropInfo = collectionDataType
-                .GetProperty(identifierPropName);
-
-                filteredData = filteredData
-                    .OrderBy(identifierPropName);
             }
 
             var resultData = filteredData
@@ -112,21 +105,61 @@
             return filteredData;
         }
 
-        //public static IQueryable<T> Like<T>(this IQueryable<T> source, string propertyName, string keyword)
-        //{
-        //    var type = typeof(T);
-        //    var property = type.GetProperty(propertyName);
-        //    string number = "Int";
-        //    if (property.PropertyType.Name.StartsWith(number))
-        //        return source;
+        private IQueryable<object> FilterDataWithExpressions(Type type, IQueryable<object> data, IDictionary<string, string> filterDict)
+        {
+            foreach (var filter in filterDict)
+            {
+                var props = filter.Key.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-        //    var parameter = Expression.Parameter(type, "p");
-        //    var propertyAccess = Expression.MakeMemberAccess(parameter, property);
-        //    var constant = Expression.Constant("%" + keyword + "%");
-        //    MethodCallExpression methodExp = Expression.Call(null, typeof(SqlMethods).GetMethod("Like", new Type[] { typeof(string), typeof(string) }), propertyAccess, constant);
-        //    Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(methodExp, parameter);
-        //    return source.Where(lambda);
-        //}
+                foreach (var prop in props)
+                {
+                    var expr = (Expression<Func<object, bool>>)CreateFilterLambda(type, prop, filter.Value);
+                    data = data.Where(expr);
+                }
+            }
+
+            return data;
+        }
+
+        private static LambdaExpression CreateSelectPropertyLambda(Type type, string prop, Type propType)
+        {
+            // x => (CastToObject)((Cast)x).Property
+            var xParam = Expression.Parameter(typeof(object), "x");
+            var xAsType = Expression.Convert(xParam, type);
+            var bindExpr = Expression.Property(xAsType, prop);
+            var outerCastToObject = Expression.Convert(bindExpr, propType);
+
+            var lambdaExpr = Expression.Lambda(outerCastToObject, xParam);
+
+            return lambdaExpr;
+        }
+
+        private static LambdaExpression CreateFilterLambda(Type type, string prop, string filter)
+        {
+            // x => x.Name.Contains(filter);
+
+            // filter
+            var filterConstExpr = Expression.Constant(filter);
+
+            // x
+            var xParamExpr = Expression.Parameter(typeof(object), "x");
+
+            // (<--Cast to original type-->)(x)
+            var xCastToType = Expression.Convert(xParamExpr, type);
+
+            // x.Name
+            var namePropExpr = Expression.Property(xCastToType, prop);
+
+            // Contains
+            var containsMethodExpr = typeof(string).GetMethod("Contains", new Type[] { typeof(string) });
+
+            // x.Name.Contains("...")
+            var exprCall = Expression.Call(namePropExpr, containsMethodExpr, filterConstExpr);
+
+            var lambda = Expression.Lambda<Func<object, bool>>(exprCall, xParamExpr);
+
+            return lambda;
+        }
 
         private IQueryable GetIdentifiersCollection(string identifierPropName, IQueryable<object> data)
         {
