@@ -89,6 +89,8 @@
     <Compile Include="Expressions\ICreateExpression.cs" />
     <Compile Include="Expressions\ContainsExpression.cs" />
     <Compile Include="Models\ConcatModel.cs" />
+    <Compile Include="ProcessDataProviders\FilterProvider.cs" />
+    <Compile Include="ProcessDataProviders\SortProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
