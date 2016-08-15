@@ -12,6 +12,7 @@
     using System.Linq.Expressions;
     using DataTables.Models;
     using Newtonsoft.Json;
+    using DataTables.Expressions;
 
     public class DataTableFilter : ActionFilterAttribute
     {
@@ -48,12 +49,12 @@
                 if (asc)
                 {
                     //filteredData = filteredData.OrderBy(orderBy);
-                    filteredData = filteredData.OrderBy((Expression<Func<object, string>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType));
+                    filteredData = filteredData.OrderBy((Expression<Func<object, dynamic>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType));
                 }
                 else
                 {
                     //filteredData = filteredData.OrderBy($"{orderBy} descending");
-                    filteredData = filteredData.OrderByDescending((Expression<Func<object, string>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType));
+                    filteredData = filteredData.OrderByDescending((Expression<Func<object, dynamic>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType));
                 }
             }
 
@@ -107,13 +108,19 @@
 
         private IQueryable<object> FilterDataWithExpressions(Type type, IQueryable<object> data, IDictionary<string, string> filterDict)
         {
+            var exprCreator = new ContainsExpression();
             foreach (var filter in filterDict)
             {
+                if (string.IsNullOrEmpty(filter.Value))
+                {
+                    continue;
+                }
+
                 var props = filter.Key.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var prop in props)
                 {
-                    var expr = (Expression<Func<object, bool>>)CreateFilterLambda(type, prop, filter.Value);
+                    var expr = (Expression<Func<object, bool>>)exprCreator.CreateLambda(filter.Key, filter.Value, type);
                     data = data.Where(expr);
                 }
             }
