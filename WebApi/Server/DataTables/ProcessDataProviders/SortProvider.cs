@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -13,38 +14,41 @@
         {
             if (!string.IsNullOrEmpty(orderBy))
             {
-                var prop = collectionDataType.GetProperty(orderBy);
-                var expr = (Expression<Func<object, string>>)CreateSelectPropertyLambda(collectionDataType, prop.Name, prop.PropertyType);
-
-                if (asc)
-                {
-                    filteredData = filteredData.OrderBy(expr);
-                }
-                else
-                {
-                    filteredData = filteredData.OrderByDescending(expr);
-                }
+                var propType = collectionDataType.GetProperty(orderBy).PropertyType;
+                var expr = CreateOrderByLambda(collectionDataType, orderBy, propType, asc);
+                IQueryable<object> sorted = (IQueryable<object>)expr.Compile().DynamicInvoke(filteredData);
+                return sorted;
             }
 
             return filteredData;
         }
 
-        private static LambdaExpression CreateSelectPropertyLambda(Type type, string prop, Type propType)
+        private static LambdaExpression CreateOrderByLambda(Type collectionGenericType, string propName, Type propType, bool isAscending)
         {
             // x => ((Cast)x).Property
-            //x
             var xParam = Expression.Parameter(typeof(object), "x");
-            // (Cast)x
-            var xAsType = Expression.Convert(xParam, type);
+            var xAsType = Expression.Convert(xParam, collectionGenericType);
+            var bindExpr = Expression.Property(xAsType, propName);
+            var outerCastToObject = Expression.Convert(bindExpr, propType);
 
-            // (Cast)x.Prop
-            var propExpr = Expression.Property(xAsType, prop);
-            var outerCastToObject = Expression.Convert(propExpr, propType);
+            Expression selectPropLambdaExpr = Expression.Lambda(outerCastToObject, xParam);
 
-            var lambdaExpr = Expression.Lambda(propExpr, xParam);
+            var dataParam = Expression.Parameter(typeof(IQueryable<>).MakeGenericType(typeof(object)), "data");
+            var orderByCall = Expression.Call(typeof(Queryable), OrderByMethodName(isAscending), new Type[] { typeof(object), propType }, new Expression[] { dataParam, selectPropLambdaExpr });
 
-            return lambdaExpr;
+            var orderByLambdaExpr = Expression.Lambda(orderByCall, dataParam);
+
+            return orderByLambdaExpr;
         }
 
+        private static string OrderByMethodName(bool isAscending)
+        {
+            if (isAscending)
+            {
+                return "OrderBy";
+            }
+
+            return "OrderByDescending";
+        }
     }
 }
