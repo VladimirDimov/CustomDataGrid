@@ -1,6 +1,7 @@
 ﻿namespace Server.filters
 {
     using DataTables.Expressions;
+    using DataTables.Models.Filter;
     using DataTables.ProcessDataProviders;
     using Newtonsoft.Json;
     using System;
@@ -95,11 +96,11 @@
             return requestParams;
         }
 
-        private Dictionary<string, string> GetFilterDictionary(ActionExecutedContext filterContext)
+        private Dictionary<string, FilterRequestModel> GetFilterDictionary(ActionExecutedContext filterContext)
         {
             var dictAsObject = filterContext.Controller.ValueProvider.GetValue("filter").AttemptedValue;
-            var dictObj = JsonConvert.DeserializeObject<Dictionary<string, string>>(dictAsObject);
-            var dict = dictObj as Dictionary<string, string>;
+            var dictObj = JsonConvert.DeserializeObject<Dictionary<string, FilterRequestModel>>(dictAsObject);
+            var dict = dictObj as Dictionary<string, FilterRequestModel>;
             return dict;
         }
 

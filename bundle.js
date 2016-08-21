@@ -234,8 +234,9 @@ var filter = (function () {
             $filter.on('change', function () {
                 var $target = $(this);
                 var dictKey = $target.attr('data-props');
+                var filterOperator = $target.attr('filter');
                 var dictValue = $target.val();
-                table.store.filter[dictKey] = dictValue;
+                table.store.filter[dictKey] = { value: dictValue, operator: filterOperator };
                 dataLoader.loadData(table, 1, true);
             });
         }
