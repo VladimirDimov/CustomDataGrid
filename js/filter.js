@@ -4,7 +4,7 @@ var filter = (function () {
 
     return {
         setFilterEvent: function (table) {
-            var $filter = $(table.$table[0]).find('.filter');
+            var $filter = $(table.$table[0]).find('[filter]');
             $filter.on('change', function () {
                 var $target = $(this);
                 var dictKey = $target.attr('data-props');
