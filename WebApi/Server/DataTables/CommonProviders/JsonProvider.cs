@@ -1,13 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-
-namespace DataTables.CommonProviders
+﻿namespace DataTables.CommonProviders
 {
+    using DataTables.CommonProviders.Contracts;
+    using Newtonsoft.Json;
+    using System.Web.Mvc;
+
     class JsonProvider : IJsonProvider
     {
         public T Deserialize<T>(string json)
