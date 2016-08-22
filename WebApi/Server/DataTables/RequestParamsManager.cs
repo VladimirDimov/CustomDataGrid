@@ -1,5 +1,6 @@
 ﻿namespace Server.filters
 {
+    using DataTables.CommonProviders;
     using DataTables.Models.Filter;
     using DataTables.Models.Request;
     using Newtonsoft.Json;
@@ -9,13 +10,15 @@
     using System.Linq.Dynamic;
     using System.Web.Mvc;
 
-    internal class RequestParamsMeneger
+    internal class RequestParamsManager
     {
         private ActionExecutedContext filterContext;
+        private JsonProvider jsonProvider;
 
-        public RequestParamsMeneger(ActionExecutedContext filterContext)
+        public RequestParamsManager(ActionExecutedContext filterContext)
         {
             this.filterContext = filterContext;
+            this.jsonProvider = new JsonProvider();
         }
 
         public RequestModel GetRequestModel()
@@ -89,7 +92,7 @@
         private Dictionary<string, FilterRequestModel> GetFilterDictionary(ActionExecutedContext filterContext)
         {
             var dictAsObject = filterContext.Controller.ValueProvider.GetValue("filter").AttemptedValue;
-            var dictObj = JsonConvert.DeserializeObject<Dictionary<string, FilterRequestModel>>(dictAsObject);
+            var dictObj = this.jsonProvider.Deserialize<Dictionary<string, FilterRequestModel>>(dictAsObject);
             var dict = dictObj as Dictionary<string, FilterRequestModel>;
             return dict;
         }
