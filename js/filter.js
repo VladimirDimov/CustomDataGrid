@@ -10,7 +10,7 @@ var filter = (function () {
                 var dictKey = $target.attr('data-props');
                 var filterOperator = $target.attr('filter');
                 var dictValue = $target.val();
-                table.store.filter[dictKey] = { value: dictValue, operator: filterOperator };
+                table.store.filter[dictKey] = { value: dictValue, operator: filterOperator || 0 };
                 dataLoader.loadData(table, 1, true);
             });
         }

@@ -2,16 +2,18 @@
 
 th[asc]::after {
   content: url('/img/asc.png');
-  display: inline-block;
+  /*display: inline-block;*/
   vertical-align: middle;
   margin-left: 10px;
+  position: static;
 }
 
 th[desc]::after {
   content: url('/img/desc.png');
-  display: inline-block;
+  /*display: inline-block;*/
   vertical-align: middle;
   margin-left: 10px;
+  position: static;
 }
 
 th[sortable] {

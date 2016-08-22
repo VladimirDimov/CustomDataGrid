@@ -6,12 +6,14 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Text;
-    using System.Threading.Tasks;
 
     class FilterProvider
     {
-        public IQueryable<object> FilterDataWithExpressions(Type type, IQueryable<object> data, IDictionary<string, FilterRequestModel> filterDict)
+        public IQueryable<object> FilterDataWithExpressions(
+                                                            Type type,
+                                                            IQueryable<object> data,
+                                                            IDictionary<string,
+                                                            FilterRequestModel> filterDict)
         {
             var exprCreator = new ContainsExpression();
 
@@ -26,13 +28,17 @@
 
                 foreach (var prop in props)
                 {
-                    var expr = (Expression<Func<object, bool>>)exprCreator.CreateLambda(filter.Key, filter.Value.Value, type);
+                    var expr = (Expression<Func<object, bool>>)exprCreator.CreateLambda(
+                                                                                        filter.Key,
+                                                                                        filter.Value.Value,
+                                                                                        filter.Value.Operator,
+                                                                                        type);
+
                     data = data.Where(expr);
                 }
             }
 
             return data;
         }
-
     }
 }

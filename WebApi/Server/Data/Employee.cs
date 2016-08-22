@@ -14,6 +14,6 @@
 
         public string StartDate { get; set; }
 
-        public string Salary { get; set; }
+        public decimal Salary { get; set; }
     }
 }

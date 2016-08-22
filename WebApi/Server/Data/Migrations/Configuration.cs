@@ -10,6 +10,7 @@ namespace Data.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
         }
 
         protected override void Seed(Data.ApplicationDbContext context)
@@ -22,7 +23,7 @@ namespace Data.Migrations
                     LastName = "Petrov",
                     Occupation = "Sofia",
                     Position = "Asd",
-                    Salary = "100",
+                    Salary = 100,
                     StartDate = DateTime.UtcNow.ToShortDateString()
                 });
 
@@ -32,7 +33,7 @@ namespace Data.Migrations
                     LastName = "Goshev",
                     Occupation = "Tokio",
                     Position = "dfg",
-                    Salary = "250",
+                    Salary = 250,
                     StartDate = DateTime.UtcNow.ToShortDateString()
                 });
             }
