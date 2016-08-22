@@ -42,12 +42,12 @@
                 .Take(requestModel.PageSize);
 
             filterContext.Result = jsonProvider.GetJsonResult(
-                new
-                {
-                    identifiers = requestModel.Identifiers,
-                    data = resultData,
-                    rowsNumber = filteredData.Count()
-                });
+                                                                new
+                                                                {
+                                                                    identifiers = requestModel.Identifiers,
+                                                                    data = resultData,
+                                                                    rowsNumber = filteredData.Count()
+                                                                });
         }
     }
 }
