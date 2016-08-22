@@ -7,7 +7,7 @@
 
     class ContainsExpression
     {
-        public LambdaExpression CreateLambda(string props, object filterValue, int filterOperator, Type genericType)
+        public LambdaExpression CreateLambda(string props, object filterValue, string filterOperator, Type genericType)
         {
             var propsCollection = props.Split(new char[] { ' ', ',' });
             var numberOfProps = propsCollection.Length;
@@ -28,18 +28,18 @@
             return lambda;
         }
 
-        private Expression GetPropertySelectExpression(string prop, object filterValue, Expression argumentExpr, int filterOperator)
+        private Expression GetPropertySelectExpression(string prop, object filterValue, Expression argumentExpr, string filterOperator)
         {
             switch (filterOperator)
             {
-                case 0:
+                case "cs":
+                    throw new NotImplementedException();
+
+                case "ci":
                     return GetContainsPartialExpr(prop, filterValue, argumentExpr);
 
-                case 1:
-                    return CreateCompareLambda(prop, filterValue, argumentExpr);
-
                 default:
-                    throw new ArgumentException();
+                    return CreateCompareLambda(prop, filterValue, argumentExpr, filterOperator);
             }
         }
 
@@ -59,7 +59,7 @@
             return JoinWithOr(expressions.Take(numberOfExpressions - 1).ToList());
         }
 
-        private static Expression CreateCompareLambda(string propName, object filter, Expression xExpr)
+        private static Expression CreateCompareLambda(string propName, object filter, Expression xExpr, string filterOperator)
         {
             //var genericType = collection.GetType().GenericTypeArguments.First();
             //var propType = collectionGenericType.GetProperty(propName).PropertyType;
@@ -70,16 +70,52 @@
 
             // x => x.Prop
             var propExpr = Expression.Property(xExpr, propName);
+
             // Value
-            var parsedFilter = ParseFilter(filter, xExpr.Type.GetProperty(propName).PropertyType);
+            var propType = xExpr.Type.GetProperty(propName).PropertyType;
+
+            object parsedFilter = null;
+            if (propType.GetMethods().Any(m => m.Name == "Parse"))
+            {
+                parsedFilter = ParseFilter(filter, propType);
+            }
+            else
+            {
+                parsedFilter = filter;
+            }
+
             var parsedFilterExpr = Expression.Constant(parsedFilter);
             // x => x.Prop.CompareTo(value)
 
-            var compareToExpr = Expression.GreaterThanOrEqual(parsedFilterExpr, propExpr);
+            var compareToExpr = GetCompareToExpression(filterOperator, parsedFilterExpr, propExpr);
             // x => x.Prop.CompareTo(value) == 0
             //var operatorExpr = Expression.Equal(compareToExpr, Expression.Constant(0));
 
             return compareToExpr;
+        }
+
+        private static Expression GetCompareToExpression(string filterOperator, Expression left, Expression right)
+        {
+            switch (filterOperator)
+            {
+                case "=":
+                    return Expression.Equal(left, right);
+
+                case ">=":
+                    return Expression.GreaterThanOrEqual(left, right);
+
+                case "<=":
+                    return Expression.LessThanOrEqual(left, right);
+
+                case ">":
+                    return Expression.GreaterThan(left, right);
+
+                case "<":
+                    return Expression.LessThan(left, right);
+
+                default:
+                    throw new ArgumentException($"Invalid comparisson operator {filterOperator}");
+            }
         }
 
         private static object ParseFilter(object filter, Type toType)

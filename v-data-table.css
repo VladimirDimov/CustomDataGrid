@@ -2,18 +2,22 @@
 
 th[asc]::after {
   content: url('/img/asc.png');
-  /*display: inline-block;*/
-  vertical-align: middle;
+  display: inline-block;
+  vertical-align: top;
   margin-left: 10px;
   position: static;
+  height: 0px;
+  top: -2px;
 }
 
 th[desc]::after {
   content: url('/img/desc.png');
-  /*display: inline-block;*/
-  vertical-align: middle;
+  display: inline-block;
+  vertical-align: top;
   margin-left: 10px;
   position: static;
+  height: 0px;
+  top: -2px;
 }
 
 th[sortable] {

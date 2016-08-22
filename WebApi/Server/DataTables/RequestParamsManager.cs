@@ -72,7 +72,6 @@
             var identifierPropInfo = collectionDataType
                 .GetProperty(identifierPropName);
 
-            //var identifiers = data.Select(x => identifierPropInfo.GetValue(x));
             var identifiers = data.Select($"{identifierPropName}");
 
             return identifiers;
@@ -85,7 +84,9 @@
             {
                 return null;
             }
+
             var requestedParamValue = requestParam.AttemptedValue;
+
             return requestedParamValue;
         }
 
@@ -94,6 +95,7 @@
             var dictAsObject = filterContext.Controller.ValueProvider.GetValue("filter").AttemptedValue;
             var dictObj = this.jsonProvider.Deserialize<Dictionary<string, FilterRequestModel>>(dictAsObject);
             var dict = dictObj as Dictionary<string, FilterRequestModel>;
+
             return dict;
         }
 
@@ -106,6 +108,7 @@
 
                 case "false":
                     return false;
+
                 default:
                     throw new ArgumentException($"Invalid bool value: {val}");
             }
