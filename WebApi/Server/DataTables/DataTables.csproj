@@ -90,9 +90,11 @@
     <Compile Include="Expressions\ContainsExpression.cs" />
     <Compile Include="Models\ConcatModel.cs" />
     <Compile Include="Models\Filter\FilterRequestModel.cs" />
+    <Compile Include="Models\Request\RequestModel.cs" />
     <Compile Include="ProcessDataProviders\FilterProvider.cs" />
     <Compile Include="ProcessDataProviders\SortProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestParamsMeneger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
