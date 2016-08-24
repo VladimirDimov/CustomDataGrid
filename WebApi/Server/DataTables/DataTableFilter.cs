@@ -43,13 +43,14 @@
                 .Skip((requestModel.Page - 1) * requestModel.PageSize)
                 .Take(requestModel.PageSize);
 
-            filterContext.Result = jsonProvider.GetJsonResult(
-                                                    new
-                                                    {
-                                                        identifiers = requestModel.Identifiers,
-                                                        data = resultData,
-                                                        rowsNumber = filteredData.Count()
-                                                    });
+            filterContext.Result = jsonProvider
+                .GetJsonResult(
+                    new
+                    {
+                        identifiers = requestModel.Identifiers,
+                        data = resultData,
+                        rowsNumber = filteredData.Count()
+                    });
         }
     }
 }
