@@ -61,13 +61,6 @@
 
         private static Expression CreateCompareLambda(string propName, object filter, Expression xExpr, string filterOperator)
         {
-            //var genericType = collection.GetType().GenericTypeArguments.First();
-            //var propType = collectionGenericType.GetProperty(propName).PropertyType;
-            // x => x.Property.Compare(value)
-            // =========================================
-            // x => x
-            //var xCastedExpr = Expression.Convert(xExpr, collectionGenericType);
-
             // x => x.Prop
             var propExpr = Expression.Property(xExpr, propName);
 
@@ -122,6 +115,7 @@
         {
             var xExpr = Expression.Parameter(typeof(string), "x");
             var castedValExpr = Expression.Call(toType, "Parse", null, new Expression[] { xExpr });
+
             return Expression.Lambda(castedValExpr, new ParameterExpression[] { xExpr }).Compile().DynamicInvoke(filter);
         }
 

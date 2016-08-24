@@ -9,13 +9,16 @@ vDataTable = function () {
 
 
   var defaultSettings = {
-    pageSize: 5,
+    pageSize: 9,
     paginator: {
-      length: 5
+      length: 10
     },
     features: {
       enableFilter: true,
       selectable: true
+    },
+    colors: {
+      selectedRow: 'gray'
     }
   };
 
@@ -27,8 +30,10 @@ vDataTable = function () {
 
       // Paginator settings
       this._paginator = {};
-      this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
+      this._paginator.currentPage = 1;
+      this._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
       this._paginator.$paginator = paginator(this).setPaginator(1, this._paginator.length, 1);
+
       this._columnPropertyNames = setColumnPropertyNames();
 
       // Data
@@ -45,7 +50,7 @@ vDataTable = function () {
           url: settings.ajax.url
         },
         colors: {
-          selectedRow: 'gray',
+          selectedRow: (settings.colors ? selectedRow : null) || defaultSettings.colors.selectedRow,
         },
         pageSize: settings.pageSize || defaultSettings.pageSize,
         features: {
@@ -56,7 +61,7 @@ vDataTable = function () {
         columns: settings.columns || {}
       }
 
-      paginator(this).setPageClickEvents(this);
+      paginator(this).setPageClickEvents();
       filter.setFilterEvent(this);
       sortable.formatSortables(this);
       dataLoader.loadData(table, 1, true);

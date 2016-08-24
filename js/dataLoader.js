@@ -19,7 +19,7 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(table, data.data, data.identifiers);
+                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
 
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
@@ -29,8 +29,14 @@ var dataLoader = (function () {
         }
     };
 
-    function refreshPageData(table, data, identifiers) {
+    function refreshPageData(table, data, identifiers, rowsNumber) {
         table.store.pageData = data;
+        table.store.numberOfRows = rowsNumber;
+        table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+
+        tableRenderer.renderNumberOfRows(table);
+        tableRenderer.renderNumberOfPages(table);
+
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
 

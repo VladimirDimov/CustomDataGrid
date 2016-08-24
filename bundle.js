@@ -114,7 +114,7 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(table, data.data, data.identifiers);
+                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
 
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
@@ -124,8 +124,14 @@ var dataLoader = (function () {
         }
     };
 
-    function refreshPageData(table, data, identifiers) {
+    function refreshPageData(table, data, identifiers, rowsNumber) {
         table.store.pageData = data;
+        table.store.numberOfRows = rowsNumber;
+        table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+
+        tableRenderer.renderNumberOfRows(table);
+        tableRenderer.renderNumberOfPages(table);
+
         var $tbody = table.$table.children('tbody').empty();
         // TODO: To foreach the table._columnPropertyNames instead of the response data columns
 
@@ -260,10 +266,23 @@ var paginator = function (table) {
 
             $footer.append($paginator);
 
+            if (table.paginator.start > 1) {
+                var $firstPageElement = $('<li><a href="#" page-first>' + 1 + '</a></li>');
+                var $previousPageElement = $('<li><a href="#" page-previous>' + '...' + '</a></li>');
+                $paginator.append($firstPageElement);
+                $paginator.append($previousPageElement);
+            }
             for (var i = start; i <= end; i++) {
-                var $currentPageElement = $('<li><a href="#">' + i + '</a></li>');
+                var $currentPageElement = $('<li><a href="#" page>' + i + '</a></li>');
                 $paginator.append($currentPageElement);
                 if (i == activePage) $currentPageElement.addClass('active');
+            }
+
+            if (table.paginator && table.store && table.paginator.end < table.store.numberOfPages) {
+                var $nextPageElement = $('<li><a href="#" page-next>' + '...' + '</a></li>');
+                var $lastPageElement = $('<li><a href="#" page-last>' + (table.store ? table.store.numberOfPages : "") + '</a></li>');
+                $paginator.append($nextPageElement);
+                $paginator.append($lastPageElement);
             }
 
             return $paginator;
@@ -292,12 +311,36 @@ var paginator = function (table) {
         },
 
         setPageClickEvents: function () {
-            table.paginator.$paginator.on('click', 'li>a', function (e) {
+            table.paginator.$paginator.on('click', 'li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
                 table.paginator.$paginator.children('li').removeClass('active');
+                table.paginator.currentPage = page;
                 $(e.target).parent().addClass('active');
 
-                dataLoader.loadData(table, page, page == table.paginator.start || page == table.paginator.end);
+                var isUpdatePagnator =
+                    page == table.paginator.start ||
+                    page == table.paginator.end ||
+                    page == 1 || page == table.store.numberOfPages;
+
+                dataLoader.loadData(table, page, isUpdatePagnator);
+            });
+
+            table.paginator.$paginator.on('click', 'li>a[page-next]', function (e) {
+                var page = parseInt(table.paginator.currentPage) + 1;
+                table.paginator.$paginator.children('li').removeClass('active');
+                table.paginator.currentPage = page;
+                $(e.target).parent().addClass('active');
+
+                dataLoader.loadData(table, page, true);
+            });
+
+            table.paginator.$paginator.on('click', 'li>a[page-previous]', function (e) {
+                var page = parseInt(table.paginator.currentPage) - 1;
+                table.paginator.$paginator.children('li').removeClass('active');
+                table.paginator.currentPage = page;
+                $(e.target).parent().addClass('active');
+
+                dataLoader.loadData(table, page, true);
             });
         }
     };
@@ -477,6 +520,26 @@ var renderer = {
         $row.attr('data-identifier', identifier);
 
         return $row;
+    },
+
+    renderNumberOfRows: function (table) {
+        var numberOfRows = table.store.numberOfRows;
+
+        var containers = table.$table.find('[number-of-rows]');
+
+        for (var i = 0, l = containers.length; i < l; i += 1) {
+            $(containers[i]).html(numberOfRows);
+        }
+    },
+
+    renderNumberOfPages: function (table) {
+        var numberOfPages = table.store.numberOfPages;
+
+        var containers = table.$table.find('[number-of-pages]');
+
+        for (var i = 0, l = containers.length; i < l; i += 1) {
+            $(containers[i]).html(numberOfPages);
+        }
     }
 };
 
@@ -493,13 +556,16 @@ vDataTable = function () {
 
 
   var defaultSettings = {
-    pageSize: 5,
+    pageSize: 9,
     paginator: {
-      length: 5
+      length: 10
     },
     features: {
       enableFilter: true,
       selectable: true
+    },
+    colors: {
+      selectedRow: 'gray'
     }
   };
 
@@ -511,8 +577,10 @@ vDataTable = function () {
 
       // Paginator settings
       this._paginator = {};
-      this._paginator.length = (settings.paginator && settings.paginator.length) || defaultSettings.paginator.length;
+      this._paginator.currentPage = 1;
+      this._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
       this._paginator.$paginator = paginator(this).setPaginator(1, this._paginator.length, 1);
+
       this._columnPropertyNames = setColumnPropertyNames();
 
       // Data
@@ -529,7 +597,7 @@ vDataTable = function () {
           url: settings.ajax.url
         },
         colors: {
-          selectedRow: 'gray',
+          selectedRow: (settings.colors ? selectedRow : null) || defaultSettings.colors.selectedRow,
         },
         pageSize: settings.pageSize || defaultSettings.pageSize,
         features: {
@@ -540,7 +608,7 @@ vDataTable = function () {
         columns: settings.columns || {}
       }
 
-      paginator(this).setPageClickEvents(this);
+      paginator(this).setPageClickEvents();
       filter.setFilterEvent(this);
       sortable.formatSortables(this);
       dataLoader.loadData(table, 1, true);

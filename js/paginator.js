@@ -13,10 +13,23 @@ var paginator = function (table) {
 
             $footer.append($paginator);
 
+            if (table.paginator.start > 1) {
+                var $firstPageElement = $('<li><a href="#" page-first>' + 1 + '</a></li>');
+                var $previousPageElement = $('<li><a href="#" page-previous>' + '...' + '</a></li>');
+                $paginator.append($firstPageElement);
+                $paginator.append($previousPageElement);
+            }
             for (var i = start; i <= end; i++) {
-                var $currentPageElement = $('<li><a href="#">' + i + '</a></li>');
+                var $currentPageElement = $('<li><a href="#" page>' + i + '</a></li>');
                 $paginator.append($currentPageElement);
                 if (i == activePage) $currentPageElement.addClass('active');
+            }
+
+            if (table.paginator && table.store && table.paginator.end < table.store.numberOfPages) {
+                var $nextPageElement = $('<li><a href="#" page-next>' + '...' + '</a></li>');
+                var $lastPageElement = $('<li><a href="#" page-last>' + (table.store ? table.store.numberOfPages : "") + '</a></li>');
+                $paginator.append($nextPageElement);
+                $paginator.append($lastPageElement);
             }
 
             return $paginator;
@@ -45,12 +58,36 @@ var paginator = function (table) {
         },
 
         setPageClickEvents: function () {
-            table.paginator.$paginator.on('click', 'li>a', function (e) {
+            table.paginator.$paginator.on('click', 'li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
                 table.paginator.$paginator.children('li').removeClass('active');
+                table.paginator.currentPage = page;
                 $(e.target).parent().addClass('active');
 
-                dataLoader.loadData(table, page, page == table.paginator.start || page == table.paginator.end);
+                var isUpdatePagnator =
+                    page == table.paginator.start ||
+                    page == table.paginator.end ||
+                    page == 1 || page == table.store.numberOfPages;
+
+                dataLoader.loadData(table, page, isUpdatePagnator);
+            });
+
+            table.paginator.$paginator.on('click', 'li>a[page-next]', function (e) {
+                var page = parseInt(table.paginator.currentPage) + 1;
+                table.paginator.$paginator.children('li').removeClass('active');
+                table.paginator.currentPage = page;
+                $(e.target).parent().addClass('active');
+
+                dataLoader.loadData(table, page, true);
+            });
+
+            table.paginator.$paginator.on('click', 'li>a[page-previous]', function (e) {
+                var page = parseInt(table.paginator.currentPage) - 1;
+                table.paginator.$paginator.children('li').removeClass('active');
+                table.paginator.currentPage = page;
+                $(e.target).parent().addClass('active');
+
+                dataLoader.loadData(table, page, true);
             });
         }
     };

@@ -15,8 +15,8 @@
             <tr>
                 <th colspan="7">
                     // Filter equal
-                    <span>Name:</span><input type="text" data-props="FirstName" filter="cs">
-                    <span>Occupation:</span><input type="text" data-props="Occupation" filter="=">
+                    <span>Name:</span><input type="text" data-props="FirstName" filter="ci">
+                    <span>Occupation:</span><input type="text" data-props="Occupation" filter="cs">
                     <span>Salary:</span><input type="text" data-props="Salary" filter="<=">
                     <button id="selectAll">Select All</button>
                     <button id="unselectAll">Unselect All</button>
@@ -34,7 +34,12 @@
         </thead>
         <tbody>
         </tbody>
-        <tfoot></tfoot>
+        <tfoot>
+            <tr>
+                <th>Rows: <span number-of-rows></span></th>
+                <th>Pages: <span number-of-pages></span></th>
+            </tr>
+        </tfoot>
     </table>
 
     <button id="btnGetSelected">Get Selected</button>
