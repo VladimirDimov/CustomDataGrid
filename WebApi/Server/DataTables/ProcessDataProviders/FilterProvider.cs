@@ -26,16 +26,13 @@
 
                 var props = filter.Key.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var prop in props)
-                {
-                    var expr = (Expression<Func<object, bool>>)exprCreator.CreateLambda(
-                                                                                        filter.Key,
-                                                                                        filter.Value.Value,
-                                                                                        filter.Value.Operator,
-                                                                                        type);
+                var expr = (Expression<Func<object, bool>>)exprCreator.CreateLambda(
+                                                                                    filter.Key,
+                                                                                    filter.Value.Value,
+                                                                                    filter.Value.Operator,
+                                                                                    type);
 
-                    data = data.Where(expr);
-                }
+                data = data.Where(expr);
             }
 
             return data;

@@ -33,10 +33,10 @@
             switch (filterOperator)
             {
                 case "cs":
-                    throw new NotImplementedException();
+                    return GetContainsPartialExpr(prop, filterValue, argumentExpr, isCaseInsensitive: false);
 
                 case "ci":
-                    return GetContainsPartialExpr(prop, filterValue, argumentExpr);
+                    return GetContainsPartialExpr(prop, filterValue, argumentExpr, isCaseInsensitive: true);
 
                 default:
                     return CreateCompareLambda(prop, filterValue, argumentExpr, filterOperator);
@@ -125,16 +125,24 @@
             return Expression.Lambda(castedValExpr, new ParameterExpression[] { xExpr }).Compile().DynamicInvoke(filter);
         }
 
-        private Expression GetContainsPartialExpr(string prop, object filter, Expression xExpr)
+        private Expression GetContainsPartialExpr(string prop, object filter, Expression xExpr, bool isCaseInsensitive = false)
         {
             // x => ((Cast)x).Prop1.ToString().ToLower().Contains(filter1.ToLower()) || x.Prop2.ToString().ToLower().Contains(filter2.ToLower()) || ...;
 
             // filter
             var filterConstExpr = Expression.Constant(filter);
             // ToLower()
-            var toLowerMethodInfo = typeof(string).GetMethod("ToLower", System.Type.EmptyTypes);
+            var toLowerMethodInfo = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
             // filter.ToLower()
-            var filterToLowerExpr = Expression.Call(filterConstExpr, toLowerMethodInfo);
+            Expression filterToLowerExpr;
+            if (isCaseInsensitive)
+            {
+                filterToLowerExpr = Expression.Call(filterConstExpr, toLowerMethodInfo);
+            }
+            else
+            {
+                filterToLowerExpr = filterConstExpr;
+            }
 
             // x.Name
             var namePropExpr = Expression.Property(xExpr, prop);
@@ -146,7 +154,16 @@
             // x.Name.ToString()
             var toStringExprCall = Expression.Call(namePropExpr, toStringMethodInfo);
             // x.Prop.ToString().ToLower()
-            var toLowerExprCall = Expression.Call(toStringExprCall, toLowerMethodInfo);
+            Expression toLowerExprCall;
+            if (isCaseInsensitive)
+            {
+                toLowerExprCall = Expression.Call(toStringExprCall, toLowerMethodInfo);
+            }
+            else
+            {
+                toLowerExprCall = toStringExprCall;
+            }
+
             // x.Prop.ToString().ToLower().Contains(filter.ToLower())
             var containsExprCall = Expression.Call(toLowerExprCall, containsMethodInfo, filterToLowerExpr);
 

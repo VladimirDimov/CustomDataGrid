@@ -12,16 +12,14 @@
 
     internal class RequestParamsManager
     {
-        private ActionExecutedContext filterContext;
         private JsonProvider jsonProvider;
 
-        public RequestParamsManager(ActionExecutedContext filterContext)
+        public RequestParamsManager()
         {
-            this.filterContext = filterContext;
             this.jsonProvider = new JsonProvider();
         }
 
-        public RequestModel GetRequestModel()
+        public RequestModel GetRequestModel(ActionExecutedContext filterContext)
         {
             var pageSizeString = this.GetRequestParameter("pageSize", filterContext);
             var pageSize = int.Parse(pageSizeString);
