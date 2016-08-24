@@ -89,7 +89,8 @@
     <Compile Include="CommonProviders\JsonProvider.cs" />
     <Compile Include="DataTableFilter.cs" />
     <Compile Include="Expressions\ICreateExpression.cs" />
-    <Compile Include="Expressions\ContainsExpression.cs" />
+    <Compile Include="Expressions\FilterExpression.cs" />
+    <Compile Include="Expressions\OrderByLambda.cs" />
     <Compile Include="Models\ConcatModel.cs" />
     <Compile Include="Models\Filter\FilterRequestModel.cs" />
     <Compile Include="Models\Request\RequestModel.cs" />

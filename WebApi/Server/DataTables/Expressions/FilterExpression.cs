@@ -5,9 +5,9 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    class ContainsExpression
+    internal static class FilterExpression
     {
-        public LambdaExpression CreateLambda(string props, object filterValue, string filterOperator, Type genericType)
+        internal static LambdaExpression LambdaExpression(string props, object filterValue, string filterOperator, Type genericType)
         {
             var propsCollection = props.Split(new char[] { ' ', ',' });
             var numberOfProps = propsCollection.Length;
@@ -28,7 +28,7 @@
             return lambda;
         }
 
-        private Expression GetPropertySelectExpression(string prop, object filterValue, Expression argumentExpr, string filterOperator)
+        private static Expression GetPropertySelectExpression(string prop, object filterValue, Expression argumentExpr, string filterOperator)
         {
             switch (filterOperator)
             {
@@ -43,7 +43,7 @@
             }
         }
 
-        private Expression JoinWithOr(IList<Expression> expressions)
+        private static Expression JoinWithOr(IList<Expression> expressions)
         {
             var numberOfExpressions = expressions.Count();
 
@@ -125,7 +125,7 @@
             return Expression.Lambda(castedValExpr, new ParameterExpression[] { xExpr }).Compile().DynamicInvoke(filter);
         }
 
-        private Expression GetContainsPartialExpr(string prop, object filter, Expression xExpr, bool isCaseInsensitive = false)
+        private static Expression GetContainsPartialExpr(string prop, object filter, Expression xExpr, bool isCaseInsensitive = false)
         {
             // x => ((Cast)x).Prop1.ToString().ToLower().Contains(filter1.ToLower()) || x.Prop2.ToString().ToLower().Contains(filter2.ToLower()) || ...;
 

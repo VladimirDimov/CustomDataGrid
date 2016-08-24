@@ -15,8 +15,6 @@
                                                             IDictionary<string,
                                                             FilterRequestModel> filterDict)
         {
-            var exprCreator = new ContainsExpression();
-
             foreach (var filter in filterDict)
             {
                 if (string.IsNullOrEmpty(filter.Value.Value))
@@ -26,7 +24,7 @@
 
                 var props = filter.Key.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                var expr = (Expression<Func<object, bool>>)exprCreator.CreateLambda(
+                var expr = (Expression<Func<object, bool>>)FilterExpression.LambdaExpression(
                                                                                     filter.Key,
                                                                                     filter.Value.Value,
                                                                                     filter.Value.Operator,

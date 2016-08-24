@@ -3,7 +3,6 @@
     using DataTables.CommonProviders;
     using DataTables.Models.Filter;
     using DataTables.Models.Request;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
