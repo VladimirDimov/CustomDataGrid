@@ -119,6 +119,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="HttpContextHelpersTests.cs" />
+    <Compile Include="Mocks\ActionExecutedContext\ActionExecutedContextMocks.cs" />
+    <Compile Include="Mocks\ActionExecutedContext\ControllerMock.cs" />
     <Compile Include="RequestParamsManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -140,6 +143,7 @@
       <Name>Server</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

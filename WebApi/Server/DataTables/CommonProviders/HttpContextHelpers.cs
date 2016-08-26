@@ -1,17 +1,18 @@
-﻿using DataTables.CommonProviders.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-
-namespace DataTables.CommonProviders
+﻿namespace DataTables.CommonProviders
 {
-    class HttpContextHelpers : IHttpContextHelpers
+    using DataTables.CommonProviders.Contracts;
+    using System;
+    using System.Web.Mvc;
+
+    public class HttpContextHelpers : IHttpContextHelpers
     {
         public string GetRequestParameterOrDefault(string param, ActionExecutedContext filterContext)
         {
+            if (param == null)
+            {
+                throw new ArgumentNullException("Invalid null argument value.");
+            }
+
             var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
             if (requestParam == null)
             {
@@ -25,8 +26,13 @@ namespace DataTables.CommonProviders
 
         public string GetRequestParameter(string param, ActionExecutedContext filterContext)
         {
+            if (param == null)
+            {
+                throw new ArgumentNullException("Invalid null argument value.");
+            }
+
             var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
-            if (requestParam == null)
+            if (requestParam.AttemptedValue == null)
             {
                 throw new ArgumentException($"The request parameter \"{param}\" is missing.");
             }
