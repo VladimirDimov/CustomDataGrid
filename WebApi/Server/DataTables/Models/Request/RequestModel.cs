@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    class RequestModel
+    public class RequestModel
     {
         public IOrderedQueryable<object> Data { get; internal set; }
 

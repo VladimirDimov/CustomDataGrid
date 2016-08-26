@@ -1,6 +1,7 @@
 ﻿namespace Server.filters
 {
     using DataTables.CommonProviders;
+    using DataTables.CommonProviders.Contracts;
     using DataTables.Models.Filter;
     using DataTables.Models.Request;
     using System;
@@ -9,32 +10,34 @@
     using System.Linq.Dynamic;
     using System.Web.Mvc;
 
-    internal class RequestParamsManager
+    public class RequestParamsManager
     {
         private JsonProvider jsonProvider;
+        private IHttpContextHelpers httpContextHelpers;
 
         public RequestParamsManager()
         {
             this.jsonProvider = new JsonProvider();
+            this.httpContextHelpers = new HttpContextHelpers();
         }
 
         public RequestModel GetRequestModel(ActionExecutedContext filterContext)
         {
-            var pageSizeString = this.GetRequestParameterOrDefault("pageSize", filterContext);
+            var pageSizeString = httpContextHelpers.GetRequestParameter("pageSize", filterContext);
             var pageSize = int.Parse(pageSizeString);
-            var pageString = this.GetRequestParameterOrDefault("page", filterContext);
+            var pageString = httpContextHelpers.GetRequestParameter("page", filterContext);
             var page = int.Parse(pageString);
             var filter = this.GetFilterDictionary(filterContext);
-            var orderBy = this.GetRequestParameterOrDefault("orderBy", filterContext);
-            var ascString = this.GetRequestParameterOrDefault("asc", filterContext);
+            var orderBy = httpContextHelpers.GetRequestParameterOrDefault("orderBy", filterContext);
+            var ascString = httpContextHelpers.GetRequestParameter("asc", filterContext);
             var asc = this.StringAsBool(ascString);
-            var identifierPropName = this.GetRequestParameterOrDefault("identifierPropName", filterContext);
-            var getIdentifiersString = this.GetRequestParameterOrDefault("getIdentifiers", filterContext);
-            var getIdentifiers = this.StringAsBool(getIdentifiersString);
+            var identifierPropName = httpContextHelpers.GetRequestParameterOrDefault("identifierPropName", filterContext);
+            var isGetIdentifiersString = httpContextHelpers.GetRequestParameter("getIdentifiers", filterContext);
+            var isGetIdentifiers = this.StringAsBool(isGetIdentifiersString);
 
             var data = (IOrderedQueryable<object>)filterContext.Controller.ViewData.Model;
 
-            IQueryable identifiers = getIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
+            IQueryable identifiers = isGetIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
 
             var requestModel = new RequestModel
             {
@@ -44,7 +47,7 @@
                 OrderByPropName = orderBy,
                 IsAscending = asc,
                 IdentifierPropName = identifierPropName,
-                GetIdentifiers = getIdentifiers,
+                GetIdentifiers = isGetIdentifiers,
                 Data = data,
                 Identifiers = identifiers,
             };
@@ -72,32 +75,6 @@
             var identifiers = data.Select($"{identifierPropName}");
 
             return identifiers;
-        }
-
-        private string GetRequestParameterOrDefault(string param, ActionExecutedContext filterContext)
-        {
-            var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
-            if (requestParam == null)
-            {
-                return null;
-            }
-
-            var requestedParamValue = requestParam.AttemptedValue;
-
-            return requestedParamValue;
-        }
-
-        private string GetRequestParameter(string param, ActionExecutedContext filterContext)
-        {
-            var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
-            if (requestParam == null)
-            {
-                throw new ArgumentException($"The request parameter \"{param}\" is missing.");
-            }
-
-            var requestedParamValue = requestParam.AttemptedValue;
-
-            return requestedParamValue;
         }
 
         private Dictionary<string, FilterRequestModel> GetFilterDictionary(ActionExecutedContext filterContext)

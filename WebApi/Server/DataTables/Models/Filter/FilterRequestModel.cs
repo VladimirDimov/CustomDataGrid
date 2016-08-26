@@ -1,6 +1,6 @@
 ﻿namespace DataTables.Models.Filter
 {
-    class FilterRequestModel
+    public class FilterRequestModel
     {
         public string Value { get; set; }
 
