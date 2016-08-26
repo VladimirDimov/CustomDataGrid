@@ -88,6 +88,7 @@
     <Compile Include="CommonProviders\Contracts\IJsonProvider.cs" />
     <Compile Include="CommonProviders\JsonProvider.cs" />
     <Compile Include="DataTableFilter.cs" />
+    <Compile Include="Engine.cs" />
     <Compile Include="Expressions\ICreateExpression.cs" />
     <Compile Include="Expressions\FilterExpression.cs" />
     <Compile Include="Expressions\OrderByLambda.cs" />

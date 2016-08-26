@@ -20,16 +20,16 @@
 
         public RequestModel GetRequestModel(ActionExecutedContext filterContext)
         {
-            var pageSizeString = this.GetRequestParameter("pageSize", filterContext);
+            var pageSizeString = this.GetRequestParameterOrDefault("pageSize", filterContext);
             var pageSize = int.Parse(pageSizeString);
-            var pageString = this.GetRequestParameter("page", filterContext);
+            var pageString = this.GetRequestParameterOrDefault("page", filterContext);
             var page = int.Parse(pageString);
             var filter = this.GetFilterDictionary(filterContext);
-            var orderBy = this.GetRequestParameter("orderBy", filterContext);
-            var ascString = this.GetRequestParameter("asc", filterContext);
+            var orderBy = this.GetRequestParameterOrDefault("orderBy", filterContext);
+            var ascString = this.GetRequestParameterOrDefault("asc", filterContext);
             var asc = this.StringAsBool(ascString);
-            var identifierPropName = this.GetRequestParameter("identifierPropName", filterContext);
-            var getIdentifiersString = this.GetRequestParameter("getIdentifiers", filterContext);
+            var identifierPropName = this.GetRequestParameterOrDefault("identifierPropName", filterContext);
+            var getIdentifiersString = this.GetRequestParameterOrDefault("getIdentifiers", filterContext);
             var getIdentifiers = this.StringAsBool(getIdentifiersString);
 
             var data = (IOrderedQueryable<object>)filterContext.Controller.ViewData.Model;
@@ -74,12 +74,25 @@
             return identifiers;
         }
 
-        private string GetRequestParameter(string param, ActionExecutedContext filterContext)
+        private string GetRequestParameterOrDefault(string param, ActionExecutedContext filterContext)
         {
             var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
             if (requestParam == null)
             {
                 return null;
+            }
+
+            var requestedParamValue = requestParam.AttemptedValue;
+
+            return requestedParamValue;
+        }
+
+        private string GetRequestParameter(string param, ActionExecutedContext filterContext)
+        {
+            var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
+            if (requestParam == null)
+            {
+                throw new ArgumentException($"The request parameter \"{param}\" is missing.");
             }
 
             var requestedParamValue = requestParam.AttemptedValue;

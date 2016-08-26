@@ -1,7 +1,9 @@
 ﻿namespace Server.filters
 {
+    using DataTables;
     using DataTables.CommonProviders;
     using DataTables.ProcessDataProviders;
+    using System;
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Dynamic;
@@ -17,10 +19,6 @@
 
         public DataTableFilter()
         {
-            this.filterProvider = new FilterProvider();
-            this.sortProvider = new SortProvider();
-            this.jsonProvider = new JsonProvider();
-            this.requestParamsManager = new RequestParamsManager();
         }
 
         public override void OnResultExecuting(ResultExecutingContext filterContext)
@@ -30,27 +28,19 @@
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            var requestModel = this.requestParamsManager.GetRequestModel(filterContext);
-            var collectionDataType = requestModel.Data
-                                        .GetType()
-                                        .GetGenericArguments()
-                                        .FirstOrDefault();
-
-            IQueryable<object> filteredData = this.filterProvider.FilterDataWithExpressions(collectionDataType, requestModel.Data, requestModel.Filter);
-            IQueryable<object> orderedData = this.sortProvider.SortCollection(filteredData, requestModel.OrderByPropName, requestModel.IsAscending, collectionDataType);
-
-            var resultData = orderedData
-                .Skip((requestModel.Page - 1) * requestModel.PageSize)
-                .Take(requestModel.PageSize);
-
-            filterContext.Result = jsonProvider
-                .GetJsonResult(
-                    new
-                    {
-                        identifiers = requestModel.Identifiers,
-                        data = resultData,
-                        rowsNumber = filteredData.Count()
-                    });
+            var engine = new Engine();
+            try
+            {
+                engine.Run(filterContext);
+            }
+            catch (Exception ex)
+            {
+#if (!debug)
+                this.result = new HttpStatusCodeResult(500, ex.Message);
+#else
+                throw ex;
+#endif
+            }
         }
     }
 }
