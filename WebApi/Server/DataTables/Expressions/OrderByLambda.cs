@@ -4,14 +4,26 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal static class OrderByLambda
+    public static class OrderByLambda
     {
-        public static LambdaExpression LambdaExpression(Type collectionGenericType, string propName, Type propType, bool isAscending)
+        public static LambdaExpression LambdaExpression(Type collectionGenericType, string propName, bool isAscending)
         {
+            if (collectionGenericType == null)
+            {
+                throw new ArgumentNullException("Collection generic type cannot be null.");
+            }
+
+            if (string.IsNullOrEmpty(propName))
+            {
+                throw new ArgumentException("OrderBy property name cannot be null or empty.");
+            }
+
             // x => ((Cast)x).Property
             var xParam = Expression.Parameter(typeof(object), "x");
             var xAsType = Expression.Convert(xParam, collectionGenericType);
             var bindExpr = Expression.Property(xAsType, propName);
+
+            var propType = collectionGenericType.GetProperty(propName).PropertyType;
             var outerCastToObject = Expression.Convert(bindExpr, propType);
 
             Expression selectPropLambdaExpr = Expression.Lambda(outerCastToObject, xParam);

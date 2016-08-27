@@ -1,14 +1,12 @@
-﻿using DataTables.Models.Filter;
-using DataTables.ProcessDataProviders;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UnitTests.ProcessDataProviers
+﻿namespace UnitTests.ProcessDataProviers
 {
+    using DataTables.Models.Filter;
+    using DataTables.ProcessDataProviders;
+    using NUnit.Framework;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     class FilterProviderTests
     {
         // Input validation
