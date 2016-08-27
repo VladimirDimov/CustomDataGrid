@@ -8,7 +8,7 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    class FilterProvider
+    public class FilterProvider
     {
         private ValidationProvider validationProvider;
 
@@ -23,9 +23,9 @@
                                             IDictionary<string, FilterRequestModel> filterDict)
         {
             // STARRT validation
-            this.validationProvider.ValidateMustNotBeNull(dataCollectionGenericType);
-            this.validationProvider.ValidateMustNotBeNull(data);
-            this.validationProvider.ValidateMustNotBeNull(filterDict);
+            this.validationProvider.ValidateMustNotBeNull(dataCollectionGenericType, "data collection generic type");
+            this.validationProvider.ValidateMustNotBeNull(data, "filtered data");
+            this.validationProvider.ValidateMustNotBeNull(filterDict, "filters dictionary");
             // END validation
 
             foreach (var filter in filterDict)

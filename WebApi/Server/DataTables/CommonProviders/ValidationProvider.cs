@@ -8,11 +8,11 @@ namespace DataTables.CommonProviders
 {
     class ValidationProvider
     {
-        public void ValidateMustNotBeNull(object obj)
+        public void ValidateMustNotBeNull(object obj, string parameterName)
         {
             if (obj == null)
             {
-                throw new ArgumentNullException($"Invalid null value of type {obj.GetType().TypeInitializer.Name}.");
+                throw new ArgumentNullException($"Invalid null value of {parameterName}");
             }
         }
     }

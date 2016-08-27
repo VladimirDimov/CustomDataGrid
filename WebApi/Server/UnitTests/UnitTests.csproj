@@ -122,6 +122,7 @@
     <Compile Include="CommonProviders\HttpContextHelpersTests.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ActionExecutedContextMocks.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ControllerMock.cs" />
+    <Compile Include="ProcessDataProviers\FilterProviderTests.cs" />
     <Compile Include="RequestParamsManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
