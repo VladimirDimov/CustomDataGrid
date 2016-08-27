@@ -1,4 +1,4 @@
-﻿namespace UnitTests
+﻿namespace UnitTests.CommonProviders
 {
     using DataTables.CommonProviders;
     using NUnit.Framework;

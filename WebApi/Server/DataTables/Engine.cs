@@ -29,7 +29,7 @@
                                         .GetGenericArguments()
                                         .FirstOrDefault();
 
-            IQueryable<object> filteredData = this.filterProvider.FilterDataWithExpressions(collectionDataType, requestModel.Data, requestModel.Filter);
+            IQueryable<object> filteredData = this.filterProvider.FilterData(collectionDataType, requestModel.Data, requestModel.Filter);
             IQueryable<object> orderedData = this.sortProvider.SortCollection(filteredData, requestModel.OrderByPropName, requestModel.IsAscending, collectionDataType);
 
             var resultData = orderedData

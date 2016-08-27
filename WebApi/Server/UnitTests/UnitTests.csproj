@@ -119,7 +119,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="HttpContextHelpersTests.cs" />
+    <Compile Include="CommonProviders\HttpContextHelpersTests.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ActionExecutedContextMocks.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ControllerMock.cs" />
     <Compile Include="RequestParamsManagerTests.cs" />

@@ -1,5 +1,6 @@
 ﻿namespace DataTables.ProcessDataProviders
 {
+    using CommonProviders;
     using Expressions;
     using Models.Filter;
     using System;
@@ -9,12 +10,24 @@
 
     class FilterProvider
     {
-        public IQueryable<object> FilterDataWithExpressions(
-                                                            Type type,
-                                                            IQueryable<object> data,
-                                                            IDictionary<string,
-                                                            FilterRequestModel> filterDict)
+        private ValidationProvider validationProvider;
+
+        public FilterProvider()
         {
+            this.validationProvider = new ValidationProvider();
+        }
+
+        public IQueryable<object> FilterData(
+                                            Type dataCollectionGenericType,
+                                            IQueryable<object> data,
+                                            IDictionary<string, FilterRequestModel> filterDict)
+        {
+            // STARRT validation
+            this.validationProvider.ValidateMustNotBeNull(dataCollectionGenericType);
+            this.validationProvider.ValidateMustNotBeNull(data);
+            this.validationProvider.ValidateMustNotBeNull(filterDict);
+            // END validation
+
             foreach (var filter in filterDict)
             {
                 if (string.IsNullOrEmpty(filter.Value.Value))
@@ -28,7 +41,7 @@
                                                                                     filter.Key,
                                                                                     filter.Value.Value,
                                                                                     filter.Value.Operator,
-                                                                                    type);
+                                                                                    dataCollectionGenericType);
 
                 data = data.Where(expr);
             }
