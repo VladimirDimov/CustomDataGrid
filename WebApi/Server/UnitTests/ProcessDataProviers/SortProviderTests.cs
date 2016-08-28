@@ -98,6 +98,31 @@
             this.TestSort(5000, "PropChar", false);
         }
 
+        [Test]
+        public void ShouldSortByStringPropertyCaseInsensitive()
+        {
+            var sortProvider = new SortProvider();
+            var collection = new List<DataObject>()
+            {
+                new DataObject {PropString = "c" },
+                new DataObject {PropString = "e" },
+                new DataObject {PropString = "a" },
+                new DataObject {PropString = "B" },
+                new DataObject {PropString = "D" },
+            }.AsQueryable();
+
+            var orderedCollection = sortProvider
+                .SortCollection(collection, "PropString", true, typeof(DataObject))
+                .ToList();
+            for (int i = 0; i < collection.Count() - 2; i++)
+            {
+                string left = ((DataObject)orderedCollection[i]).PropString.ToLower();
+                string right = ((DataObject)orderedCollection[i + 1]).PropString.ToLower();
+
+                Assert.IsTrue(string.Compare(left, right) <= 0);
+            }
+        }
+
         private void TestSort(int numberOfItems, string propName, bool isAsc)
         {
             var sortProvider = new SortProvider();
