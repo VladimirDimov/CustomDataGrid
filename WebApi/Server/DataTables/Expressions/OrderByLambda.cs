@@ -21,13 +21,14 @@
             // x => ((Cast)x).Property
             var xParam = Expression.Parameter(typeof(object), "x");
             var xAsType = Expression.Convert(xParam, collectionGenericType);
-            var bindExpr = Expression.Property(xAsType, propName);
 
             var propertyPropInfo = collectionGenericType.GetProperty(propName);
             if (propertyPropInfo == null)
             {
                 throw new ArgumentException($"Invalid property name: {propName}. The data collection type does not contain such property.");
             }
+
+            var bindExpr = Expression.Property(xAsType, propName);
 
             var propType = propertyPropInfo.PropertyType;
             var outerCastToObject = Expression.Convert(bindExpr, propType);

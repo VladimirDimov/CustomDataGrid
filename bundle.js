@@ -92,7 +92,7 @@ $('#selectAll').on('click', function () {
 $('#unselectAll').on('click', function () {
   tb.unselectAll();
 });
-},{"../js/v-data-table.js":11}],2:[function(require,module,exports){
+},{"../js/v-data-table.js":9}],2:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
@@ -174,205 +174,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":8,"../js/selectable.js":9,"../js/table-renderer.js":10}],3:[function(require,module,exports){
-var baseProvider = (function () {
-    return {
-        init: function (table) {
-            this.table = table;
-        },
-
-        get table() {
-            return this._table;
-        },
-
-        set table(value) {
-            if (!value) {
-                throw new "Invalid null value for table";
-            }
-
-            this._table = value;
-        }
-    };
-})();
-
-module.exports = baseProvider;
-},{}],4:[function(require,module,exports){
-var baseProvider = require('../../js/dataTableProviders/baseProvider.js');
-
-var dataLoader = (function (parent) {
-    var paginator = require('../../js/paginator.js');
-    var selectable = require('../../js/selectable.js');
-    var tableRenderer = require('../../js/table-renderer.js');
-
-    var dataLoader = Object.create(baseProvider, {
-        init: {
-            value: function (table) {
-                parent.init.call(this, table);
-
-                return this;
-            }
-        },
-
-        loadData: {
-            value: function (page, isUpdatePaginator) {
-                paginator(this.table).updatePaginator = paginator(this.table).updatePaginator || true;
-                var table = this.table;
-                $.ajax({
-                    url: table.settings.ajax.url,
-                    data: {
-                        identifierPropName: table.settings.features.identifier,
-                        getIdentifiers: table.store.identifiers === null,
-                        page: page,
-                        pageSize: table.settings.pageSize,
-                        filter: JSON.stringify(table.store.filter),
-                        orderBy: table.orderBy ? table.orderBy.Name : null,
-                        asc: table.orderBy ? table.orderBy.Asc : true
-                    },
-                    success: function (data) {
-                        refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
-
-                        if (isUpdatePaginator) {
-                            paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
-                        }
-                    }
-                });
-            }
-        }
-    });
-
-    function refreshPageData(table, data, identifiers, rowsNumber) {
-        table.store.pageData = data;
-        table.store.numberOfRows = rowsNumber;
-        table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
-
-        tableRenderer.renderNumberOfRows(table);
-        tableRenderer.renderNumberOfPages(table);
-
-        var $tbody = table.$table.children('tbody').empty();
-        // TODO: To foreach the table._columnPropertyNames instead of the response data columns
-
-        for (var row = 0; row < data.length; row++) {
-            var rowData = data[row];
-            var identifier = rowData[table.settings.features.identifier];
-            var $row = tableRenderer.renderRow(table, rowData);
-            $tbody.append($row);
-
-            if (table.store.identifiers != null) {
-                formatRowSelected(table, $row, identifier);
-            }
-
-            if (table.store.identifiers === null) {
-                selectable.initIdentifiers(table, identifiers);
-            }
-            // var $row = tableRenderer.renderRow(table, rowData, identifiers);
-        }
-    }
-
-    function formatRowSelected(table, $row, identifier) {
-        if (isSelected(table, identifier)) {
-            $row.css('backgroundColor', table.settings.colors.selectedRow);
-        }
-    }
-
-    function isSelected(table, identifier) {
-        var identifiers = table.store.identifiers;
-        var status = identifiers.filter(function (element) {
-            return element.identifier == identifier;
-        })[0].selected;
-
-        return status;
-    }
-
-    return dataLoader;
-} (baseProvider));
-
-module.exports = dataLoader;
-},{"../../js/dataTableProviders/baseProvider.js":3,"../../js/paginator.js":8,"../../js/selectable.js":9,"../../js/table-renderer.js":10}],5:[function(require,module,exports){
-var baseProvider = require('../../js/dataTableProviders/baseProvider.js');
-
-var filter = (function (parent) {
-    'use strict';
-    var dataLoader = require('../../js/dataLoader.js');
-
-    var filter = Object.create(baseProvider, {
-        init: {
-            value: function (table) {
-                parent.init.call(this, table);
-
-                return this;
-            }
-        },
-
-        setFilterEvent: {
-            value: function () {
-                var $filter = $(this.table.$table[0]).find('[filter]');
-                var table = this.table;
-
-                $filter.on('change', function () {
-                    var $target = $(this);
-                    var dictKey = $target.attr('data-props');
-                    var filterOperator = $target.attr('filter');
-                    var dictValue = $target.val();
-                    table.store.filter[dictKey] = { value: dictValue, operator: filterOperator || 'ci' };
-                    dataLoader.loadData(table, 1, true);
-                });
-            }
-        }
-    });
-
-    return filter;
-} (baseProvider));
-
-module.exports = filter;
-},{"../../js/dataLoader.js":2,"../../js/dataTableProviders/baseProvider.js":3}],6:[function(require,module,exports){
-var baseProvider = require('../../js/dataTableProviders/baseProvider.js');
-
-var sortable = (function (parent) {
-    'use strict';
-    var dataLoader = require('../../js/dataLoader.js');
-
-    var sortable = Object.create(baseProvider, {
-
-        init: {
-            value: function (table) {
-                parent.init.call(this, table);
-
-                return this;
-            }
-        },
-
-        formatSortables: {
-            value: function () {
-                var table = this.table;
-                var $sortables = table.$table.find('thead tr:last-child th[sortable]');
-
-                $sortables.on('click', function (e) {
-                    var name = $(e.target).attr('data-colName');
-                    var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
-                    table.orderBy = {
-                        Name: name,
-                        Asc: isAsc
-                    };
-
-                    $sortables.removeAttr('asc desc');
-                    if (isAsc) {
-                        $(e.target).attr('asc', '')
-                    } else {
-                        $(e.target).attr('desc', '')
-                    }
-
-                    dataLoader.loadData(table, 1);
-                });
-            }
-        }
-
-    });
-
-    return sortable;
-})(baseProvider);
-
-module.exports = sortable;
-},{"../../js/dataLoader.js":2,"../../js/dataTableProviders/baseProvider.js":3}],7:[function(require,module,exports){
+},{"../js/paginator.js":5,"../js/selectable.js":6,"../js/table-renderer.js":8}],3:[function(require,module,exports){
 var editable = (function () {
     var tableRenderer = require('../js/table-renderer.js');
 
@@ -430,7 +232,28 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../js/table-renderer.js":10}],8:[function(require,module,exports){
+},{"../js/table-renderer.js":8}],4:[function(require,module,exports){
+var filter = (function () {
+    'use strict';
+    var dataLoader = require('../js/dataLoader.js');
+
+    return {
+        setFilterEvent: function (table) {
+            var $filter = $(table.$table[0]).find('[filter]');
+            $filter.on('change', function () {
+                var $target = $(this);
+                var dictKey = $target.attr('data-props');
+                var filterOperator = $target.attr('filter');
+                var dictValue = $target.val();
+                table.store.filter[dictKey] = { value: dictValue, operator: filterOperator || 'ci' };
+                dataLoader.loadData(table, 1, true);
+            });
+        }
+    };
+} ());
+
+module.exports = filter;
+},{"../js/dataLoader.js":2}],5:[function(require,module,exports){
 var paginator = function (table) {
     var dataLoader = require('../js/dataLoader.js');
 
@@ -529,7 +352,7 @@ var paginator = function (table) {
 };
 
 module.exports = paginator;
-},{"../js/dataLoader.js":2}],9:[function(require,module,exports){
+},{"../js/dataLoader.js":2}],6:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -645,7 +468,38 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],10:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+var sortable = (function () {
+    'use strict';
+    var dataLoader = require('../js/dataLoader.js');
+
+    return {
+        formatSortables: function (table) {
+            var $sortables = table.$table.find('thead tr:last-child th[sortable]');
+
+            $sortables.on('click', function (e) {
+                var name = $(e.target).attr('data-colName');
+                var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
+                table.orderBy = {
+                    Name: name,
+                    Asc: isAsc
+                };
+
+                $sortables.removeAttr('asc desc');
+                if (isAsc) {
+                    $(e.target).attr('asc', '')
+                } else {
+                    $(e.target).attr('desc', '')
+                }
+
+                dataLoader.loadData(table, 1);
+            });
+        },
+    }
+})();
+
+module.exports = sortable;
+},{"../js/dataLoader.js":2}],8:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = {
@@ -693,14 +547,14 @@ var renderer = {
 };
 
 module.exports = renderer;
-},{"../js/selectable.js":9}],11:[function(require,module,exports){
+},{"../js/selectable.js":6}],9:[function(require,module,exports){
 vDataTable = function () {
   'use strict'
   var selectable = require('../js/selectable.js');
-  var sortable = require('../js/dataTableProviders/sortableProvider.js');
-  var dataLoader = require('../js/dataTableProviders/dataLoader.js');
+  var sortable = require('../js/sortable.js');
+  var dataLoader = require('../js/dataLoader.js');
   var paginator = require('../js/paginator.js');
-  var filter = require('../js/dataTableProviders/filterProvider.js');
+  var filter = require('../js/filter.js');
   var editable = require('../js/editable');
 
 
@@ -758,11 +612,9 @@ vDataTable = function () {
       }
 
       paginator(this).setPageClickEvents();
-      filter.init(this).setFilterEvent();
-      sortable.init(this).formatSortables();
-
-      this.dataLoader = dataLoader.init(this);
-      this.dataLoader.loadData(1, true);
+      filter.setFilterEvent(this);
+      sortable.formatSortables(this);
+      dataLoader.loadData(table, 1, true);
 
       if (settings.features) {
         processFeatures(settings.features);
@@ -820,4 +672,4 @@ vDataTable = function () {
 };
 
 module.exports = vDataTable;
-},{"../js/dataTableProviders/dataLoader.js":4,"../js/dataTableProviders/filterProvider.js":5,"../js/dataTableProviders/sortableProvider.js":6,"../js/editable":7,"../js/paginator.js":8,"../js/selectable.js":9}]},{},[1]);
+},{"../js/dataLoader.js":2,"../js/editable":3,"../js/filter.js":4,"../js/paginator.js":5,"../js/selectable.js":6,"../js/sortable.js":7}]},{},[1]);
