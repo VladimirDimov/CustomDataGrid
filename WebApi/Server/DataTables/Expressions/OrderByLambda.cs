@@ -23,7 +23,13 @@
             var xAsType = Expression.Convert(xParam, collectionGenericType);
             var bindExpr = Expression.Property(xAsType, propName);
 
-            var propType = collectionGenericType.GetProperty(propName).PropertyType;
+            var propertyPropInfo = collectionGenericType.GetProperty(propName);
+            if (propertyPropInfo == null)
+            {
+                throw new ArgumentException($"Invalid property name: {propName}. The data collection type does not contain such property.");
+            }
+
+            var propType = propertyPropInfo.PropertyType;
             var outerCastToObject = Expression.Convert(bindExpr, propType);
 
             Expression selectPropLambdaExpr = Expression.Lambda(outerCastToObject, xParam);

@@ -123,6 +123,7 @@
     <Compile Include="LambdaExpressions\OrderByLambdaTests.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ActionExecutedContextMocks.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ControllerMock.cs" />
+    <Compile Include="Mocks\DataObjects\DataObject.cs" />
     <Compile Include="ProcessDataProviers\FilterProviderTests.cs" />
     <Compile Include="ProcessDataProviers\SortProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -36,7 +36,7 @@
             catch (Exception ex)
             {
 #if (!debug)
-                this.result = new HttpStatusCodeResult(500, ex.Message);
+                filterContext.Result = new HttpStatusCodeResult(500, ex.Message);
 #else
                 throw ex;
 #endif

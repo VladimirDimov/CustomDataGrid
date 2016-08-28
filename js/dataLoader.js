@@ -24,6 +24,9 @@ var dataLoader = (function () {
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
+                },
+                error: function(err) {
+                    throw err;
                 }
             });
         }
