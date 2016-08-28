@@ -66,6 +66,10 @@
 
             // Value
             var propType = xExpr.Type.GetProperty(propName).PropertyType;
+            if (propType.GetInterface("IComparable") == null)
+            {
+                throw new InvalidOperationException($"Cannot compare property of type that does not implement IComparable. Property name: {propName}; Type: {propType.Name}");
+            }
 
             object parsedFilter = null;
             if (propType.GetMethods().Any(m => m.Name == "Parse"))
