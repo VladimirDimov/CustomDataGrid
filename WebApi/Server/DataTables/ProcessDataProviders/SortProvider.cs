@@ -30,15 +30,5 @@
 
             return filteredData;
         }
-
-        //private static string OrderByMethodName(bool isAscending)
-        //{
-        //    if (isAscending)
-        //    {
-        //        return "OrderBy";
-        //    }
-
-        //    return "OrderByDescending";
-        //}
     }
 }
