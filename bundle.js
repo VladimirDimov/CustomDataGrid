@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // // Some code
-var vDataTable = require('../js/v-data-table.js');
+var vDataTable = require('../js/data-table.js');
 
 var tb = vDataTable().init('#table', {
   ajax: {
@@ -19,15 +19,16 @@ var tb = vDataTable().init('#table', {
       }
     }
   },
+  
   features: {
     identifier: 'Id',
     selectable: {
       active: true,
-      selectFunction: function ($row) {
-        return $row.children().first('td').html();
-      }
+      cssClasses: 'row-selected'
+      // selectFunction: function ($row) {
+      //   // return $row.children().first('td').html();
+      // }
     },
-    // filter:  [names of the columns to be filtered]
     editable: {
       columns: {
         FirstName: {
@@ -92,7 +93,135 @@ $('#selectAll').on('click', function () {
 $('#unselectAll').on('click', function () {
   tb.unselectAll();
 });
-},{"../js/v-data-table.js":9}],2:[function(require,module,exports){
+},{"../js/data-table.js":2}],2:[function(require,module,exports){
+dataTable = function () {
+  'use strict'
+  var selectable = require('../js/selectable.js');
+  var sortable = require('../js/sortable.js');
+  var dataLoader = require('../js/dataLoader.js');
+  var paginator = require('../js/paginator.js');
+  var filter = require('../js/filter.js');
+  var editable = require('../js/editable');
+
+
+  var defaultSettings = {
+    pageSize: 9,
+    paginator: {
+      length: 10
+    },
+    features: {
+      enableFilter: true,
+      selectable: {
+        active: true,
+        cssCasses: 'dt-row-selected',
+      }
+    },
+    colors: {
+      // No colors yet
+    }
+  };
+
+  var table = {
+    init: function (selector, settings) {
+      var tb = {};
+      this._$table = $(selector).first();
+      this._$table._currentPage = 1;
+
+      // Paginator settings
+      this._paginator = {};
+      this._paginator.currentPage = 1;
+      this._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
+      this._paginator.$paginator = paginator(this).setPaginator(1, this._paginator.length, 1);
+
+      this._columnPropertyNames = setColumnPropertyNames();
+
+      // Data
+      this.store = {
+        filter: new Object(),
+        selectedRows: [],
+        identifiers: null,
+        pageData: null
+      };
+
+      // Settings
+      this._settings = {
+        ajax: {
+          url: settings.ajax.url
+        },
+        colors: {
+          selectedRow: (settings.colors ? selectedRow : null) || defaultSettings.colors.selectedRow,
+        },
+        pageSize: settings.pageSize || defaultSettings.pageSize,
+        features: {
+          identifier: settings.features.identifier,
+          selectable: settings.features.selectable,
+          editable: settings.features.editable
+        },
+        columns: settings.columns || {}
+      }
+
+      paginator(this).setPageClickEvents();
+      filter.setFilterEvent(this);
+      sortable.formatSortables(this);
+      dataLoader.loadData(table, 1, true);
+
+      if (settings.features) {
+        processFeatures(settings.features);
+      };
+
+      return this;
+    },
+
+    get settings() {
+      return this._settings;
+    },
+
+    get paginator() {
+      return this._paginator;
+    },
+
+    get $table() {
+      return this._$table;
+    },
+
+    get filter() {
+      return table.store.filter;
+    },
+
+    getSelected: function () {
+      return selectable.getSelected(this);
+    },
+
+    get columnPropertyNames() {
+      return this._columnPropertyNames;
+    }
+  };
+
+  function processFeatures(features) {
+    if (features.selectable.active && features.selectable.active == true) {
+      selectable.makeSelectable(table);
+    };
+
+    if (features.editable) {
+      editable.init(table);
+    }
+  }
+
+  function setColumnPropertyNames() {
+    var colPropNames = [];
+    var $columns = table.$table.find('thead tr:last-child').children();
+    for (var i = 0; i < $columns.length; i++) {
+      colPropNames.push($($columns[i]).attr('data-name'));
+    }
+
+    return colPropNames;
+  };
+
+  return table;
+};
+
+module.exports = dataTable;
+},{"../js/dataLoader.js":3,"../js/editable":4,"../js/filter.js":5,"../js/paginator.js":6,"../js/selectable.js":7,"../js/sortable.js":8}],3:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
@@ -174,7 +303,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":5,"../js/selectable.js":6,"../js/table-renderer.js":8}],3:[function(require,module,exports){
+},{"../js/paginator.js":6,"../js/selectable.js":7,"../js/table-renderer.js":9}],4:[function(require,module,exports){
 var editable = (function () {
     var tableRenderer = require('../js/table-renderer.js');
 
@@ -232,7 +361,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../js/table-renderer.js":8}],4:[function(require,module,exports){
+},{"../js/table-renderer.js":9}],5:[function(require,module,exports){
 var filter = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -253,7 +382,7 @@ var filter = (function () {
 } ());
 
 module.exports = filter;
-},{"../js/dataLoader.js":2}],5:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],6:[function(require,module,exports){
 var paginator = function (table) {
     var dataLoader = require('../js/dataLoader.js');
 
@@ -352,7 +481,7 @@ var paginator = function (table) {
 };
 
 module.exports = paginator;
-},{"../js/dataLoader.js":2}],6:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],7:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -361,20 +490,21 @@ var selectable = (function () {
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');
-
                 if (!e.ctrlKey && !isSelected(table, $row)) {
-                    $tbody.find('tr').css('background-color', 'white');
+                    // $tbody.find('tr').css('background-color', 'white');
+                    setRowSelectCssClasses(table, $tbody.find('tr'), false);
                     selectable.unselectAll(table);
-                    // $row.css('background-color', 'gray');
                 }
 
                 if (isSelected(table, $row)) {
                     RemoveFromArray($row[0], table.store.selectedRows);
                     setIdentifierSelectStatus(table, identifier, false);
-                    $row.css('background-color', 'white');
+                    // $row.css('background-color', 'white');
+                    setRowSelectCssClasses(table, $row, true);
                 } else {
                     setIdentifierSelectStatus(table, identifier, true);
-                    $row.css('background-color', 'gray');
+                    // $row.css('background-color', 'gray');
+                    setRowSelectCssClasses(table, $row, true);
                 }
             });
 
@@ -432,15 +562,26 @@ var selectable = (function () {
         }
     };
 
+    function setRowSelectCssClasses(table, $row, isSelected) {
+        var cssClasses = table.settings.features.selectable.cssClasses;
+        if (isSelected) {
+            $row.addClass(cssClasses);
+        } else {
+            $row.removeClass(cssClasses);
+        }
+    }
+
     function refreshPageSelection(table) {
         var tableRows = table.$table.find('tbody tr').slice();
         for (var i = 0, l = tableRows.length; i < l; i += 1) {
             var $row = $(tableRows[i]);
             var rowIdentifier = $row.attr('data-identifier');
             if (table.store.identifiers[rowIdentifier].selected) {
-                $row.css('background-color', 'gray');
+                // $row.css('background-color', 'gray');
+                setRowSelectCssClasses(table, $row, true);
             } else {
-                $row.css('background-color', '');
+                // $row.css('background-color', '');
+                setRowSelectCssClasses(table, $row, false);
             }
         }
     }
@@ -468,7 +609,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var sortable = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -499,7 +640,7 @@ var sortable = (function () {
 })();
 
 module.exports = sortable;
-},{"../js/dataLoader.js":2}],8:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],9:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = {
@@ -547,129 +688,4 @@ var renderer = {
 };
 
 module.exports = renderer;
-},{"../js/selectable.js":6}],9:[function(require,module,exports){
-vDataTable = function () {
-  'use strict'
-  var selectable = require('../js/selectable.js');
-  var sortable = require('../js/sortable.js');
-  var dataLoader = require('../js/dataLoader.js');
-  var paginator = require('../js/paginator.js');
-  var filter = require('../js/filter.js');
-  var editable = require('../js/editable');
-
-
-  var defaultSettings = {
-    pageSize: 9,
-    paginator: {
-      length: 10
-    },
-    features: {
-      enableFilter: true,
-      selectable: true
-    },
-    colors: {
-      selectedRow: 'gray'
-    }
-  };
-
-  var table = {
-    init: function (selector, settings) {
-      var tb = {};
-      this._$table = $(selector).first();
-      this._$table._currentPage = 1;
-
-      // Paginator settings
-      this._paginator = {};
-      this._paginator.currentPage = 1;
-      this._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
-      this._paginator.$paginator = paginator(this).setPaginator(1, this._paginator.length, 1);
-
-      this._columnPropertyNames = setColumnPropertyNames();
-
-      // Data
-      this.store = {
-        filter: new Object(),
-        selectedRows: [],
-        identifiers: null,
-        pageData: null
-      };
-
-      // Settings
-      this._settings = {
-        ajax: {
-          url: settings.ajax.url
-        },
-        colors: {
-          selectedRow: (settings.colors ? selectedRow : null) || defaultSettings.colors.selectedRow,
-        },
-        pageSize: settings.pageSize || defaultSettings.pageSize,
-        features: {
-          identifier: settings.features.identifier,
-          selectable: settings.features.selectable,
-          editable: settings.features.editable
-        },
-        columns: settings.columns || {}
-      }
-
-      paginator(this).setPageClickEvents();
-      filter.setFilterEvent(this);
-      sortable.formatSortables(this);
-      dataLoader.loadData(table, 1, true);
-
-      if (settings.features) {
-        processFeatures(settings.features);
-      };
-
-      return this;
-    },
-
-    get settings() {
-      return this._settings;
-    },
-
-    get paginator() {
-      return this._paginator;
-    },
-
-    get $table() {
-      return this._$table;
-    },
-
-    get filter() {
-      return table.store.filter;
-    },
-
-    getSelected: function () {
-      return selectable.getSelected(this);
-    },
-
-    get columnPropertyNames() {
-      return this._columnPropertyNames;
-    }
-  };
-
-  function processFeatures(features) {
-    if (features.selectable.active && features.selectable.active == true) {
-      selectable.makeSelectable(table);
-    };
-
-    if (features.editable) {
-      editable.init(table);
-    }
-  }
-
-  function setColumnPropertyNames() {
-    var colPropNames = [];
-    var $columns = table.$table.find('thead tr:last-child').children();
-    for (var i = 0; i < $columns.length; i++) {
-      colPropNames.push($($columns[i]).attr('data-colName'));
-    }
-
-    return colPropNames;
-  };
-
-  return table;
-};
-
-module.exports = vDataTable;
-},{"../js/dataLoader.js":2,"../js/editable":3,"../js/filter.js":4,"../js/paginator.js":5,"../js/selectable.js":6,"../js/sortable.js":7}]},{},[1]);
+},{"../js/selectable.js":7}]},{},[1]);

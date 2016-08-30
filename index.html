@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="./v-data-table.css" charset="utf-8">
     <!--JS-->
     <script src="./node_modules/jquery/dist/jquery.js"></script>
+    <style>
+        .row-selected {
+            background-color: red;
+        }
+    </style>
 </head>
 
 <body>
@@ -23,13 +28,13 @@
                 </th>
             </tr>
             <tr>
-                <th data-colName="FirstName" sortable>First Name</th>
-                <th data-colName="LastName" sortable>Last Name</th>
-                <th data-ColName="Position">Position</th>
-                <th data-colName="Occupation" sortable>Occupation</th>
-                <th data-colName="StartDate" sortable>Start Date</th>
-                <th data-colName="Salary" sortable>Salary</th>
-                <th data-colName="Actions">Actions</th>
+                <th data-name="FirstName" sortable>First Name</th>
+                <th data-name="LastName" sortable>Last Name</th>
+                <th data-name="Position">Position</th>
+                <th data-name="Occupation" sortable>Occupation</th>
+                <th data-name="StartDate" sortable>Start Date</th>
+                <th data-name="Salary" sortable>Salary</th>
+                <th data-name="Actions">Actions</th>
             </tr>
         </thead>
         <tbody>

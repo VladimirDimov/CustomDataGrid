@@ -125,8 +125,6 @@
 
         private static Expression GetContainsPartialExpr(string prop, object filter, Expression xExpr, bool isCaseInsensitive = false)
         {
-            // x => ((Cast)x).Prop1.ToString().ToLower().Contains(filter1.ToLower()) || x.Prop2.ToString().ToLower().Contains(filter2.ToLower()) || ...;
-
             // filter
             var filterConstExpr = Expression.Constant(filter);
             // ToLower()
@@ -144,7 +142,6 @@
 
             // x.Name
             var namePropExpr = Expression.Property(xExpr, prop);
-
             // Contains
             var containsMethodInfo = typeof(string).GetMethod("Contains", new Type[] { typeof(string) });
             // ToString()
@@ -165,6 +162,7 @@
             // x.Prop.ToString().ToLower().Contains(filter.ToLower())
             var containsExprCall = Expression.Call(toLowerExprCall, containsMethodInfo, filterToLowerExpr);
 
+            // x => ((Cast)x).Prop1.ToString().ToLower().Contains(filter1.ToLower())
             return containsExprCall;
         }
     }

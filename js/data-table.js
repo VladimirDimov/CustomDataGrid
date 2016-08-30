@@ -1,4 +1,4 @@
-vDataTable = function () {
+dataTable = function () {
   'use strict'
   var selectable = require('../js/selectable.js');
   var sortable = require('../js/sortable.js');
@@ -15,10 +15,13 @@ vDataTable = function () {
     },
     features: {
       enableFilter: true,
-      selectable: true
+      selectable: {
+        active: true,
+        cssCasses: 'dt-row-selected',
+      }
     },
     colors: {
-      selectedRow: 'gray'
+      // No colors yet
     }
   };
 
@@ -112,7 +115,7 @@ vDataTable = function () {
     var colPropNames = [];
     var $columns = table.$table.find('thead tr:last-child').children();
     for (var i = 0; i < $columns.length; i++) {
-      colPropNames.push($($columns[i]).attr('data-colName'));
+      colPropNames.push($($columns[i]).attr('data-name'));
     }
 
     return colPropNames;
@@ -121,4 +124,4 @@ vDataTable = function () {
   return table;
 };
 
-module.exports = vDataTable;
+module.exports = dataTable;

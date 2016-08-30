@@ -1,5 +1,5 @@
 // // Some code
-var vDataTable = require('../js/v-data-table.js');
+var vDataTable = require('../js/data-table.js');
 
 var tb = vDataTable().init('#table', {
   ajax: {
@@ -18,15 +18,16 @@ var tb = vDataTable().init('#table', {
       }
     }
   },
+  
   features: {
     identifier: 'Id',
     selectable: {
       active: true,
-      selectFunction: function ($row) {
-        return $row.children().first('td').html();
-      }
+      cssClasses: 'row-selected'
+      // selectFunction: function ($row) {
+      //   // return $row.children().first('td').html();
+      // }
     },
-    // filter:  [names of the columns to be filtered]
     editable: {
       columns: {
         FirstName: {

@@ -6,20 +6,21 @@ var selectable = (function () {
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');
-
                 if (!e.ctrlKey && !isSelected(table, $row)) {
-                    $tbody.find('tr').css('background-color', 'white');
+                    // $tbody.find('tr').css('background-color', 'white');
+                    setRowSelectCssClasses(table, $tbody.find('tr'), false);
                     selectable.unselectAll(table);
-                    // $row.css('background-color', 'gray');
                 }
 
                 if (isSelected(table, $row)) {
                     RemoveFromArray($row[0], table.store.selectedRows);
                     setIdentifierSelectStatus(table, identifier, false);
-                    $row.css('background-color', 'white');
+                    // $row.css('background-color', 'white');
+                    setRowSelectCssClasses(table, $row, true);
                 } else {
                     setIdentifierSelectStatus(table, identifier, true);
-                    $row.css('background-color', 'gray');
+                    // $row.css('background-color', 'gray');
+                    setRowSelectCssClasses(table, $row, true);
                 }
             });
 
@@ -77,15 +78,26 @@ var selectable = (function () {
         }
     };
 
+    function setRowSelectCssClasses(table, $row, isSelected) {
+        var cssClasses = table.settings.features.selectable.cssClasses;
+        if (isSelected) {
+            $row.addClass(cssClasses);
+        } else {
+            $row.removeClass(cssClasses);
+        }
+    }
+
     function refreshPageSelection(table) {
         var tableRows = table.$table.find('tbody tr').slice();
         for (var i = 0, l = tableRows.length; i < l; i += 1) {
             var $row = $(tableRows[i]);
             var rowIdentifier = $row.attr('data-identifier');
             if (table.store.identifiers[rowIdentifier].selected) {
-                $row.css('background-color', 'gray');
+                // $row.css('background-color', 'gray');
+                setRowSelectCssClasses(table, $row, true);
             } else {
-                $row.css('background-color', '');
+                // $row.css('background-color', '');
+                setRowSelectCssClasses(table, $row, false);
             }
         }
     }
