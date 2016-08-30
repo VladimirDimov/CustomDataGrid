@@ -84,7 +84,7 @@
             var parsedFilterExpr = Expression.Constant(parsedFilter);
             // x => x.Prop.CompareTo(value)
 
-            var compareToExpr = GetCompareToExpression(filterOperator, parsedFilterExpr, propExpr);
+            var compareToExpr = GetCompareToExpression(filterOperator, propExpr, parsedFilterExpr);
             // x => x.Prop.CompareTo(value) == 0
             //var operatorExpr = Expression.Equal(compareToExpr, Expression.Constant(0));
 

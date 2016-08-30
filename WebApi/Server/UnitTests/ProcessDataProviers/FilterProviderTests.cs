@@ -141,7 +141,134 @@
         [Test]
         public void ShouldReturnProperResultForFilterByLessThanForInt()
         {
+            this.TestFilterComparables(
+                            new Dictionary<int, int>()
+                            {
+                                    { 5, 3000},
+                                    { 10, 4000},
+                                    { 15, 5000},
+                            },
+                            oper: "<", fitlerVal: "15",
+                            expectNum: 7000,
+                            propName: "PropInt");
+        }
 
+        [Test]
+        public void ShouldReturnProperResultForFilterByLessThanOrEqualForInt()
+        {
+            this.TestFilterComparables(
+                            new Dictionary<int, int>()
+                            {
+                                    { 5, 3000},
+                                    { 10, 4000},
+                                    { 15, 5000},
+                            },
+                            oper: "<=", fitlerVal: "10",
+                            expectNum: 7000,
+                            propName: "PropInt");
+        }
+
+        [Test]
+        public void ShouldReturnProperResultForGreaterThanForInt()
+        {
+            this.TestFilterComparables(
+                            new Dictionary<int, int>()
+                            {
+                                    { 5, 3000},
+                                    { 10, 4000},
+                                    { 15, 5000},
+                            },
+                            oper: ">", fitlerVal: "10",
+                            expectNum: 5000,
+                            propName: "PropInt");
+        }
+
+        [Test]
+        public void ShouldReturnProperResultForFilterByGreaterThanOrEqualForInt()
+        {
+            this.TestFilterComparables(
+                            new Dictionary<int, int>()
+                            {
+                                    { 5, 3000},
+                                    { 10, 4000},
+                                    { 15, 5000},
+                            },
+                            oper: ">=", fitlerVal: "10",
+                            expectNum: 9000,
+                            propName: "PropInt");
+        }
+
+        [Test]
+        public void ShouldReturnProperResultForEqualForInt()
+        {
+            this.TestFilterComparables(
+                            new Dictionary<int, int>()
+                            {
+                                    { 5, 3000},
+                                    { 10, 4000},
+                                    { 15, 5000},
+                            },
+                            oper: "=", fitlerVal: "10",
+                            expectNum: 4000,
+                            propName: "PropInt");
+        }
+
+        [Test]
+        public void ShouldReturnProperResultForCaseInsensitiveForString()
+        {
+            this.TestFilterComparables(
+                            new Dictionary<string, int>()
+                            {
+                                    { "test", 3000},
+                                    { "TeSt", 4000},
+                                    { "somethingElse", 5000},
+                            },
+                            oper: "ci", fitlerVal: "test",
+                            expectNum: 7000,
+                            propName: "PropString");
+        }
+
+        [Test]
+        public void ShouldReturnProperResultForCaseSensitiveForString()
+        {
+            this.TestFilterComparables(
+                            new Dictionary<string, int>()
+                            {
+                                    { "test", 3000},
+                                    { "TeSt", 4000},
+                                    { "somethingElse", 5000},
+                            },
+                            oper: "cs", fitlerVal: "test",
+                            expectNum: 3000,
+                            propName: "PropString");
+        }
+
+        public void TestFilterComparables<T>(Dictionary<T, int> valueNumberDict, string oper, string fitlerVal, int expectNum, string propName)
+        {
+            var data = new List<DataObject>();
+            var prop = typeof(DataObject).GetProperty(propName);
+            foreach (var valueNum in valueNumberDict)
+            {
+                for (int i = 0; i < valueNum.Value; i++)
+                {
+                    var newObj = new DataObject();
+                    prop.SetValue(newObj, valueNum.Key);
+                    data.Add(newObj);
+                }
+            }
+
+            var rnd = new Random();
+            data = data.OrderBy(x => rnd.Next()).ToList();
+
+            var filterProvider = new FilterProvider();
+            var filters = new Dictionary<string, FilterRequestModel>()
+            {
+                { propName, new FilterRequestModel {Operator = oper , Value = fitlerVal} },
+            };
+
+            var filteredCollection = filterProvider.FilterData(typeof(DataObject), data.AsQueryable(), filters);
+
+            Assert.AreEqual(expectNum, filteredCollection.Count());
         }
     }
 }
