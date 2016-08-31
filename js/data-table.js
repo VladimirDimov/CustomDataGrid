@@ -1,12 +1,13 @@
 window.dataTable = function () {
     'use strict'
+
     var selectable = require('../js/selectable.js');
     var sortable = require('../js/sortable.js');
     var dataLoader = require('../js/dataLoader.js');
     var paginator = require('../js/paginator.js');
     var filter = require('../js/filter.js');
     var editable = require('../js/editable');
-
+    var validator = require('../js/validator.js')
 
     var defaultSettings = {
         pageSize: 10,
@@ -29,6 +30,8 @@ window.dataTable = function () {
     var table = {
         init: function (selector, settings) {
             this._$table = $(selector).first();
+
+            validateSettings(settings);
 
             // Paginator settings
             configurePaginator(this, settings, defaultSettings);
@@ -75,6 +78,7 @@ window.dataTable = function () {
     };
 
     function configureSettings(table, settings, defaultSettings) {
+        validateSettings(settings);
         table._settings = {
             ajax: {
                 url: settings.ajax.url
@@ -89,6 +93,12 @@ window.dataTable = function () {
             },
             columns: settings.columns || {}
         };
+    }
+
+    function validateSettings(settings) {
+        validator.ValidateValueCannotBeNullOrUndefined(settings, "settings", "The configuration object argument is missing from the datatable init constructor function.");
+        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax, "settings.ajax");
+        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax.url, "settings.ajax.url");
     }
 
     function configureStore(table) {

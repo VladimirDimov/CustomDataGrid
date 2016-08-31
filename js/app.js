@@ -1,4 +1,8 @@
-
+var tb1 = dataTable().init('#table', {
+    ajax: {
+        url: ""
+    }
+});
 var tb = dataTable().init('#table', {
     ajax: {
         url: 'http://localhost:65219/home/indexDB'

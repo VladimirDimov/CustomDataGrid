@@ -122,13 +122,14 @@ process.umask = function() { return 0; };
 },{}],2:[function(require,module,exports){
 window.dataTable = function () {
     'use strict'
+
     var selectable = require('../js/selectable.js');
     var sortable = require('../js/sortable.js');
     var dataLoader = require('../js/dataLoader.js');
     var paginator = require('../js/paginator.js');
     var filter = require('../js/filter.js');
     var editable = require('../js/editable');
-
+    var validator = require('../js/validator.js')
 
     var defaultSettings = {
         pageSize: 10,
@@ -151,6 +152,8 @@ window.dataTable = function () {
     var table = {
         init: function (selector, settings) {
             this._$table = $(selector).first();
+
+            validateSettings(settings);
 
             // Paginator settings
             configurePaginator(this, settings, defaultSettings);
@@ -197,6 +200,7 @@ window.dataTable = function () {
     };
 
     function configureSettings(table, settings, defaultSettings) {
+        validateSettings(settings);
         table._settings = {
             ajax: {
                 url: settings.ajax.url
@@ -211,6 +215,12 @@ window.dataTable = function () {
             },
             columns: settings.columns || {}
         };
+    }
+
+    function validateSettings(settings) {
+        validator.ValidateValueCannotBeNullOrUndefined(settings, "settings", "The configuration object argument is missing from the datatable init constructor function.");
+        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax, "settings.ajax");
+        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax.url, "settings.ajax.url");
     }
 
     function configureStore(table) {
@@ -255,7 +265,7 @@ window.dataTable = function () {
 };
 
 module.exports = dataTable;
-},{"../js/dataLoader.js":3,"../js/editable":4,"../js/filter.js":5,"../js/paginator.js":6,"../js/selectable.js":7,"../js/sortable.js":8}],3:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/editable":4,"../js/filter.js":5,"../js/paginator.js":6,"../js/selectable.js":7,"../js/sortable.js":8,"../js/validator.js":10}],3:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
@@ -341,7 +351,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":6,"../js/selectable.js":7,"../js/table-renderer.js":9,"../node_modules/q/q.js":10}],4:[function(require,module,exports){
+},{"../js/paginator.js":6,"../js/selectable.js":7,"../js/table-renderer.js":9,"../node_modules/q/q.js":11}],4:[function(require,module,exports){
 var editable = (function () {
     var tableRenderer = require('../js/table-renderer.js');
 
@@ -745,6 +755,20 @@ var renderer = {
 
 module.exports = renderer;
 },{"../js/selectable.js":7}],10:[function(require,module,exports){
+var validator = (function () {
+    var validator = {
+        ValidateValueCannotBeNullOrUndefined(val, name, message) {
+            if (val === null || val === undefined) {
+                throw message || "Value cannot be null or undefined. Name: \"" + name + "\".";
+            }
+        }
+    };
+
+    return validator;
+})();
+
+module.exports = validator;
+},{}],11:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
