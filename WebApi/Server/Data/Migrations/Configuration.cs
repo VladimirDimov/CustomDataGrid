@@ -15,27 +15,32 @@ namespace Data.Migrations
 
         protected override void Seed(Data.ApplicationDbContext context)
         {
-            for (int i = 0; i < 50; i++)
-            {
-                context.Employees.Add(new Employee
-                {
-                    FirstName = "Pesho",
-                    LastName = "Petrov",
-                    Occupation = "Sofia",
-                    Position = "Asd",
-                    Salary = 100,
-                    StartDate = DateTime.UtcNow.ToShortDateString()
-                });
+            var firstNames = RandomGen.Gen.Random.Names.First();
+            var lastNames = RandomGen.Gen.Random.Names.Surname();
+            var cities = RandomGen.Gen.Random.Text.Words();
+            var salaries = RandomGen.Gen.Random.Numbers.Integers(100, 1000);
+            var dates = RandomGen.Gen.Random.Time.Dates(new DateTime(2000, 1, 1), new DateTime(2016, 1, 1));
 
-                context.Employees.Add(new Employee
+
+
+            if (!context.Employees.Any())
+            {
+                for (int cityNum = 0; cityNum < 10; cityNum++)
                 {
-                    FirstName = "Gosho",
-                    LastName = "Goshev",
-                    Occupation = "Tokio",
-                    Position = "dfg",
-                    Salary = 250,
-                    StartDate = DateTime.UtcNow.ToShortDateString()
-                });
+                    var city = cities();
+                    for (int i = 0; i < 50; i++)
+                    {
+                        context.Employees.Add(new Employee
+                        {
+                            FirstName = firstNames(),
+                            LastName = lastNames(),
+                            Occupation = city,
+                            Position = cities(),
+                            Salary = salaries(),
+                            StartDate = dates().ToShortDateString()
+                        });
+                    }
+                }
             }
 
             context.SaveChanges();
