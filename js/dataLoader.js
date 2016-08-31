@@ -3,10 +3,11 @@ var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
     var selectable = require('../js/selectable.js');
     var tableRenderer = require('../js/table-renderer.js');
+    var q = require('../node_modules/q/q.js')
 
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
-            paginator(table).updatePaginator = paginator(table).updatePaginator || true;
+            var deferred = q.defer();
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
@@ -24,11 +25,16 @@ var dataLoader = (function () {
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
+                    
+                    deferred.resolve();
                 },
                 error: function (err) {
+                    console.log(err.responseText);
                     throw err;
                 }
             });
+            
+            return deferred.promise;
         }
     };
 

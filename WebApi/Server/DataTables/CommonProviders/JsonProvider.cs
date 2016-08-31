@@ -17,6 +17,7 @@
         {
             var jsonResult = new JsonResult();
             jsonResult.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            jsonResult.MaxJsonLength = int.MaxValue;
             jsonResult.Data = data;
 
             return jsonResult;

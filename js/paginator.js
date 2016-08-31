@@ -54,38 +54,34 @@ var paginator = function (table) {
             }
 
             table.paginator.$paginator = paginator.setPaginator(start, end, page);
-            paginator.setPageClickEvents(this);
         },
 
         setPageClickEvents: function () {
-            table.paginator.$paginator.on('click', 'li>a[page], li>a[page-first], li>a[page-last]', function (e) {
+            table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
-                table.paginator.$paginator.children('li').removeClass('active');
-                table.paginator.currentPage = page;
-                $(e.target).parent().addClass('active');
 
                 var isUpdatePagnator =
                     page == table.paginator.start ||
                     page == table.paginator.end ||
                     page == 1 || page == table.store.numberOfPages;
-
-                dataLoader.loadData(table, page, isUpdatePagnator);
+                table.paginator.currentPage = page;
+                table.paginator.$paginator.children('li').removeClass('active');
+                dataLoader.loadData(table, page, isUpdatePagnator)
+                    .then(function () {
+                        $(e.target).parent().addClass('active');
+                    });
             });
 
-            table.paginator.$paginator.on('click', 'li>a[page-next]', function (e) {
+            table.$table.on('click', 'li>a[page-next]', function (e) {
                 var page = parseInt(table.paginator.currentPage) + 1;
-                table.paginator.$paginator.children('li').removeClass('active');
                 table.paginator.currentPage = page;
-                $(e.target).parent().addClass('active');
 
                 dataLoader.loadData(table, page, true);
             });
 
-            table.paginator.$paginator.on('click', 'li>a[page-previous]', function (e) {
+            table.$table.on('click', 'li>a[page-previous]', function (e) {
                 var page = parseInt(table.paginator.currentPage) - 1;
-                table.paginator.$paginator.children('li').removeClass('active');
                 table.paginator.currentPage = page;
-                $(e.target).parent().addClass('active');
 
                 dataLoader.loadData(table, page, true);
             });

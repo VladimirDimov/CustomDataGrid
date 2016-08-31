@@ -14,14 +14,15 @@ var sortable = (function () {
                     Asc: isAsc
                 };
 
-                $sortables.removeAttr('asc desc');
-                if (isAsc) {
-                    $(e.target).attr('asc', '')
-                } else {
-                    $(e.target).attr('desc', '')
-                }
-
-                dataLoader.loadData(table, 1);
+                dataLoader.loadData(table, 1)
+                    .then(function () {
+                        $sortables.removeAttr('asc desc');
+                        if (isAsc) {
+                            $(e.target).attr('asc', '')
+                        } else {
+                            $(e.target).attr('desc', '')
+                        }
+                    });
             });
         },
     }

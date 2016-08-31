@@ -4,7 +4,7 @@
 <head>
     <!--CSS-->
     <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="./v-data-table.css" charset="utf-8">
+    <link rel="stylesheet" href="./data-table.css" charset="utf-8">
     <!--JS-->
     <script src="./node_modules/jquery/dist/jquery.js"></script>
 </head>
@@ -14,10 +14,12 @@
         <thead>
             <tr>
                 <th colspan="7">
-                    // Filter equal
-                    <span>Name:</span><input type="text" data-props="FirstName" filter="ci">
-                    <span>Occupation:</span><input type="text" data-props="Occupation" filter="cs">
-                    <span>Salary:</span><input type="text" data-props="Salary" filter="<=">
+                    <span>Name:</span>
+                    <input type="text" data-props="FirstName" filter="ci">
+                    <span>Occupation:</span>
+                    <input type="text" data-props="Occupation" filter="cs">
+                    <span>Salary:</span>
+                    <input type="text" data-props="Salary" filter=">=">
                     <button id="selectAll">Select All</button>
                     <button id="unselectAll">Unselect All</button>
                 </th>
@@ -29,7 +31,7 @@
                 <th data-name="Occupation" sortable>Occupation</th>
                 <th data-name="StartDate" sortable>Start Date</th>
                 <th data-name="Salary" sortable>Salary</th>
-                <th>Actions</th>
+                <th data-name="Actions">Actions</th>
             </tr>
         </thead>
         <tbody>

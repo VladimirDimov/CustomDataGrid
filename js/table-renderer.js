@@ -13,15 +13,15 @@ var renderer = {
     renderRow: function (table, rowData) {
         var identifier = rowData[table.settings.features.identifier];
         var $row = $('<tr>');
-        for (var col = 0; col < table._columnPropertyNames.length; col++) {
-            var propName = table._columnPropertyNames[col];
+        var propValue;
+        for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
+            var propName = table.store.columnPropertyNames[col];
+
             if (!propName) {
-                continue;
+                throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
             }
-            var propValue = rowData[propName]
-            if (!propValue) {
-                throw "Invalid property name" + propName
-            }
+
+            propValue = rowData[propName];
 
             var $col = $('<td>').html(renderer.renderCell(table, propName, propValue));
             $row.append($col);

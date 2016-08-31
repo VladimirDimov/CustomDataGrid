@@ -1,4 +1,6 @@
-﻿namespace Data
+﻿using System;
+
+namespace Data
 {
     public class Employee
     {
@@ -12,7 +14,7 @@
 
         public string Occupation { get; set; }
 
-        public string StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         public decimal Salary { get; set; }
     }

@@ -1,128 +1,134 @@
-dataTable = function () {
-  'use strict'
-  var selectable = require('../js/selectable.js');
-  var sortable = require('../js/sortable.js');
-  var dataLoader = require('../js/dataLoader.js');
-  var paginator = require('../js/paginator.js');
-  var filter = require('../js/filter.js');
-  var editable = require('../js/editable');
+var dataTable = function () {
+    'use strict'
+    var selectable = require('../js/selectable.js');
+    var sortable = require('../js/sortable.js');
+    var dataLoader = require('../js/dataLoader.js');
+    var paginator = require('../js/paginator.js');
+    var filter = require('../js/filter.js');
+    var editable = require('../js/editable');
 
 
-  var defaultSettings = {
-    pageSize: 9,
-    paginator: {
-      length: 10
-    },
-    features: {
-      enableFilter: true,
-      selectable: {
-        active: true,
-        cssCasses: 'active',
-        // cssCasses: 'dt-row-selected',
-      }
-    },
-    colors: {
-      // No colors yet
-    }
-  };
-
-  var table = {
-    init: function (selector, settings) {
-      var tb = {};
-      this._$table = $(selector).first();
-      this._$table._currentPage = 1;
-
-      // Paginator settings
-      this._paginator = {};
-      this._paginator.currentPage = 1;
-      this._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
-      this._paginator.$paginator = paginator(this).setPaginator(1, this._paginator.length, 1);
-
-      this._columnPropertyNames = setColumnPropertyNames();
-
-      // Data
-      this.store = {
-        filter: new Object(),
-        selectedRows: [],
-        identifiers: null,
-        pageData: null
-      };
-
-      // Settings
-      this._settings = {
-        ajax: {
-          url: settings.ajax.url
+    var defaultSettings = {
+        pageSize: 10,
+        paginator: {
+            length: 10
+        },
+        features: {
+            enableFilter: true,
+            selectable: {
+                active: true,
+                cssCasses: 'active',
+                // cssCasses: 'dt-row-selected',
+            }
         },
         colors: {
-          selectedRow: (settings.colors ? selectedRow : null) || defaultSettings.colors.selectedRow,
-        },
-        pageSize: settings.pageSize || defaultSettings.pageSize,
-        features: {
-          identifier: settings.features.identifier,
-          selectable: settings.features.selectable,
-          editable: settings.features.editable
-        },
-        columns: settings.columns || {}
-      }
-
-      paginator(this).setPageClickEvents();
-      filter.setFilterEvent(this);
-      sortable.formatSortables(this);
-      dataLoader.loadData(table, 1, true);
-
-      if (settings.features) {
-        processFeatures(settings.features);
-      };
-
-      return this;
-    },
-
-    get settings() {
-      return this._settings;
-    },
-
-    get paginator() {
-      return this._paginator;
-    },
-
-    get $table() {
-      return this._$table;
-    },
-
-    get filter() {
-      return table.store.filter;
-    },
-
-    getSelected: function () {
-      return selectable.getSelected(this);
-    },
-
-    get columnPropertyNames() {
-      return this._columnPropertyNames;
-    }
-  };
-
-  function processFeatures(features) {
-    if (features.selectable.active && features.selectable.active == true) {
-      selectable.makeSelectable(table);
+            // No colors yet
+        }
     };
 
-    if (features.editable) {
-      editable.init(table);
+    var table = {
+        init: function (selector, settings) {
+            this._$table = $(selector).first();
+
+            // Paginator settings
+            configurePaginator(this, settings, defaultSettings);
+            // Init table store
+            configureStore(this);
+            // Settings
+            configureSettings(table, settings, defaultSettings);
+
+            paginator(this).setPageClickEvents();
+            filter.setFilterEvent(this);
+            sortable.formatSortables(this);
+            dataLoader.loadData(table, 1, true);
+
+            if (settings.features) {
+                processFeatures(settings.features);
+            };
+
+            return this;
+        },
+
+        get settings() {
+            return this._settings;
+        },
+
+        get paginator() {
+            return this._paginator;
+        },
+
+        get $table() {
+            return this._$table;
+        },
+
+        get filter() {
+            return table.store.filter;
+        },
+
+        getSelected: function () {
+            return selectable.getSelected(this);
+        },
+
+        get columnPropertyNames() {
+            return this._columnPropertyNames;
+        }
+    };
+
+    function configureSettings(table, settings, defaultSettings) {
+        table._settings = {
+            ajax: {
+                url: settings.ajax.url
+            },
+            colors: {
+            },
+            pageSize: settings.pageSize || defaultSettings.pageSize,
+            features: {
+                identifier: settings.features.identifier,
+                selectable: settings.features.selectable,
+                editable: settings.features.editable
+            },
+            columns: settings.columns || {}
+        };
     }
-  }
 
-  function setColumnPropertyNames() {
-    var colPropNames = [];
-    var $columns = table.$table.find('thead tr:last-child').children();
-    for (var i = 0; i < $columns.length; i++) {
-      colPropNames.push($($columns[i]).attr('data-name'));
+    function configureStore(table) {
+        table.store = {
+            columnPropertyNames: getColumnPropertyNames(),
+            filter: new Object(),
+            selectedRows: [],
+            identifiers: null,
+            pageData: null
+        };
     }
 
-    return colPropNames;
-  };
+    function configurePaginator(table, settings, defaultSettings) {
+        table._paginator = {};
+        table._paginator.currentPage = 1;
+        table._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
+        table._paginator.$paginator = paginator(table).setPaginator(1, table._paginator.length, 1);
+    }
 
-  return table;
+    function processFeatures(features) {
+        if (features.selectable.active && features.selectable.active == true) {
+            selectable.makeSelectable(table);
+        };
+
+        if (features.editable) {
+            editable.init(table);
+        }
+    }
+
+    function getColumnPropertyNames() {
+        var colPropNames = [];
+        var $columns = table.$table.find('thead tr:last-child').children();
+        for (var i = 0; i < $columns.length; i++) {
+            colPropNames.push($($columns[i]).attr('data-name'));
+        }
+
+        return colPropNames;
+    };
+
+    return table;
 };
 
 module.exports = dataTable;
