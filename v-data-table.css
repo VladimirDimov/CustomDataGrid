@@ -1,4 +1,6 @@
-
+.row-selected {
+    background-color: red;
+}
 
 th[asc]::after {
   content: url('/img/asc.png');

@@ -19,6 +19,7 @@
         {
             if (!string.IsNullOrEmpty(orderBy))
             {
+                this.validationProvider.ValidateMustNotBeNull(orderBy, "OrderBy property name");
                 this.validationProvider.ValidateMustNotBeNull(filteredData, "data collection");
                 this.validationProvider.ValidateMustNotBeNull(collectionDataType, "data collection generic type");
 

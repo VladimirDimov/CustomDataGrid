@@ -25,7 +25,7 @@ var dataLoader = (function () {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
                 },
-                error: function(err) {
+                error: function (err) {
                     throw err;
                 }
             });
@@ -49,20 +49,22 @@ var dataLoader = (function () {
             var $row = tableRenderer.renderRow(table, rowData);
             $tbody.append($row);
 
-            if (table.store.identifiers != null) {
-                formatRowSelected(table, $row, identifier);
-            }
+            // if (table.store.identifiers != null) {
+            //     formatRowSelected(table, $row, identifier);
+            // }
 
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
-            // var $row = tableRenderer.renderRow(table, rowData, identifiers);
         }
+
+        selectable.refreshPageSelection(table);
     }
 
     function formatRowSelected(table, $row, identifier) {
         if (isSelected(table, identifier)) {
-            $row.css('backgroundColor', table.settings.colors.selectedRow);
+            debugger;
+            selectable.setRowSelectCssClasses();
         }
     }
 

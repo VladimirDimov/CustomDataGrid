@@ -17,7 +17,8 @@ dataTable = function () {
       enableFilter: true,
       selectable: {
         active: true,
-        cssCasses: 'dt-row-selected',
+        cssCasses: 'active',
+        // cssCasses: 'dt-row-selected',
       }
     },
     colors: {

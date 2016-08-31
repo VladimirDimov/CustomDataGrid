@@ -23,7 +23,7 @@ var tb = vDataTable().init('#table', {
     identifier: 'Id',
     selectable: {
       active: true,
-      cssClasses: 'row-selected'
+      cssClasses: 'active'
       // selectFunction: function ($row) {
       //   // return $row.children().first('td').html();
       // }

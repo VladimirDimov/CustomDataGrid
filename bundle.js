@@ -24,7 +24,7 @@ var tb = vDataTable().init('#table', {
     identifier: 'Id',
     selectable: {
       active: true,
-      cssClasses: 'row-selected'
+      cssClasses: 'active'
       // selectFunction: function ($row) {
       //   // return $row.children().first('td').html();
       // }
@@ -113,7 +113,8 @@ dataTable = function () {
       enableFilter: true,
       selectable: {
         active: true,
-        cssCasses: 'dt-row-selected',
+        cssCasses: 'active',
+        // cssCasses: 'dt-row-selected',
       }
     },
     colors: {
@@ -249,7 +250,7 @@ var dataLoader = (function () {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
                 },
-                error: function(err) {
+                error: function (err) {
                     throw err;
                 }
             });
@@ -273,20 +274,22 @@ var dataLoader = (function () {
             var $row = tableRenderer.renderRow(table, rowData);
             $tbody.append($row);
 
-            if (table.store.identifiers != null) {
-                formatRowSelected(table, $row, identifier);
-            }
+            // if (table.store.identifiers != null) {
+            //     formatRowSelected(table, $row, identifier);
+            // }
 
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
             }
-            // var $row = tableRenderer.renderRow(table, rowData, identifiers);
         }
+
+        selectable.refreshPageSelection(table);
     }
 
     function formatRowSelected(table, $row, identifier) {
         if (isSelected(table, identifier)) {
-            $row.css('backgroundColor', table.settings.colors.selectedRow);
+            debugger;
+            selectable.setRowSelectCssClasses();
         }
     }
 
@@ -490,27 +493,43 @@ var selectable = (function () {
             $tbody.on('click', function (e) {
                 $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');
-                if (!e.ctrlKey && !isSelected(table, $row)) {
+                var rowIsSelected = isSelected(table, identifier);
+                var numberOfSelectedRows;
+
+                debugger;
+                // No Ctrl && Row is not selected
+                if (!e.ctrlKey) {
+                    numberOfSelectedRows = selectable.unselectAll(table);
                     // $tbody.find('tr').css('background-color', 'white');
-                    setRowSelectCssClasses(table, $tbody.find('tr'), false);
-                    selectable.unselectAll(table);
+                    // setRowSelectCssClasses(table, $tbody.find('tr'), false);
                 }
 
-                if (isSelected(table, $row)) {
-                    RemoveFromArray($row[0], table.store.selectedRows);
-                    setIdentifierSelectStatus(table, identifier, false);
-                    // $row.css('background-color', 'white');
-                    setRowSelectCssClasses(table, $row, true);
+                if (rowIsSelected) {
+                    if (numberOfSelectedRows > 2) {
+                        setIdentifierSelectStatus(table, identifier, true);
+                    } else {
+                        setIdentifierSelectStatus(table, identifier, false);
+                    }
                 } else {
                     setIdentifierSelectStatus(table, identifier, true);
-                    // $row.css('background-color', 'gray');
-                    setRowSelectCssClasses(table, $row, true);
                 }
+
+                selectable.refreshPageSelection(table);
+                // if (rowIsSelected) {
+                //     RemoveFromArray($row[0], table.store.selectedRows);
+                //     setIdentifierSelectStatus(table, identifier, false);
+                //     // $row.css('background-color', 'white');
+                //     setRowSelectCssClasses(table, $row, true);
+                // } else {
+                //     setIdentifierSelectStatus(table, identifier, true);
+                //     // $row.css('background-color', 'gray');
+                //     setRowSelectCssClasses(table, $row, true);
+                // }
             });
 
             table.selectAll = function () {
                 selectable.selectAll(table);
-                refreshPageSelection(table);
+                selectable.refreshPageSelection(table);
             };
 
             table.unselectAll = function () {
@@ -540,14 +559,21 @@ var selectable = (function () {
         },
 
         unselectAll: function (table) {
+            var numberOfModifiedRows = 0;
             if (table.store.identifiers) {
                 table.store.identifiers.map(function (elem) {
+                    if (elem.selected == true) {
+                        numberOfModifiedRows += 1;
+                    }
+
                     elem.selected = false;
 
                     return elem;
                 });
 
-                refreshPageSelection(table);
+                this.refreshPageSelection(table);
+
+                return numberOfModifiedRows;
             }
         },
 
@@ -558,6 +584,21 @@ var selectable = (function () {
 
                     return elem;
                 });
+            }
+        },
+
+        refreshPageSelection: function (table) {
+            var tableRows = table.$table.find('tbody tr').slice();
+            for (var i = 0, l = tableRows.length; i < l; i += 1) {
+                var $row = $(tableRows[i]);
+                var rowIdentifier = $row.attr('data-identifier');
+                if (isSelected(table, rowIdentifier)) {
+                    // $row.css('background-color', 'gray');
+                    setRowSelectCssClasses(table, $row, true);
+                } else {
+                    // $row.css('background-color', '');
+                    setRowSelectCssClasses(table, $row, false);
+                }
             }
         }
     };
@@ -571,23 +612,12 @@ var selectable = (function () {
         }
     }
 
-    function refreshPageSelection(table) {
-        var tableRows = table.$table.find('tbody tr').slice();
-        for (var i = 0, l = tableRows.length; i < l; i += 1) {
-            var $row = $(tableRows[i]);
-            var rowIdentifier = $row.attr('data-identifier');
-            if (table.store.identifiers[rowIdentifier].selected) {
-                // $row.css('background-color', 'gray');
-                setRowSelectCssClasses(table, $row, true);
-            } else {
-                // $row.css('background-color', '');
-                setRowSelectCssClasses(table, $row, false);
-            }
-        }
-    }
+    function isSelected(table, identifier) {
+        var identifierObj = table.store.identifiers.find(function (el) {
+            return el.identifier == identifier;
+        });
 
-    function isSelected(table, $row) {
-        return table.store.selectedRows.includes($row[0])
+        return identifierObj.selected;
     }
 
     function RemoveFromArray(element, arr) {
@@ -619,7 +649,7 @@ var sortable = (function () {
             var $sortables = table.$table.find('thead tr:last-child th[sortable]');
 
             $sortables.on('click', function (e) {
-                var name = $(e.target).attr('data-colName');
+                var name = $(e.target).attr('data-name');
                 var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
                 table.orderBy = {
                     Name: name,
@@ -657,7 +687,16 @@ var renderer = {
         var identifier = rowData[table.settings.features.identifier];
         var $row = $('<tr>');
         for (var col = 0; col < table._columnPropertyNames.length; col++) {
-            var $col = $('<td>').html(renderer.renderCell(table, table._columnPropertyNames[col], rowData[table._columnPropertyNames[col]]));
+            var propName = table._columnPropertyNames[col];
+            if (!propName) {
+                continue;
+            }
+            var propValue = rowData[propName]
+            if (!propValue) {
+                throw "Invalid property name" + propName
+            }
+
+            var $col = $('<td>').html(renderer.renderCell(table, propName, propValue));
             $row.append($col);
         }
 
