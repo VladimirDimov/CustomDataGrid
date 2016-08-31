@@ -1,7 +1,5 @@
-// // Some code
-var vDataTable = require('../js/data-table.js');
 
-var tb = vDataTable().init('#table', {
+var tb = dataTable().init('#table', {
     ajax: {
         url: 'http://localhost:65219/home/indexDB'
     },
@@ -24,7 +22,7 @@ var tb = vDataTable().init('#table', {
                 var milli = content.replace(/\/Date\((-?\d+)\)\//, '$1');
                 var d = new Date(parseInt(milli));
                 var formattedDate = d.getUTCDate() + "." + d.getUTCMonth() + "." + d.getUTCFullYear();
-                
+
                 return formattedDate;
             }
         }
@@ -78,15 +76,12 @@ var tb = vDataTable().init('#table', {
     }
 });
 
-$('table').on('click', function (e) {
-    if (!$(e.target).hasClass('btn-edit')) return;
+$('table').on('click', '.btn-edit', function (e) {
     var $row = $(e.target).parent().parent();
-
     tb.edit($row);
 });
 
-$('table').on('click', function (e) {
-    if (!$(e.target).hasClass('btn-save')) return;
+$('table').on('click', '.btn-save', function (e) {
     var $row = $(e.target).parent().parent();
     tb.save($row)
 });

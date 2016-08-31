@@ -48,7 +48,7 @@ var editable = (function () {
     }
 
     function getColumnIndex(table, colName) {
-        return table.columnPropertyNames.indexOf(colName);
+        return table.store.columnPropertyNames.indexOf(colName);
     }
 
     return editable;

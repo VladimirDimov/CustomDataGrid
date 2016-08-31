@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // shim for using process in browser
+
 var process = module.exports = {};
 
 // cached from whatever global is present so that test runners that stub it
@@ -10,84 +11,22 @@ var process = module.exports = {};
 var cachedSetTimeout;
 var cachedClearTimeout;
 
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
 (function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
     }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
+  }
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
     }
+  }
 } ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
 var queue = [];
 var draining = false;
 var currentQueue;
@@ -112,7 +51,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = runTimeout(cleanUpNextTick);
+    var timeout = cachedSetTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -129,7 +68,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    runClearTimeout(timeout);
+    cachedClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -141,7 +80,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
+        cachedSetTimeout(drainQueue, 0);
     }
 };
 
@@ -181,113 +120,7 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-// // Some code
-var vDataTable = require('../js/data-table.js');
-
-var tb = vDataTable().init('#table', {
-    ajax: {
-        url: 'http://localhost:65219/home/indexDB'
-    },
-    columns: {
-        Salary: {
-            render: function (content) {
-                return content + ' $';
-            }
-        },
-
-        Actions: {
-            render: function () {
-                return '<button class="btn-edit">Edit</button>' +
-                    '<button class="btn-save">Save</button>';
-            }
-        },
-
-        StartDate: {
-            render: function (content) {
-                var milli = content.replace(/\/Date\((-?\d+)\)\//, '$1');
-                var d = new Date(parseInt(milli));
-                var formattedDate = d.getUTCDate() + "." + d.getUTCMonth() + "." + d.getUTCFullYear();
-                
-                return formattedDate;
-            }
-        }
-    },
-
-    features: {
-        identifier: 'Id',
-        selectable: {
-            active: true,
-            cssClasses: 'active'
-            // selectFunction: function ($row) {
-            //   // return $row.children().first('td').html();
-            // }
-        },
-        editable: {
-            columns: {
-                FirstName: {
-                    edit: function ($td) {
-                        var val = $td.html();
-                        var $input = $('<input>');
-                        $input.val(val);
-                        $td.html($input);
-                    },
-
-                    save: function ($td) {
-                        var val = $td.find('input').first().val();
-
-                        return val;
-                    }
-                },
-                LastName: {
-                    edit: function ($td) {
-                        var val = $td.html();
-                        var $input = $('<input>');
-                        $input.val(val);
-                        $td.html($input);
-                    },
-
-                    save: function ($td) {
-                        var val = $td.find('input').first().val();
-
-                        return val;
-                    }
-                }
-            },
-
-            update: function (data) {
-                console.log(data);
-            }
-        }
-    }
-});
-
-$('table').on('click', function (e) {
-    if (!$(e.target).hasClass('btn-edit')) return;
-    var $row = $(e.target).parent().parent();
-
-    tb.edit($row);
-});
-
-$('table').on('click', function (e) {
-    if (!$(e.target).hasClass('btn-save')) return;
-    var $row = $(e.target).parent().parent();
-    tb.save($row)
-});
-
-$('#btnGetSelected').on('click', function () {
-    var selectedIdentifiers = tb.getSelected();
-    console.log(selectedIdentifiers);
-});
-
-$('#selectAll').on('click', function () {
-    tb.selectAll();
-});
-
-$('#unselectAll').on('click', function () {
-    tb.unselectAll();
-});
-},{"../js/data-table.js":3}],3:[function(require,module,exports){
-var dataTable = function () {
+window.dataTable = function () {
     'use strict'
     var selectable = require('../js/selectable.js');
     var sortable = require('../js/sortable.js');
@@ -386,7 +219,8 @@ var dataTable = function () {
             filter: new Object(),
             selectedRows: [],
             identifiers: null,
-            pageData: null
+            pageData: null,
+            data: {}
         };
     }
 
@@ -421,7 +255,7 @@ var dataTable = function () {
 };
 
 module.exports = dataTable;
-},{"../js/dataLoader.js":4,"../js/editable":5,"../js/filter.js":6,"../js/paginator.js":7,"../js/selectable.js":8,"../js/sortable.js":9}],4:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/editable":4,"../js/filter.js":5,"../js/paginator.js":6,"../js/selectable.js":7,"../js/sortable.js":8}],3:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
@@ -449,7 +283,7 @@ var dataLoader = (function () {
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
-                    
+
                     deferred.resolve();
                 },
                 error: function (err) {
@@ -457,7 +291,7 @@ var dataLoader = (function () {
                     throw err;
                 }
             });
-            
+
             return deferred.promise;
         }
     };
@@ -478,10 +312,6 @@ var dataLoader = (function () {
             var identifier = rowData[table.settings.features.identifier];
             var $row = tableRenderer.renderRow(table, rowData);
             $tbody.append($row);
-
-            // if (table.store.identifiers != null) {
-            //     formatRowSelected(table, $row, identifier);
-            // }
 
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);
@@ -511,7 +341,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":7,"../js/selectable.js":8,"../js/table-renderer.js":10,"../node_modules/q/q.js":11}],5:[function(require,module,exports){
+},{"../js/paginator.js":6,"../js/selectable.js":7,"../js/table-renderer.js":9,"../node_modules/q/q.js":10}],4:[function(require,module,exports){
 var editable = (function () {
     var tableRenderer = require('../js/table-renderer.js');
 
@@ -562,14 +392,14 @@ var editable = (function () {
     }
 
     function getColumnIndex(table, colName) {
-        return table.columnPropertyNames.indexOf(colName);
+        return table.store.columnPropertyNames.indexOf(colName);
     }
 
     return editable;
 } ());
 
 module.exports = editable;
-},{"../js/table-renderer.js":10}],6:[function(require,module,exports){
+},{"../js/table-renderer.js":9}],5:[function(require,module,exports){
 var filter = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -590,7 +420,7 @@ var filter = (function () {
 } ());
 
 module.exports = filter;
-},{"../js/dataLoader.js":4}],7:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],6:[function(require,module,exports){
 var paginator = function (table) {
     var dataLoader = require('../js/dataLoader.js');
 
@@ -685,7 +515,7 @@ var paginator = function (table) {
 };
 
 module.exports = paginator;
-},{"../js/dataLoader.js":4}],8:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],7:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -825,7 +655,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var sortable = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -857,7 +687,7 @@ var sortable = (function () {
 })();
 
 module.exports = sortable;
-},{"../js/dataLoader.js":4}],10:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],9:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = {
@@ -914,7 +744,7 @@ var renderer = {
 };
 
 module.exports = renderer;
-},{"../js/selectable.js":8}],11:[function(require,module,exports){
+},{"../js/selectable.js":7}],10:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!

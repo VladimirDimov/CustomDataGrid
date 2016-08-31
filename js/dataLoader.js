@@ -25,7 +25,7 @@ var dataLoader = (function () {
                     if (isUpdatePaginator) {
                         paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
                     }
-                    
+
                     deferred.resolve();
                 },
                 error: function (err) {
@@ -33,7 +33,7 @@ var dataLoader = (function () {
                     throw err;
                 }
             });
-            
+
             return deferred.promise;
         }
     };
@@ -54,10 +54,6 @@ var dataLoader = (function () {
             var identifier = rowData[table.settings.features.identifier];
             var $row = tableRenderer.renderRow(table, rowData);
             $tbody.append($row);
-
-            // if (table.store.identifiers != null) {
-            //     formatRowSelected(table, $row, identifier);
-            // }
 
             if (table.store.identifiers === null) {
                 selectable.initIdentifiers(table, identifiers);

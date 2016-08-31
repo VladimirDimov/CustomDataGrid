@@ -1,4 +1,4 @@
-var dataTable = function () {
+window.dataTable = function () {
     'use strict'
     var selectable = require('../js/selectable.js');
     var sortable = require('../js/sortable.js');
@@ -97,7 +97,8 @@ var dataTable = function () {
             filter: new Object(),
             selectedRows: [],
             identifiers: null,
-            pageData: null
+            pageData: null,
+            data: {}
         };
     }
 
