@@ -129,7 +129,8 @@ window.dataTable = function () {
     var paginator = require('../js/paginator.js');
     var filter = require('../js/filter.js');
     var editable = require('../js/editable');
-    var validator = require('../js/validator.js')
+    var validator = require('../js/validator.js');
+    var settingsExternal = require('../js/dt-settings.js');
 
     var defaultSettings = {
         pageSize: 10,
@@ -144,10 +145,6 @@ window.dataTable = function () {
                 active: true,
                 cssCasses: 'active',
             }
-        },
-
-        colors: {
-            // No colors yet
         }
     };
 
@@ -156,8 +153,7 @@ window.dataTable = function () {
             this._$table = $(selector).first();
 
             // Settings
-            configureSettings(table, settings, defaultSettings);
-
+            this._settings = settingsExternal.init(settings);
             // Paginator settings
             configurePaginator(this, settings, defaultSettings);
             // Init table store
@@ -199,48 +195,6 @@ window.dataTable = function () {
             return this._columnPropertyNames;
         }
     };
-
-    function configureSettings(table, settings, defaultSettings) {
-        validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
-
-        table._settings = {};
-        configureSettingsAjax(table, settings, defaultSettings);
-        configureSettingsFeatures(table, settings, defaultSettings);
-        configureSettingsPaging(table, settings, defaultSettings);
-        configureSettingsColumns(table, settings);
-    }
-
-    function configureSettingsPaging(table, settings, defaultSettings) {
-        table._settings.paging = defaultSettings.paging;
-        if (!settings.paging) return;
-
-        table._settings.pageSize = settings.paging.pageSize || defaultSettings.pageSize;
-    }
-
-    function configureSettingsFeatures(table, settings) {
-        table._settings.features = {};
-        if (settings.features == null) return;
-
-        table._settings.features.identifier = settings.features.identifier || null;
-        table._settings.features.selectable = defaultSettings.features.selectable;
-        if (settings.features.selectable) {
-            table._settings.features.selectable.active = settings.features.selectable.active || defaultSettings.features.selectable.active;
-            table._settings.features.selectable.cssClasses = settings.features.selectable.cssClasses || defaultSettings.features.selectable.cssClasses;
-        }
-    }
-
-    function configureSettingsColumns(table, settings) {
-        if (!settings.columns) return;
-        table._settings.columns = settings.columns;
-    }
-
-    function configureSettingsAjax(table, settings, defaultSettings) {
-        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax, 'settings.ajax');
-        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax.url, 'settings.ajax.url');
-
-        table._settings.ajax = {};
-        table._settings.ajax.url = settings.ajax.url;
-    }
 
     function configureStore(table) {
         table.store = {
@@ -284,7 +238,7 @@ window.dataTable = function () {
 };
 
 module.exports = dataTable;
-},{"../js/dataLoader.js":3,"../js/editable":4,"../js/filter.js":5,"../js/paginator.js":6,"../js/selectable.js":7,"../js/sortable.js":8,"../js/validator.js":10}],3:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/filter.js":7,"../js/paginator.js":8,"../js/selectable.js":9,"../js/sortable.js":10,"../js/validator.js":12}],3:[function(require,module,exports){
 
 var dataLoader = (function () {
     var paginator = require('../js/paginator.js');
@@ -386,7 +340,136 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":6,"../js/selectable.js":7,"../js/table-renderer.js":9,"../node_modules/q/q.js":11}],4:[function(require,module,exports){
+},{"../js/paginator.js":8,"../js/selectable.js":9,"../js/table-renderer.js":11,"../node_modules/q/q.js":13}],4:[function(require,module,exports){
+var defaultSettings = (function () {
+    var defaultSettings = {
+        pageSize: 10,
+
+        paginator: {
+            active: true,
+            length: 5
+        },
+
+        features: {
+            selectable: {
+                active: true,
+                cssCasses: 'active',
+            }
+        },
+        
+    };
+
+    return defaultSettings;
+})();
+
+module.exports = defaultSettings;
+},{}],5:[function(require,module,exports){
+var defaultSettings = require('../js/dt-default-settings.js');
+var validator = require('../js/validator.js');
+
+var settings = (function (defaultSettings, validator) {
+    var settings = {
+        init: function (settings) {
+            validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
+
+            // Init default values
+            this.pageSize = defaultSettings.pageSize;
+            this.paginator = defaultSettings.paginator;
+            this.features = defaultSettings.features;
+            // Set custom values
+            setCustomPaging.call(this, settings.paging);
+            setCustomFeatures.call(this, settings.features);
+            setCustomColumns.call(this, settings.columns);
+
+            this.ajax = settings.ajax;
+
+            return this;
+        },
+
+        get pageSize() {
+            return this._pageSize;
+        },
+        set pageSize(val) {
+            validator.ValidateMustBeAPositiveNumber(val, 'pageSize');
+            this._pageSize = val;
+        },
+
+        get paginator() {
+            return this._paginator;
+        },
+        set paginator(val) {
+            this._paginator = val;
+        },
+
+        get features() {
+            return this._features;
+        },
+        set features(val) {
+            this._features = val;
+        },
+
+        get ajax() {
+            return this._ajax;
+        },
+        set ajax(val) {
+            validator.ValidateValueCannotBeNullOrUndefined(val, "ajax", "The ajax propery of the settings object is required");
+            validator.ValidateValueCannotBeNullOrUndefined(val.url, "ajax.url");
+
+            this._ajax = val;
+        },
+
+        get columns() {
+            return this._columns;
+        },
+        set columns(val) {
+            if (!val) return;
+            for (var prop in val) {
+                if (val[prop].render) {
+                    validator.ValidateMustBeAFunction(val[prop].render, "columns." + prop + ".render()");
+                }
+            }
+
+            this._columns = val;
+        }
+    };
+
+    function setCustomPaging(paging) {
+        if (!paging) return;
+        if (paging.pageSize) {
+            this.pageSize = paging.pageSize;
+        }
+    }
+
+    function setCustomFeatures(features) {
+        if (!features) return;
+        if (features.selectable) {
+            if (features.selectable.active) {
+                validator.ValidateMustBeValidBoolean(features.selectable.active, "features.active");
+                this.features.selectable.active = features.selectable.active;
+            }
+
+            if (features.selectable.cssClasses) {
+                validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
+                this.features.selectable.cssClasses = features.selectable.cssClasses;
+            }
+
+            if (features.identifier) {
+                validator.ValidateMustBeValidString(features.identifier, 'features.identifier');
+                this.features.identifier = features.identifier;
+            }
+        }
+    }
+
+    function setCustomColumns(columns) {
+        if (!columns) return;
+        this.columns = columns;
+    }
+
+    return settings;
+})(defaultSettings, validator);
+
+module.exports = settings;
+},{"../js/dt-default-settings.js":4,"../js/validator.js":12}],6:[function(require,module,exports){
 var editable = (function () {
     var tableRenderer = require('../js/table-renderer.js');
 
@@ -444,7 +527,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../js/table-renderer.js":9}],5:[function(require,module,exports){
+},{"../js/table-renderer.js":11}],7:[function(require,module,exports){
 var filter = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -485,7 +568,7 @@ var filter = (function () {
 } ());
 
 module.exports = filter;
-},{"../js/dataLoader.js":3}],6:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],8:[function(require,module,exports){
 var paginator = function (table) {
     var dataLoader = require('../js/dataLoader.js');
 
@@ -581,7 +664,7 @@ var paginator = function (table) {
 };
 
 module.exports = paginator;
-},{"../js/dataLoader.js":3}],7:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],9:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -721,7 +804,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var sortable = (function () {
     'use strict';
     var dataLoader = require('../js/dataLoader.js');
@@ -753,7 +836,7 @@ var sortable = (function () {
 })();
 
 module.exports = sortable;
-},{"../js/dataLoader.js":3}],9:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],11:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = {
@@ -810,12 +893,50 @@ var renderer = {
 };
 
 module.exports = renderer;
-},{"../js/selectable.js":7}],10:[function(require,module,exports){
+},{"../js/selectable.js":9}],12:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined(val, name, message) {
             if (val === null || val === undefined) {
                 throw message || "Value cannot be null or undefined. Parameter name: \"" + name + "\".";
+            }
+        },
+
+        ValidateShouldBeANumber(val, name, message) {
+            if (!typeof (val) === 'number') {
+                throw message || 'The value of ' + name + ' must be a number';
+            }
+        },
+
+        ValidateMustBeAPositiveNumber(val, name, message) {
+            this.ValidateShouldBeANumber(val);
+            if (val < 0) {
+                throw message || 'The value of ' + name + ' must be a positive number';
+            }
+        },
+
+        ValidateMustBeValidBoolean(val, name, message) {
+            this.ValidateValueCannotBeNullOrUndefined(val);
+            if (typeof (val) !== 'boolean') {
+                throw message || 'The value of ' + name + ' must be a valid boolean.';
+            }
+        },
+
+        ValidateMustBeValidStringOrNull(val, name, message) {
+            if (!val) return;
+            if (typeof (val) !== 'string') {
+                throw message || 'The value of ' + name + ' must be a valid string';
+            }
+        },
+
+        ValidateMustBeValidString(val, name, message) {
+            this.ValidateValueCannotBeNullOrUndefined(val, name, message);
+            this.ValidateMustBeValidStringOrNull(val, name, message);
+        },
+
+        ValidateMustBeAFunction(val, name, message) {
+            if (typeof (val) !== 'function') {
+                throw message || 'The type of ' + name + ' must be a function.';
             }
         }
     };
@@ -824,7 +945,7 @@ var validator = (function () {
 })();
 
 module.exports = validator;
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!

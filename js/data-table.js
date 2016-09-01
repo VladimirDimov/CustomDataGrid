@@ -7,7 +7,8 @@ window.dataTable = function () {
     var paginator = require('../js/paginator.js');
     var filter = require('../js/filter.js');
     var editable = require('../js/editable');
-    var validator = require('../js/validator.js')
+    var validator = require('../js/validator.js');
+    var settingsExternal = require('../js/dt-settings.js');
 
     var defaultSettings = {
         pageSize: 10,
@@ -22,10 +23,6 @@ window.dataTable = function () {
                 active: true,
                 cssCasses: 'active',
             }
-        },
-
-        colors: {
-            // No colors yet
         }
     };
 
@@ -34,8 +31,7 @@ window.dataTable = function () {
             this._$table = $(selector).first();
 
             // Settings
-            configureSettings(table, settings, defaultSettings);
-
+            this._settings = settingsExternal.init(settings);
             // Paginator settings
             configurePaginator(this, settings, defaultSettings);
             // Init table store
@@ -77,48 +73,6 @@ window.dataTable = function () {
             return this._columnPropertyNames;
         }
     };
-
-    function configureSettings(table, settings, defaultSettings) {
-        validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
-
-        table._settings = {};
-        configureSettingsAjax(table, settings, defaultSettings);
-        configureSettingsFeatures(table, settings, defaultSettings);
-        configureSettingsPaging(table, settings, defaultSettings);
-        configureSettingsColumns(table, settings);
-    }
-
-    function configureSettingsPaging(table, settings, defaultSettings) {
-        table._settings.paging = defaultSettings.paging;
-        if (!settings.paging) return;
-
-        table._settings.pageSize = settings.paging.pageSize || defaultSettings.pageSize;
-    }
-
-    function configureSettingsFeatures(table, settings) {
-        table._settings.features = {};
-        if (settings.features == null) return;
-
-        table._settings.features.identifier = settings.features.identifier || null;
-        table._settings.features.selectable = defaultSettings.features.selectable;
-        if (settings.features.selectable) {
-            table._settings.features.selectable.active = settings.features.selectable.active || defaultSettings.features.selectable.active;
-            table._settings.features.selectable.cssClasses = settings.features.selectable.cssClasses || defaultSettings.features.selectable.cssClasses;
-        }
-    }
-
-    function configureSettingsColumns(table, settings) {
-        if (!settings.columns) return;
-        table._settings.columns = settings.columns;
-    }
-
-    function configureSettingsAjax(table, settings, defaultSettings) {
-        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax, 'settings.ajax');
-        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax.url, 'settings.ajax.url');
-
-        table._settings.ajax = {};
-        table._settings.ajax.url = settings.ajax.url;
-    }
 
     function configureStore(table) {
         table.store = {

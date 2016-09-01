@@ -30,6 +30,12 @@ var tb = dataTable().init('#table', {
 
                 return formattedDate;
             }
+        },
+
+        Test: {
+            render: function() {
+                
+            }
         }
     },
 
