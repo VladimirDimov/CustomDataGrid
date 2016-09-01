@@ -32,7 +32,7 @@
             }
 
             var requestParam = filterContext.Controller.ValueProvider.GetValue(param);
-            if (requestParam.AttemptedValue == null)
+            if (requestParam?.AttemptedValue == null)
             {
                 throw new ArgumentException($"The request parameter \"{param}\" is missing.");
             }

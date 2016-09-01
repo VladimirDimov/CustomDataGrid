@@ -11,17 +11,19 @@ window.dataTable = function () {
 
     var defaultSettings = {
         pageSize: 10,
+
         paginator: {
+            active: true,
             length: 10
         },
+
         features: {
-            enableFilter: true,
             selectable: {
                 active: true,
                 cssCasses: 'active',
-                // cssCasses: 'dt-row-selected',
             }
         },
+
         colors: {
             // No colors yet
         }
@@ -31,14 +33,13 @@ window.dataTable = function () {
         init: function (selector, settings) {
             this._$table = $(selector).first();
 
-            validateSettings(settings);
+            // Settings
+            configureSettings(table, settings, defaultSettings);
 
             // Paginator settings
             configurePaginator(this, settings, defaultSettings);
             // Init table store
             configureStore(this);
-            // Settings
-            configureSettings(table, settings, defaultSettings);
 
             paginator(this).setPageClickEvents();
             filter.setFilterEvent(this);
@@ -78,27 +79,45 @@ window.dataTable = function () {
     };
 
     function configureSettings(table, settings, defaultSettings) {
-        validateSettings(settings);
-        table._settings = {
-            ajax: {
-                url: settings.ajax.url
-            },
-            colors: {
-            },
-            pageSize: settings.pageSize || defaultSettings.pageSize,
-            features: {
-                identifier: settings.features.identifier,
-                selectable: settings.features.selectable,
-                editable: settings.features.editable
-            },
-            columns: settings.columns || {}
-        };
+        validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
+
+        table._settings = {};
+        configureSettingsAjax(table, settings, defaultSettings);
+        configureSettingsFeatures(table, settings, defaultSettings);
+        configureSettingsPaging(table, settings, defaultSettings);
+        configureSettingsColumns(table, settings);
     }
 
-    function validateSettings(settings) {
-        validator.ValidateValueCannotBeNullOrUndefined(settings, "settings", "The configuration object argument is missing from the datatable init constructor function.");
-        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax, "settings.ajax");
-        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax.url, "settings.ajax.url");
+    function configureSettingsPaging(table, settings, defaultSettings) {
+        table._settings.paging = defaultSettings.paging;
+        if (!settings.paging) return;
+
+        table._settings.pageSize = settings.paging.pageSize || defaultSettings.pageSize;
+    }
+
+    function configureSettingsFeatures(table, settings) {
+        table._settings.features = {};
+        if (settings.features == null) return;
+
+        table._settings.features.identifier = settings.features.identifier || null;
+        table._settings.features.selectable = defaultSettings.features.selectable;
+        if (settings.features.selectable) {
+            table._settings.features.selectable.active = settings.features.selectable.active || defaultSettings.features.selectable.active;
+            table._settings.features.selectable.cssClasses = settings.features.selectable.cssClasses || defaultSettings.features.selectable.cssClasses;
+        }
+    }
+
+    function configureSettingsColumns(table, settings) {
+        if (!settings.columns) return;
+        table._settings.columns = settings.columns;
+    }
+
+    function configureSettingsAjax(table, settings, defaultSettings) {
+        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax, 'settings.ajax');
+        validator.ValidateValueCannotBeNullOrUndefined(settings.ajax.url, 'settings.ajax.url');
+
+        table._settings.ajax = {};
+        table._settings.ajax.url = settings.ajax.url;
     }
 
     function configureStore(table) {

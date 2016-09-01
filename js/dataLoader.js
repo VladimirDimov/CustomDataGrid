@@ -29,7 +29,7 @@ var dataLoader = (function () {
                     deferred.resolve();
                 },
                 error: function (err) {
-                    console.log(err.responseText);
+                    // console.log(err.responseText);
                     throw err;
                 }
             });

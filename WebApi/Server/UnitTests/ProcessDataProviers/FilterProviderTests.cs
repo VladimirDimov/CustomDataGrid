@@ -214,6 +214,35 @@
         }
 
         [Test]
+        public void ShouldReturnProperResultForRangeForInt()
+        {
+            var data = new List<DataObject>();
+            var prop = typeof(DataObject).GetProperty("PropInt");
+            var rnd = new Random();
+            for (int i = 0; i < 5000; i++)
+            {
+                var newObj = new DataObject() { PropInt = rnd.Next(0, 5000) };
+                data.Add(newObj);
+            }
+
+            data = data.OrderBy(x => rnd.Next()).ToList();
+
+            var filterProvider = new FilterProvider();
+            var filters = new List<KeyValuePair<string, FilterRequestModel>>()
+            {
+                new KeyValuePair<string, FilterRequestModel>( "PropInt", new FilterRequestModel {Operator = ">" , Value = "300" }),
+                new KeyValuePair<string, FilterRequestModel>( "PropInt", new FilterRequestModel {Operator = "<" , Value = "700" }),
+            };
+
+            var filteredCollection = filterProvider.FilterData(typeof(DataObject), data.AsQueryable(), filters);
+
+            foreach (DataObject item in filteredCollection)
+            {
+                Assert.IsTrue(300 < item.PropInt && item.PropInt < 700);
+            }
+        }
+
+        [Test]
         public void ShouldReturnProperResultForCaseInsensitiveForString()
         {
             this.TestFilterComparables(

@@ -20,7 +20,7 @@
         public IQueryable<object> FilterData(
                                             Type dataCollectionGenericType,
                                             IQueryable<object> data,
-                                            IDictionary<string, FilterRequestModel> filterDict)
+                                            IEnumerable<KeyValuePair<string, FilterRequestModel>> filterDict)
         {
             // STARRT validation
             this.validationProvider.ValidateMustNotBeNull(dataCollectionGenericType, "data collection generic type");

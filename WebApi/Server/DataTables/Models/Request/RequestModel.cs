@@ -8,7 +8,7 @@
     {
         public IOrderedQueryable<object> Data { get; internal set; }
 
-        public Dictionary<string, FilterRequestModel> Filter { get; internal set; }
+        public IEnumerable<KeyValuePair<string, FilterRequestModel>> Filter { get; internal set; }
 
         public bool GetIdentifiers { get; internal set; }
 

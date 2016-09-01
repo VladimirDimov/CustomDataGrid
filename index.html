@@ -14,12 +14,25 @@
         <thead>
             <tr>
                 <th colspan="7">
-                    <span>Name:</span>
+                    <span>Name (contains):</span>
                     <input type="text" data-props="FirstName" filter="ci">
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
                     <span>Occupation:</span>
                     <input type="text" data-props="Occupation" filter="cs">
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
                     <span>Salary:</span>
-                    <input type="text" data-props="Salary" filter=">=">
+                    <input type="text" data-props="Salary" filter=">="> to
+                    <input type="text" data-props="Salary" filter="<">
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
                     <button id="selectAll">Select All</button>
                     <button id="unselectAll">Unselect All</button>
                 </th>
