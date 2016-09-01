@@ -77,11 +77,11 @@
             return identifiers;
         }
 
-        private Dictionary<string, FilterRequestModel> GetFilterDictionary(ActionExecutedContext filterContext)
+        private IEnumerable<KeyValuePair<string, FilterRequestModel>> GetFilterDictionary(ActionExecutedContext filterContext)
         {
             var dictAsObject = filterContext.Controller.ValueProvider.GetValue("filter").AttemptedValue;
-            var dictObj = this.jsonProvider.Deserialize<Dictionary<string, FilterRequestModel>>(dictAsObject);
-            var dict = dictObj as Dictionary<string, FilterRequestModel>;
+            var dictObj = this.jsonProvider.Deserialize<IEnumerable<KeyValuePair<string, FilterRequestModel>>>(dictAsObject);
+            var dict = dictObj as IEnumerable<KeyValuePair<string, FilterRequestModel>>;
 
             return dict;
         }
