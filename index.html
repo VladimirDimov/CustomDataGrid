@@ -15,13 +15,13 @@
             <tr>
                 <th colspan="7">
                     <span>Name (contains):</span>
-                    <input type="text" data-props="FirstName" filter="ci">
+                    <input type="text" data-props="FirstName" filter="ci" class="form-control">
                 </th>
             </tr>
             <tr>
                 <th colspan="7">
-                    <span>Occupation:</span>
-                    <input type="text" data-props="Occupation" filter="cs">
+                    <span>Occupation (exact match):</span>
+                    <input type="text" data-props="Occupation" filter="=">
                 </th>
             </tr>
             <tr>
@@ -34,8 +34,13 @@
             <tr>
                 <th colspan="7">
                     <span>Last Name:</span>
-                    <input type="text" data-props="LastName" filter=">="> to
-                    <input type="text" data-props="LastName" filter="<=">
+                    Starts with: <input type="text" data-props="LastName" filter="ss"> to
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
+                    <span>Ends Name:</span>
+                    Starts with: <input type="text" data-props="LastName" filter="es"> to
                 </th>
             </tr>
             <tr>

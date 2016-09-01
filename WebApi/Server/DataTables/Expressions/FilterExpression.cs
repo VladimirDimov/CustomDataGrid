@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     internal static class FilterExpression
     {
@@ -38,9 +39,60 @@
                 case "ci":
                     return GetContainsPartialExpr(prop, filterValue, argumentExpr, isCaseInsensitive: true);
 
+                case "si":
+                    return GetStartsWithPartialExpr(prop, filterValue, argumentExpr, "StartsWith", isCaseInsensitive: true);
+
+                case "ss":
+                    return GetStartsWithPartialExpr(prop, filterValue, argumentExpr, "StartsWith", isCaseInsensitive: false);
+
+                case "ei":
+                    return GetStartsWithPartialExpr(prop, filterValue, argumentExpr, "EndsWith", isCaseInsensitive: true);
+
+                case "es":
+                    return GetStartsWithPartialExpr(prop, filterValue, argumentExpr, "EndsWith", isCaseInsensitive: false);
+
                 default:
                     return CreateCompareLambda(prop, filterValue, argumentExpr, filterOperator);
             }
+        }
+
+        private static Expression GetStartsWithPartialExpr(
+                                            string prop,
+                                            object filterValue,
+                                            Expression argumentExpr,
+                                            string methodName,
+                                            bool isCaseInsensitive)
+        {
+            // x.Prop
+            var propExpr = Expression.Property(argumentExpr, prop);
+            Expression propToUpperExpr;
+            // x.Prop.tolower()
+            var toUpperMethodInfo = typeof(string).GetMethod("ToUpper", new Type[0]);
+            if (isCaseInsensitive)
+            {
+                propToUpperExpr = Expression.Call(propExpr, toUpperMethodInfo);
+            }
+            else
+            {
+                propToUpperExpr = propExpr;
+            }
+            // filterValue
+            var filterValueExpr = Expression.Constant(filterValue, typeof(string));
+            Expression filterVaueToUpperExpr = null;
+            if (isCaseInsensitive)
+            {
+                filterVaueToUpperExpr = Expression.Call(filterValueExpr, toUpperMethodInfo);
+            }
+            else
+            {
+                filterVaueToUpperExpr = filterValueExpr;
+            }
+            // x.Prop.ToLower().StartsWith()
+            MethodInfo startsWithMethodInfo = typeof(string).GetMethod(methodName, new Type[] { typeof(string) });
+            var stringComparisonExpr = Expression.Constant(StringComparison.CurrentCulture);
+            var containsExpr = Expression.Call(propToUpperExpr, startsWithMethodInfo, new Expression[] { filterVaueToUpperExpr });
+
+            return containsExpr;
         }
 
         private static Expression JoinWithOr(IList<Expression> expressions)
