@@ -14,7 +14,7 @@ window.dataTable = function () {
 
         paginator: {
             active: true,
-            length: 10
+            length: 5
         },
 
         features: {

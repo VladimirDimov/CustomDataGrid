@@ -24,7 +24,7 @@ var dataLoader = (function () {
                     refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
 
                     if (isUpdatePaginator) {
-                        paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table.paginator.length));
+                        paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table._settings.pageSize));
                     }
 
                     deferred.resolve();

@@ -41,6 +41,7 @@ var paginator = function (table) {
             var halfLength = Math.floor((length - 1) / 2);
             var currentPaginatorLength = Math.min(length, numberOfPages);
 
+            table.store.numberOfPages = numberOfPages;
             if (currentPaginatorLength > 0) {
                 start = Math.max(Math.floor(page - halfLength), 1);
                 end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
