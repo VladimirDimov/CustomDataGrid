@@ -7,10 +7,30 @@ var filter = (function () {
             var $filter = $(table.$table[0]).find('[filter]');
             $filter.on('change', function () {
                 var $target = $(this);
-                var dictKey = $target.attr('data-props');
+                var dictKey = this;
                 var filterOperator = $target.attr('filter');
-                var dictValue = $target.val();
-                table.store.filter[dictKey] = { value: dictValue, operator: filterOperator || 'ci' };
+
+                var keyIndex = -1;
+                var availableKeyElement = table.store.filter.find(function (el) {
+                    keyIndex += 1;
+                    return el.key === dictKey;
+                });
+
+                var keyToAdd = {
+                    key: dictKey,
+                    value: {
+                        key: $target.attr('data-props'),
+                        operator: filterOperator || 'ci',
+                        value: $target.val(),
+                    }
+                };
+
+                if (availableKeyElement) {
+                    table.store.filter[keyIndex] = keyToAdd;
+                } else {
+                    table.store.filter.push(keyToAdd);
+                }
+
                 dataLoader.loadData(table, 1, true);
             });
         }

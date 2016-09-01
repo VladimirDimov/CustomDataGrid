@@ -8,6 +8,7 @@ var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
             var deferred = q.defer();
+
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
@@ -15,7 +16,7 @@ var dataLoader = (function () {
                     getIdentifiers: table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
-                    filter: JSON.stringify(table.store.filter),
+                    filter: JSON.stringify(formatFilterRequestValues(table.store.filter)),
                     orderBy: table.orderBy ? table.orderBy.Name : null,
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
@@ -37,6 +38,21 @@ var dataLoader = (function () {
             return deferred.promise;
         }
     };
+    
+    function formatFilterRequestValues(filterObj) {
+        var filters = [];
+        for(var filter in filterObj) {
+            filters.push({
+                key: filterObj[filter].value.key,
+                value: {
+                    operator: filterObj[filter].value.operator,
+                    value: filterObj[filter].value.value
+                }
+            });
+        }
+        
+        return filters;
+    }
 
     function refreshPageData(table, data, identifiers, rowsNumber) {
         table.store.pageData = data;

@@ -123,7 +123,7 @@ window.dataTable = function () {
     function configureStore(table) {
         table.store = {
             columnPropertyNames: getColumnPropertyNames(),
-            filter: new Object(),
+            filter: [],
             selectedRows: [],
             identifiers: null,
             pageData: null,
