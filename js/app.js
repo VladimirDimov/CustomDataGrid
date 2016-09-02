@@ -4,7 +4,7 @@
 //     }
 // });
 
-var tb = dataTable().init('#table', {
+var tb = dataTable.init('#table', {
     ajax: {
         url: 'http://localhost:65219/home/indexDB'
     },
@@ -41,7 +41,7 @@ var tb = dataTable().init('#table', {
 
     paging: {
         active: true,
-        pageSize: 20
+        pageSize: 10
     },
 
     features: {

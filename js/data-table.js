@@ -1,30 +1,14 @@
-window.dataTable = function () {
+var selectable = require('../js/selectable.js');
+var sortable = require('../js/sortable.js');
+var dataLoader = require('../js/dataLoader.js');
+var paginator = require('../js/paginator.js');
+var filter = require('../js/filter.js');
+var editable = require('../js/editable');
+var validator = require('../js/validator.js');
+var settingsExternal = require('../js/dt-settings.js');
+
+window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal) {
     'use strict'
-
-    var selectable = require('../js/selectable.js');
-    var sortable = require('../js/sortable.js');
-    var dataLoader = require('../js/dataLoader.js');
-    var paginator = require('../js/paginator.js');
-    var filter = require('../js/filter.js');
-    var editable = require('../js/editable');
-    var validator = require('../js/validator.js');
-    var settingsExternal = require('../js/dt-settings.js');
-
-    var defaultSettings = {
-        pageSize: 10,
-
-        paginator: {
-            active: true,
-            length: 5
-        },
-
-        features: {
-            selectable: {
-                active: true,
-                cssCasses: 'active',
-            }
-        }
-    };
 
     var table = {
         init: function (selector, settings) {
@@ -33,11 +17,11 @@ window.dataTable = function () {
             // Settings
             this._settings = settingsExternal.init(settings);
             // Paginator settings
-            configurePaginator(this, settings, defaultSettings);
+            configurePaginator(this);
             // Init table store
             configureStore(this);
 
-            paginator(this).setPageClickEvents();
+            paginator.setPageClickEvents(this, dataLoader);
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
             dataLoader.loadData(table, 1, true);
@@ -55,6 +39,9 @@ window.dataTable = function () {
 
         get paginator() {
             return this._paginator;
+        },
+        set paginator(val) {
+            this._paginator = val;
         },
 
         get $table() {
@@ -85,11 +72,11 @@ window.dataTable = function () {
         };
     }
 
-    function configurePaginator(table, settings, defaultSettings) {
-        table._paginator = {};
-        table._paginator.currentPage = 1;
-        table._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
-        table._paginator.$paginator = paginator(table).setPaginator(1, table._paginator.length, 1);
+    function configurePaginator(table) {
+        if (!table.paginator) {
+            table.paginator = {};
+        }
+        table._paginator.$paginator = paginator.setPaginator(table, 1, table.settings.paginator.length, 1);
     }
 
     function processFeatures(features) {
@@ -113,6 +100,6 @@ window.dataTable = function () {
     };
 
     return table;
-};
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal);
 
-module.exports = dataTable;
+module.exports = window.dataTable;

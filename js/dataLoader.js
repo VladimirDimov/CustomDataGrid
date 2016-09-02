@@ -1,10 +1,10 @@
 
-var dataLoader = (function () {
-    var paginator = require('../js/paginator.js');
-    var selectable = require('../js/selectable.js');
-    var tableRenderer = require('../js/table-renderer.js');
-    var q = require('../node_modules/q/q.js')
+var paginator = require('../js/paginator.js');
+var selectable = require('../js/selectable.js');
+var tableRenderer = require('../js/table-renderer.js');
+var q = require('../node_modules/q/q.js')
 
+var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
             var deferred = q.defer();
@@ -22,9 +22,8 @@ var dataLoader = (function () {
                 },
                 success: function (data) {
                     refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
-
                     if (isUpdatePaginator) {
-                        paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table._settings.pageSize));
+                        paginator.updatePaginator(table, page, Math.ceil(data.rowsNumber / table._settings.pageSize));
                     }
 
                     deferred.resolve();
@@ -38,10 +37,10 @@ var dataLoader = (function () {
             return deferred.promise;
         }
     };
-    
+
     function formatFilterRequestValues(filterObj) {
         var filters = [];
-        for(var filter in filterObj) {
+        for (var filter in filterObj) {
             filters.push({
                 key: filterObj[filter].value.key,
                 value: {
@@ -50,7 +49,7 @@ var dataLoader = (function () {
                 }
             });
         }
-        
+
         return filters;
     }
 

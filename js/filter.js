@@ -1,6 +1,7 @@
-var filter = (function () {
+var dataLoader = require('../js/dataLoader.js');
+
+var filter = (function (dataLoader) {
     'use strict';
-    var dataLoader = require('../js/dataLoader.js');
 
     return {
         setFilterEvent: function (table) {
@@ -35,6 +36,6 @@ var filter = (function () {
             });
         }
     };
-} ());
+} (dataLoader));
 
 module.exports = filter;

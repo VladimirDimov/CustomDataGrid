@@ -1,8 +1,12 @@
-var paginator = function (table) {
-    var dataLoader = require('../js/dataLoader.js');
+var dataLoader = require('../js/dataLoader.js');
 
+var paginator = (function (dataLoader) {
     var paginator = {
-        setPaginator: function (start, end, activePage) {
+        setPaginator: function (table, start, end, activePage) {
+            if (!table.paginator) {
+                table.paginator = Object.create(Object);
+            }
+
             table.paginator.start = start;
             table.paginator.end = end;
 
@@ -35,9 +39,9 @@ var paginator = function (table) {
             return $paginator;
         },
 
-        updatePaginator: function (page, numberOfPages) {
+        updatePaginator: function (table, page, numberOfPages) {
             var start, end;
-            var length = table.paginator.length;
+            var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
             var currentPaginatorLength = Math.min(length, numberOfPages);
 
@@ -54,10 +58,10 @@ var paginator = function (table) {
                 end = -1;
             }
 
-            table.paginator.$paginator = paginator.setPaginator(start, end, page);
+            table.paginator.$paginator = paginator.setPaginator(table, start, end, page);
         },
 
-        setPageClickEvents: function () {
+        setPageClickEvents: function (table, dataLoader) {
             table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
 
@@ -90,6 +94,6 @@ var paginator = function (table) {
     };
 
     return paginator;
-};
+})(dataLoader);
 
 module.exports = paginator;

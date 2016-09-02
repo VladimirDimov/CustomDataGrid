@@ -1,7 +1,7 @@
-var sortable = (function () {
-    'use strict';
     var dataLoader = require('../js/dataLoader.js');
 
+var sortable = (function (dataLoader) {
+    'use strict';
     return {
         formatSortables: function (table) {
             var $sortables = table.$table.find('thead tr:last-child th[sortable]');
@@ -26,6 +26,6 @@ var sortable = (function () {
             });
         },
     }
-})();
+})(dataLoader);
 
 module.exports = sortable;

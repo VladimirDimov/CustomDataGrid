@@ -120,33 +120,17 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-window.dataTable = function () {
+var selectable = require('../js/selectable.js');
+var sortable = require('../js/sortable.js');
+var dataLoader = require('../js/dataLoader.js');
+var paginator = require('../js/paginator.js');
+var filter = require('../js/filter.js');
+var editable = require('../js/editable');
+var validator = require('../js/validator.js');
+var settingsExternal = require('../js/dt-settings.js');
+
+window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal) {
     'use strict'
-
-    var selectable = require('../js/selectable.js');
-    var sortable = require('../js/sortable.js');
-    var dataLoader = require('../js/dataLoader.js');
-    var paginator = require('../js/paginator.js');
-    var filter = require('../js/filter.js');
-    var editable = require('../js/editable');
-    var validator = require('../js/validator.js');
-    var settingsExternal = require('../js/dt-settings.js');
-
-    var defaultSettings = {
-        pageSize: 10,
-
-        paginator: {
-            active: true,
-            length: 5
-        },
-
-        features: {
-            selectable: {
-                active: true,
-                cssCasses: 'active',
-            }
-        }
-    };
 
     var table = {
         init: function (selector, settings) {
@@ -155,11 +139,11 @@ window.dataTable = function () {
             // Settings
             this._settings = settingsExternal.init(settings);
             // Paginator settings
-            configurePaginator(this, settings, defaultSettings);
+            configurePaginator(this);
             // Init table store
             configureStore(this);
 
-            paginator(this).setPageClickEvents();
+            paginator.setPageClickEvents(this, dataLoader);
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
             dataLoader.loadData(table, 1, true);
@@ -177,6 +161,9 @@ window.dataTable = function () {
 
         get paginator() {
             return this._paginator;
+        },
+        set paginator(val) {
+            this._paginator = val;
         },
 
         get $table() {
@@ -207,11 +194,11 @@ window.dataTable = function () {
         };
     }
 
-    function configurePaginator(table, settings, defaultSettings) {
-        table._paginator = {};
-        table._paginator.currentPage = 1;
-        table._paginator.length = settings.paginator ? settings.paginator.length : defaultSettings.paginator.length;
-        table._paginator.$paginator = paginator(table).setPaginator(1, table._paginator.length, 1);
+    function configurePaginator(table) {
+        if (!table.paginator) {
+            table.paginator = {};
+        }
+        table._paginator.$paginator = paginator.setPaginator(table, 1, table.settings.paginator.length, 1);
     }
 
     function processFeatures(features) {
@@ -235,17 +222,17 @@ window.dataTable = function () {
     };
 
     return table;
-};
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal);
 
-module.exports = dataTable;
+module.exports = window.dataTable;
 },{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/filter.js":7,"../js/paginator.js":8,"../js/selectable.js":9,"../js/sortable.js":10,"../js/validator.js":12}],3:[function(require,module,exports){
 
-var dataLoader = (function () {
-    var paginator = require('../js/paginator.js');
-    var selectable = require('../js/selectable.js');
-    var tableRenderer = require('../js/table-renderer.js');
-    var q = require('../node_modules/q/q.js')
+var paginator = require('../js/paginator.js');
+var selectable = require('../js/selectable.js');
+var tableRenderer = require('../js/table-renderer.js');
+var q = require('../node_modules/q/q.js')
 
+var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
             var deferred = q.defer();
@@ -263,9 +250,8 @@ var dataLoader = (function () {
                 },
                 success: function (data) {
                     refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
-
                     if (isUpdatePaginator) {
-                        paginator(table).updatePaginator(page, Math.ceil(data.rowsNumber / table._settings.pageSize));
+                        paginator.updatePaginator(table, page, Math.ceil(data.rowsNumber / table._settings.pageSize));
                     }
 
                     deferred.resolve();
@@ -279,10 +265,10 @@ var dataLoader = (function () {
             return deferred.promise;
         }
     };
-    
+
     function formatFilterRequestValues(filterObj) {
         var filters = [];
-        for(var filter in filterObj) {
+        for (var filter in filterObj) {
             filters.push({
                 key: filterObj[filter].value.key,
                 value: {
@@ -291,7 +277,7 @@ var dataLoader = (function () {
                 }
             });
         }
-        
+
         return filters;
     }
 
@@ -528,9 +514,10 @@ var editable = (function () {
 
 module.exports = editable;
 },{"../js/table-renderer.js":11}],7:[function(require,module,exports){
-var filter = (function () {
+var dataLoader = require('../js/dataLoader.js');
+
+var filter = (function (dataLoader) {
     'use strict';
-    var dataLoader = require('../js/dataLoader.js');
 
     return {
         setFilterEvent: function (table) {
@@ -565,15 +552,19 @@ var filter = (function () {
             });
         }
     };
-} ());
+} (dataLoader));
 
 module.exports = filter;
 },{"../js/dataLoader.js":3}],8:[function(require,module,exports){
-var paginator = function (table) {
-    var dataLoader = require('../js/dataLoader.js');
+var dataLoader = require('../js/dataLoader.js');
 
+var paginator = (function (dataLoader) {
     var paginator = {
-        setPaginator: function (start, end, activePage) {
+        setPaginator: function (table, start, end, activePage) {
+            if (!table.paginator) {
+                table.paginator = Object.create(Object);
+            }
+
             table.paginator.start = start;
             table.paginator.end = end;
 
@@ -606,9 +597,9 @@ var paginator = function (table) {
             return $paginator;
         },
 
-        updatePaginator: function (page, numberOfPages) {
+        updatePaginator: function (table, page, numberOfPages) {
             var start, end;
-            var length = table.paginator.length;
+            var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
             var currentPaginatorLength = Math.min(length, numberOfPages);
 
@@ -625,10 +616,10 @@ var paginator = function (table) {
                 end = -1;
             }
 
-            table.paginator.$paginator = paginator.setPaginator(start, end, page);
+            table.paginator.$paginator = paginator.setPaginator(table, start, end, page);
         },
 
-        setPageClickEvents: function () {
+        setPageClickEvents: function (table, dataLoader) {
             table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
 
@@ -661,7 +652,7 @@ var paginator = function (table) {
     };
 
     return paginator;
-};
+})(dataLoader);
 
 module.exports = paginator;
 },{"../js/dataLoader.js":3}],9:[function(require,module,exports){
@@ -805,10 +796,10 @@ var selectable = (function () {
 
 module.exports = selectable;
 },{}],10:[function(require,module,exports){
-var sortable = (function () {
-    'use strict';
     var dataLoader = require('../js/dataLoader.js');
 
+var sortable = (function (dataLoader) {
+    'use strict';
     return {
         formatSortables: function (table) {
             var $sortables = table.$table.find('thead tr:last-child th[sortable]');
@@ -833,64 +824,70 @@ var sortable = (function () {
             });
         },
     }
-})();
+})(dataLoader);
 
 module.exports = sortable;
 },{"../js/dataLoader.js":3}],11:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
-var renderer = {
+var renderer = (function (selectable) {
+    'use strict';
 
-    renderCell: function (table, colName, content) {
-        if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-            return table.settings.columns[colName].render(content);
-        };
+    var renderer = {
 
-        return content;
-    },
+        renderCell: function (table, colName, content) {
+            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
+                return table.settings.columns[colName].render(content);
+            };
 
-    renderRow: function (table, rowData) {
-        var identifier = rowData[table.settings.features.identifier];
-        var $row = $('<tr>');
-        var propValue;
-        for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
-            var propName = table.store.columnPropertyNames[col];
+            return content;
+        },
 
-            if (!propName) {
-                throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+        renderRow: function (table, rowData) {
+            var identifier = rowData[table.settings.features.identifier];
+            var $row = $('<tr>');
+            var propValue;
+            for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
+                var propName = table.store.columnPropertyNames[col];
+
+                if (!propName) {
+                    throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+                }
+
+                propValue = rowData[propName];
+
+                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue));
+                $row.append($col);
             }
 
-            propValue = rowData[propName];
+            $row.attr('data-identifier', identifier);
 
-            var $col = $('<td>').html(renderer.renderCell(table, propName, propValue));
-            $row.append($col);
+            return $row;
+        },
+
+        renderNumberOfRows: function (table) {
+            var numberOfRows = table.store.numberOfRows;
+
+            var containers = table.$table.find('[number-of-rows]');
+
+            for (var i = 0, l = containers.length; i < l; i += 1) {
+                $(containers[i]).html(numberOfRows);
+            }
+        },
+
+        renderNumberOfPages: function (table) {
+            var numberOfPages = table.store.numberOfPages;
+
+            var containers = table.$table.find('[number-of-pages]');
+
+            for (var i = 0, l = containers.length; i < l; i += 1) {
+                $(containers[i]).html(numberOfPages);
+            }
         }
+    };
 
-        $row.attr('data-identifier', identifier);
-
-        return $row;
-    },
-
-    renderNumberOfRows: function (table) {
-        var numberOfRows = table.store.numberOfRows;
-
-        var containers = table.$table.find('[number-of-rows]');
-
-        for (var i = 0, l = containers.length; i < l; i += 1) {
-            $(containers[i]).html(numberOfRows);
-        }
-    },
-
-    renderNumberOfPages: function (table) {
-        var numberOfPages = table.store.numberOfPages;
-
-        var containers = table.$table.find('[number-of-pages]');
-
-        for (var i = 0, l = containers.length; i < l; i += 1) {
-            $(containers[i]).html(numberOfPages);
-        }
-    }
-};
+    return renderer;
+} (selectable));
 
 module.exports = renderer;
 },{"../js/selectable.js":9}],12:[function(require,module,exports){
