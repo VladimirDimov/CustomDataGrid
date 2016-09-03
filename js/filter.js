@@ -32,7 +32,7 @@ var filter = (function (dataLoader) {
                     table.store.filter.push(keyToAdd);
                 }
 
-                dataLoader.loadData(table, 1, true);
+                dataLoader.loadData(table, 1);
             });
         }
     };

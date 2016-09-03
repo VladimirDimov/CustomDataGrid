@@ -9,6 +9,11 @@ var dataLoader = (function () {
         loadData: function (table, page, isUpdatePaginator) {
             var deferred = q.defer();
 
+            // Execute onDataLoading events
+            for (var index in table.events.onDataLoading) {
+                table.events.onDataLoading[index](table);
+            }
+
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
@@ -21,9 +26,10 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
-                    if (isUpdatePaginator) {
-                        paginator.updatePaginator(table, page, Math.ceil(data.rowsNumber / table._settings.pageSize));
+                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber, page);
+
+                    for (var index in table.events.onDataLoaded) {
+                        table.events.onDataLoaded[index](table);
                     }
 
                     deferred.resolve();
@@ -53,7 +59,8 @@ var dataLoader = (function () {
         return filters;
     }
 
-    function refreshPageData(table, data, identifiers, rowsNumber) {
+    function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        table.store.currentPage = currentPage;
         table.store.pageData = data;
         table.store.numberOfRows = rowsNumber;
         table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
@@ -74,24 +81,6 @@ var dataLoader = (function () {
                 selectable.initIdentifiers(table, identifiers);
             }
         }
-
-        selectable.refreshPageSelection(table);
-    }
-
-    function formatRowSelected(table, $row, identifier) {
-        if (isSelected(table, identifier)) {
-            debugger;
-            selectable.setRowSelectCssClasses();
-        }
-    }
-
-    function isSelected(table, identifier) {
-        var identifiers = table.store.identifiers;
-        var status = identifiers.filter(function (element) {
-            return element.identifier == identifier;
-        })[0].selected;
-
-        return status;
     }
 
     return dataLoader;

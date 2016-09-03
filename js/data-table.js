@@ -16,18 +16,17 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 
             // Settings
             this._settings = settingsExternal.init(settings);
-            // Paginator settings
-            configurePaginator(this);
-            // Init table store
+            // Init objects
+            configureEvents(this);
             configureStore(this);
+            configurePaginator(this, dataLoader);
 
-            paginator.setPageClickEvents(this, dataLoader);
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
             dataLoader.loadData(table, 1, true);
 
             if (settings.features) {
-                processFeatures(settings.features);
+                processFeatures(settings.features)
             };
 
             return this;
@@ -61,6 +60,12 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
         }
     };
 
+    function configureEvents(table) {
+        table.events = Object.create(Object);
+        table.events.onDataLoaded = [];
+        table.events.onDataLoading = [];
+    }
+
     function configureStore(table) {
         table.store = {
             columnPropertyNames: getColumnPropertyNames(),
@@ -72,11 +77,13 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
         };
     }
 
-    function configurePaginator(table) {
+    function configurePaginator(table, dataLoader) {
         if (!table.paginator) {
             table.paginator = {};
         }
-        table._paginator.$paginator = paginator.setPaginator(table, 1, table.settings.paginator.length, 1);
+
+        table._paginator.$paginator = paginator.init(table, 1, table.settings.paginator.length, 1);
+        paginator.setPageClickEvents(table, dataLoader);
     }
 
     function processFeatures(features) {

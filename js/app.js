@@ -41,7 +41,7 @@ var tb = dataTable.init('#table', {
 
     paging: {
         active: true,
-        pageSize: 10
+        pageSize: 5
     },
 
     features: {

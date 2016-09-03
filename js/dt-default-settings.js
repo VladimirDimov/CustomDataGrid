@@ -12,8 +12,7 @@ var defaultSettings = (function () {
                 active: true,
                 cssCasses: 'active',
             }
-        },
-        
+        },        
     };
 
     return defaultSettings;

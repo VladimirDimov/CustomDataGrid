@@ -2,6 +2,10 @@ var dataLoader = require('../js/dataLoader.js');
 
 var paginator = (function (dataLoader) {
     var paginator = {
+        init: function (table, start, end, activePage) {
+            paginator.setPaginator(table, start, end, activePage);
+            table.events.onDataLoaded.push(paginator.updatePaginator);
+        },
         setPaginator: function (table, start, end, activePage) {
             if (!table.paginator) {
                 table.paginator = Object.create(Object);
@@ -39,7 +43,9 @@ var paginator = (function (dataLoader) {
             return $paginator;
         },
 
-        updatePaginator: function (table, page, numberOfPages) {
+        updatePaginator: function (table) {
+            var page = table.store.currentPage || 1;
+            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.pageSize)
             var start, end;
             var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
@@ -65,15 +71,19 @@ var paginator = (function (dataLoader) {
             table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
 
-                var isUpdatePagnator =
-                    page == table.paginator.start ||
-                    page == table.paginator.end ||
-                    page == 1 || page == table.store.numberOfPages;
+                // var isUpdatePagnator =
+                //     page == table.paginator.start ||
+                //     page == table.paginator.end ||
+                //     page == 1 || page == table.store.numberOfPages;
                 table.paginator.currentPage = page;
                 table.paginator.$paginator.children('li').removeClass('active');
-                dataLoader.loadData(table, page, isUpdatePagnator)
+
+                dataLoader.loadData(table, page)
                     .then(function () {
                         $(e.target).parent().addClass('active');
+                        if (true) {
+                            paginator.updatePaginator(table, page, table.store.numberOfRows);
+                        }
                     });
             });
 
@@ -81,19 +91,25 @@ var paginator = (function (dataLoader) {
                 var page = parseInt(table.paginator.currentPage) + 1;
                 table.paginator.currentPage = page;
 
-                dataLoader.loadData(table, page, true);
+                dataLoader.loadData(table, page, true)
+                    .then(function () {
+                        paginator.updatePaginator(table, page, table.store.numberOfRows);
+                    })
             });
 
             table.$table.on('click', 'li>a[page-previous]', function (e) {
                 var page = parseInt(table.paginator.currentPage) - 1;
                 table.paginator.currentPage = page;
 
-                dataLoader.loadData(table, page, true);
+                dataLoader.loadData(table, page, true)
+                    .then(function () {
+                        paginator.updatePaginator(table, page, table.store.numberOfRows);
+                    })
             });
         }
     };
 
     return paginator;
-})(dataLoader);
+} (dataLoader));
 
 module.exports = paginator;

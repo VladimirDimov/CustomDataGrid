@@ -138,18 +138,17 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 
             // Settings
             this._settings = settingsExternal.init(settings);
-            // Paginator settings
-            configurePaginator(this);
-            // Init table store
+            // Init objects
+            configureEvents(this);
             configureStore(this);
+            configurePaginator(this, dataLoader);
 
-            paginator.setPageClickEvents(this, dataLoader);
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
             dataLoader.loadData(table, 1, true);
 
             if (settings.features) {
-                processFeatures(settings.features);
+                processFeatures(settings.features)
             };
 
             return this;
@@ -183,6 +182,12 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
         }
     };
 
+    function configureEvents(table) {
+        table.events = Object.create(Object);
+        table.events.onDataLoaded = [];
+        table.events.onDataLoading = [];
+    }
+
     function configureStore(table) {
         table.store = {
             columnPropertyNames: getColumnPropertyNames(),
@@ -194,11 +199,13 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
         };
     }
 
-    function configurePaginator(table) {
+    function configurePaginator(table, dataLoader) {
         if (!table.paginator) {
             table.paginator = {};
         }
-        table._paginator.$paginator = paginator.setPaginator(table, 1, table.settings.paginator.length, 1);
+
+        table._paginator.$paginator = paginator.init(table, 1, table.settings.paginator.length, 1);
+        paginator.setPageClickEvents(table, dataLoader);
     }
 
     function processFeatures(features) {
@@ -237,6 +244,11 @@ var dataLoader = (function () {
         loadData: function (table, page, isUpdatePaginator) {
             var deferred = q.defer();
 
+            // Execute onDataLoading events
+            for (var index in table.events.onDataLoading) {
+                table.events.onDataLoading[index](table);
+            }
+
             $.ajax({
                 url: table.settings.ajax.url,
                 data: {
@@ -249,9 +261,10 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
-                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber);
-                    if (isUpdatePaginator) {
-                        paginator.updatePaginator(table, page, Math.ceil(data.rowsNumber / table._settings.pageSize));
+                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber, page);
+
+                    for (var index in table.events.onDataLoaded) {
+                        table.events.onDataLoaded[index](table);
                     }
 
                     deferred.resolve();
@@ -281,7 +294,8 @@ var dataLoader = (function () {
         return filters;
     }
 
-    function refreshPageData(table, data, identifiers, rowsNumber) {
+    function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        table.store.currentPage = currentPage;
         table.store.pageData = data;
         table.store.numberOfRows = rowsNumber;
         table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
@@ -302,24 +316,6 @@ var dataLoader = (function () {
                 selectable.initIdentifiers(table, identifiers);
             }
         }
-
-        selectable.refreshPageSelection(table);
-    }
-
-    function formatRowSelected(table, $row, identifier) {
-        if (isSelected(table, identifier)) {
-            debugger;
-            selectable.setRowSelectCssClasses();
-        }
-    }
-
-    function isSelected(table, identifier) {
-        var identifiers = table.store.identifiers;
-        var status = identifiers.filter(function (element) {
-            return element.identifier == identifier;
-        })[0].selected;
-
-        return status;
     }
 
     return dataLoader;
@@ -341,8 +337,7 @@ var defaultSettings = (function () {
                 active: true,
                 cssCasses: 'active',
             }
-        },
-        
+        },        
     };
 
     return defaultSettings;
@@ -548,7 +543,7 @@ var filter = (function (dataLoader) {
                     table.store.filter.push(keyToAdd);
                 }
 
-                dataLoader.loadData(table, 1, true);
+                dataLoader.loadData(table, 1);
             });
         }
     };
@@ -560,6 +555,10 @@ var dataLoader = require('../js/dataLoader.js');
 
 var paginator = (function (dataLoader) {
     var paginator = {
+        init: function (table, start, end, activePage) {
+            paginator.setPaginator(table, start, end, activePage);
+            table.events.onDataLoaded.push(paginator.updatePaginator);
+        },
         setPaginator: function (table, start, end, activePage) {
             if (!table.paginator) {
                 table.paginator = Object.create(Object);
@@ -597,7 +596,9 @@ var paginator = (function (dataLoader) {
             return $paginator;
         },
 
-        updatePaginator: function (table, page, numberOfPages) {
+        updatePaginator: function (table) {
+            var page = table.store.currentPage || 1;
+            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.pageSize)
             var start, end;
             var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
@@ -623,15 +624,19 @@ var paginator = (function (dataLoader) {
             table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
 
-                var isUpdatePagnator =
-                    page == table.paginator.start ||
-                    page == table.paginator.end ||
-                    page == 1 || page == table.store.numberOfPages;
+                // var isUpdatePagnator =
+                //     page == table.paginator.start ||
+                //     page == table.paginator.end ||
+                //     page == 1 || page == table.store.numberOfPages;
                 table.paginator.currentPage = page;
                 table.paginator.$paginator.children('li').removeClass('active');
-                dataLoader.loadData(table, page, isUpdatePagnator)
+
+                dataLoader.loadData(table, page)
                     .then(function () {
                         $(e.target).parent().addClass('active');
+                        if (true) {
+                            paginator.updatePaginator(table, page, table.store.numberOfRows);
+                        }
                     });
             });
 
@@ -639,26 +644,33 @@ var paginator = (function (dataLoader) {
                 var page = parseInt(table.paginator.currentPage) + 1;
                 table.paginator.currentPage = page;
 
-                dataLoader.loadData(table, page, true);
+                dataLoader.loadData(table, page, true)
+                    .then(function () {
+                        paginator.updatePaginator(table, page, table.store.numberOfRows);
+                    })
             });
 
             table.$table.on('click', 'li>a[page-previous]', function (e) {
                 var page = parseInt(table.paginator.currentPage) - 1;
                 table.paginator.currentPage = page;
 
-                dataLoader.loadData(table, page, true);
+                dataLoader.loadData(table, page, true)
+                    .then(function () {
+                        paginator.updatePaginator(table, page, table.store.numberOfRows);
+                    })
             });
         }
     };
 
     return paginator;
-})(dataLoader);
+} (dataLoader));
 
 module.exports = paginator;
 },{"../js/dataLoader.js":3}],9:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
+            table.events.onDataLoaded.push(selectable.refreshPageSelection);
             var $tbody = table.$table.find('tbody');
 
             $tbody.on('click', function (e) {

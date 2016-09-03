@@ -1,6 +1,7 @@
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
+            table.events.onDataLoaded.push(selectable.refreshPageSelection);
             var $tbody = table.$table.find('tbody');
 
             $tbody.on('click', function (e) {
