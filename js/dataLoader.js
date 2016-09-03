@@ -65,9 +65,6 @@ var dataLoader = (function () {
         table.store.numberOfRows = rowsNumber;
         table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
 
-        tableRenderer.renderNumberOfRows(table);
-        tableRenderer.renderNumberOfPages(table);
-
         var $tbody = table.$table.children('tbody').empty();
 
         for (var row = 0; row < data.length; row++) {

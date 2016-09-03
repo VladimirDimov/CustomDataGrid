@@ -1,3 +1,4 @@
+var features = require('../js/features.js');
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -7,7 +8,16 @@ var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
 
-window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal) {
+window.dataTable = (function (
+    selectable,
+    sortable,
+    dataLoader,
+    paginator,
+    filter,
+    editable,
+    validator,
+    settingsExternal,
+    features) {
     'use strict'
 
     var table = {
@@ -20,6 +30,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             configureEvents(this);
             configureStore(this);
             configurePaginator(this, dataLoader);
+            features.init(this);
 
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
@@ -107,6 +118,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features);
 
 module.exports = window.dataTable;

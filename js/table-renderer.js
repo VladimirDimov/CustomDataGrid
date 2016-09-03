@@ -34,26 +34,6 @@ var renderer = (function (selectable) {
 
             return $row;
         },
-
-        renderNumberOfRows: function (table) {
-            var numberOfRows = table.store.numberOfRows;
-
-            var containers = table.$table.find('[number-of-rows]');
-
-            for (var i = 0, l = containers.length; i < l; i += 1) {
-                $(containers[i]).html(numberOfRows);
-            }
-        },
-
-        renderNumberOfPages: function (table) {
-            var numberOfPages = table.store.numberOfPages;
-
-            var containers = table.$table.find('[number-of-pages]');
-
-            for (var i = 0, l = containers.length; i < l; i += 1) {
-                $(containers[i]).html(numberOfPages);
-            }
-        }
     };
 
     return renderer;
