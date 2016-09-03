@@ -34,7 +34,6 @@ var features = (function (dataLoader, tableRenderer) {
         }
     }
 
-    debugger;
     return features;
 } (dataLoader, tableRenderer));
 

@@ -34,11 +34,12 @@ window.dataTable = (function (
 
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
-            dataLoader.loadData(table, 1, true);
 
             if (settings.features) {
                 processFeatures(settings.features)
             };
+
+            dataLoader.loadData(table, 1, true);
 
             return this;
         },
@@ -84,7 +85,8 @@ window.dataTable = (function (
             selectedRows: [],
             identifiers: null,
             pageData: null,
-            data: {}
+            data: {},
+            requestIdentifiersOnDataLoad: false,
         };
     }
 
@@ -98,7 +100,8 @@ window.dataTable = (function (
     }
 
     function processFeatures(features) {
-        if (features.selectable.active && features.selectable.active == true) {
+        if (!features) return;
+        if (features.selectable && features.selectable.active && features.selectable.active == true) {
             selectable.makeSelectable(table);
         };
 

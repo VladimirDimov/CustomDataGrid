@@ -2,6 +2,7 @@ var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
             table.events.onDataLoaded.push(selectable.refreshPageSelection);
+            table.store.requestIdentifiersOnDataLoad = true;
             var $tbody = table.$table.find('tbody');
 
             $tbody.on('click', function (e) {
@@ -49,6 +50,10 @@ var selectable = (function () {
         },
 
         initIdentifiers(table, identifiers) {
+            if (table.store.identifiers || !identifiers) {
+                return;
+            }
+
             table.store.identifiers = [];
 
             for (var i = 0, l = identifiers.length; i < l; i += 1) {

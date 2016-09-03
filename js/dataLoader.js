@@ -18,7 +18,7 @@ var dataLoader = (function () {
                 url: table.settings.ajax.url,
                 data: {
                     identifierPropName: table.settings.features.identifier,
-                    getIdentifiers: table.store.identifiers === null,
+                    getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
                     filter: JSON.stringify(formatFilterRequestValues(table.store.filter)),
@@ -35,8 +35,7 @@ var dataLoader = (function () {
                     deferred.resolve();
                 },
                 error: function (err) {
-                    console.log(err);
-                    throw err;
+                    table.$table.html(err.responseText);
                 }
             });
 
@@ -73,10 +72,9 @@ var dataLoader = (function () {
             var $row = tableRenderer.renderRow(table, rowData);
             $tbody.append($row);
 
-            if (table.store.identifiers === null) {
-                selectable.initIdentifiers(table, identifiers);
-            }
         }
+        
+        selectable.initIdentifiers(table, identifiers);
     }
 
     return dataLoader;

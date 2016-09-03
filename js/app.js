@@ -33,8 +33,8 @@ var tb = dataTable.init('#table', {
         },
 
         Test: {
-            render: function() {
-                
+            render: function () {
+
             }
         }
     },
@@ -48,7 +48,7 @@ var tb = dataTable.init('#table', {
         identifier: 'Id',
         selectable: {
             active: true,
-            cssClasses: 'active'
+            cssClasses: 'success'
             // selectFunction: function ($row) {
             //   // return $row.children().first('td').html();
             // }

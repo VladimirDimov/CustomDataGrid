@@ -156,11 +156,12 @@ window.dataTable = (function (
 
             filter.setFilterEvent(this);
             sortable.formatSortables(this);
-            dataLoader.loadData(table, 1, true);
 
             if (settings.features) {
                 processFeatures(settings.features)
             };
+
+            dataLoader.loadData(table, 1, true);
 
             return this;
         },
@@ -206,7 +207,8 @@ window.dataTable = (function (
             selectedRows: [],
             identifiers: null,
             pageData: null,
-            data: {}
+            data: {},
+            requestIdentifiersOnDataLoad: false,
         };
     }
 
@@ -220,7 +222,8 @@ window.dataTable = (function (
     }
 
     function processFeatures(features) {
-        if (features.selectable.active && features.selectable.active == true) {
+        if (!features) return;
+        if (features.selectable && features.selectable.active && features.selectable.active == true) {
             selectable.makeSelectable(table);
         };
 
@@ -264,7 +267,7 @@ var dataLoader = (function () {
                 url: table.settings.ajax.url,
                 data: {
                     identifierPropName: table.settings.features.identifier,
-                    getIdentifiers: table.store.identifiers === null,
+                    getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.pageSize,
                     filter: JSON.stringify(formatFilterRequestValues(table.store.filter)),
@@ -281,8 +284,7 @@ var dataLoader = (function () {
                     deferred.resolve();
                 },
                 error: function (err) {
-                    console.log(err);
-                    throw err;
+                    table.$table.html(err.responseText);
                 }
             });
 
@@ -319,10 +321,9 @@ var dataLoader = (function () {
             var $row = tableRenderer.renderRow(table, rowData);
             $tbody.append($row);
 
-            if (table.store.identifiers === null) {
-                selectable.initIdentifiers(table, identifiers);
-            }
         }
+        
+        selectable.initIdentifiers(table, identifiers);
     }
 
     return dataLoader;
@@ -552,7 +553,6 @@ var features = (function (dataLoader, tableRenderer) {
         }
     }
 
-    debugger;
     return features;
 } (dataLoader, tableRenderer));
 
@@ -720,6 +720,7 @@ var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
             table.events.onDataLoaded.push(selectable.refreshPageSelection);
+            table.store.requestIdentifiersOnDataLoad = true;
             var $tbody = table.$table.find('tbody');
 
             $tbody.on('click', function (e) {
@@ -767,6 +768,10 @@ var selectable = (function () {
         },
 
         initIdentifiers(table, identifiers) {
+            if (table.store.identifiers || !identifiers) {
+                return;
+            }
+
             table.store.identifiers = [];
 
             for (var i = 0, l = identifiers.length; i < l; i += 1) {
