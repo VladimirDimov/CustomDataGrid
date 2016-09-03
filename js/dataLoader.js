@@ -35,7 +35,7 @@ var dataLoader = (function () {
                     deferred.resolve();
                 },
                 error: function (err) {
-                    // console.log(err.responseText);
+                    console.log(err);
                     throw err;
                 }
             });
@@ -69,7 +69,6 @@ var dataLoader = (function () {
         tableRenderer.renderNumberOfPages(table);
 
         var $tbody = table.$table.children('tbody').empty();
-        // TODO: To foreach the table._columnPropertyNames instead of the response data columns
 
         for (var row = 0; row < data.length; row++) {
             var rowData = data[row];
