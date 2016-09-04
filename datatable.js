@@ -652,7 +652,9 @@ var paginator = (function (dataLoader) {
             var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
             var currentPaginatorLength = Math.min(length, numberOfPages);
-
+            
+            table.paginator.currentPage = page;
+            
             table.store.numberOfPages = numberOfPages;
             if (currentPaginatorLength > 0) {
                 start = Math.max(Math.floor(page - halfLength), 1);
@@ -687,7 +689,6 @@ var paginator = (function (dataLoader) {
 
             table.$table.on('click', 'li>a[page-next]', function (e) {
                 var page = parseInt(table.paginator.currentPage) + 1;
-                table.paginator.currentPage = page;
 
                 dataLoader.loadData(table, page, true)
                     .then(function () {
