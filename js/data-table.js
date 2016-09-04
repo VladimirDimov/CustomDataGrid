@@ -102,7 +102,7 @@ window.dataTable = (function (
 
     function processFeatures(features) {
         if (!features) return;
-        if (features.selectable && features.selectable.active && features.selectable.active == true) {
+        if (features.selectable) {
             selectable.makeSelectable(table);
         };
 

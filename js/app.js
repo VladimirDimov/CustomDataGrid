@@ -41,7 +41,6 @@ var tb = dataTable.init('#table', {
     features: {
         identifier: 'Id',
         selectable: {
-            active: true,
             cssClasses: 'success'
             // selectFunction: function ($row) {
             //   // return $row.children().first('td').html();
