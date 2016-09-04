@@ -1,18 +1,12 @@
 ﻿namespace Server.filters
 {
     using DataTables;
-    using DataTables.CommonProviders;
-    using DataTables.ProcessDataProviders;
     using System;
     using System.Web.Mvc;
 
     public class DataTable : ActionFilterAttribute
     {
         private ActionResult result;
-        private FilterProvider filterProvider;
-        private SortProvider sortProvider;
-        private RequestParamsManager requestParamsManager;
-        private JsonProvider jsonProvider;
 
         public DataTable()
         {
