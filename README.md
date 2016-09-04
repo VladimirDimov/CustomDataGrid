@@ -17,22 +17,22 @@ This project is still in process!
 			return View(employees);
 		}
 
-	public class Employee
-    {
-        public int Id { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public string Position { get; set; }
-
-        public string Occupation { get; set; }
-
-        public DateTime StartDate { get; set; }
-
-        public decimal Salary { get; set; }
-    }
+		public class Employee
+	    {
+	        public int Id { get; set; }
+	
+	        public string FirstName { get; set; }
+	
+	        public string LastName { get; set; }
+	
+	        public string Position { get; set; }
+	
+	        public string Occupation { get; set; }
+	
+	        public DateTime StartDate { get; set; }
+	
+	        public decimal Salary { get; set; }
+	    }
 ###Client:
 #####HTML
 Set all column headers in the < thead >. Any column that expects result from the database should have data-name attribute value as the corresponding property name from the data class.
