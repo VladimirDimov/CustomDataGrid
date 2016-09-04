@@ -76,6 +76,7 @@ window.dataTable = (function (
         table.events = Object.create(Object);
         table.events.onDataLoaded = [];
         table.events.onDataLoading = [];
+        table.events.onTableRendered = [];
     }
 
     function configureStore(table) {

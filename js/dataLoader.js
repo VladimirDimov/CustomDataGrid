@@ -33,6 +33,11 @@ var dataLoader = (function () {
                     }
 
                     tableRenderer.RenderTableBody(table, data.data);
+
+                    for (var index in table.events.onTableRendered) {
+                        table.events.onTableRendered[index](table);
+                    }
+
                     deferred.resolve();
                 },
                 error: function (err) {

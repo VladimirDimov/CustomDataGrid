@@ -198,6 +198,7 @@ window.dataTable = (function (
         table.events = Object.create(Object);
         table.events.onDataLoaded = [];
         table.events.onDataLoading = [];
+        table.events.onTableRendered = [];
     }
 
     function configureStore(table) {
@@ -282,6 +283,11 @@ var dataLoader = (function () {
                     }
 
                     tableRenderer.RenderTableBody(table, data.data);
+
+                    for (var index in table.events.onTableRendered) {
+                        table.events.onTableRendered[index](table);
+                    }
+
                     deferred.resolve();
                 },
                 error: function (err) {
@@ -707,7 +713,8 @@ module.exports = paginator;
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
-            table.events.onDataLoaded.push(selectable.refreshPageSelection);
+            // table.events.onDataLoaded.push(selectable.refreshPageSelection);
+            table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
             var $tbody = table.$table.find('tbody');
 
