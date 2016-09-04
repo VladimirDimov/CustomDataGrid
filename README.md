@@ -102,14 +102,19 @@ Just put an attribute "sortable" in the column < th > element.
     </table>
 
 ###Filters
-The filters can be created by placing input elements anywhere in the table. The inputs require an attribute filter="..." with any of the available options (see the list of available filter options). All filters can be applied together in any combinations.
+The filters can be created by placing input elements anywhere in the table. The inputs require an attribute filter="..." with any of the available options (see the list of available filter options) and attribute data-columnNames containing the names of the columns over which the filtering will be performed separated by a single space. All filters can be applied together in any combinations.
 
 #####example
 
-	<input type="text" data-props="FirstName" filter="ci" class="form-control">
 	// This will perform a case insensitive filtering. 
 	// As a result all the elements with a property FirstName containing the
 	// porvided string will be returned.
+	<input type="text" data-columnNames="FirstName" filter="ci" class="form-control">
+
+	// This will perform a case insensitive filtering. 
+	// As a result all the elements with properties FirstName or LastName equal to the
+	// porvided string will be returned.
+	<input type="text" data-columnNames="FirstName LastName" filter="=" class="form-control">
 
 #####List of available filter options
 - "ci" - contains (case insensitive);

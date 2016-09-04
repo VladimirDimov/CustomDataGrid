@@ -20,7 +20,7 @@ var filter = (function (dataLoader) {
                 var keyToAdd = {
                     key: dictKey,
                     value: {
-                        key: $target.attr('data-props'),
+                        key: $target.attr('data-columnNames'),
                         operator: filterOperator || 'ci',
                         value: $target.val(),
                     }
