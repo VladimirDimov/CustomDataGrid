@@ -32,6 +32,7 @@ var dataLoader = (function () {
                         table.events.onDataLoaded[index](table);
                     }
 
+                    tableRenderer.RenderTableBody(table, data.data);
                     deferred.resolve();
                 },
                 error: function (err) {
@@ -64,16 +65,6 @@ var dataLoader = (function () {
         table.store.numberOfRows = rowsNumber;
         table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
 
-        var $tbody = table.$table.children('tbody').empty();
-
-        for (var row = 0; row < data.length; row++) {
-            var rowData = data[row];
-            var identifier = rowData[table.settings.features.identifier];
-            var $row = tableRenderer.renderRow(table, rowData);
-            $tbody.append($row);
-
-        }
-        
         selectable.initIdentifiers(table, identifiers);
     }
 

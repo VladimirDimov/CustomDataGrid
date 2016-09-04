@@ -34,6 +34,18 @@ var renderer = (function (selectable) {
 
             return $row;
         },
+
+        RenderTableBody: function (table, data) {
+            var $tbody = table.$table.children('tbody').empty();
+            var buffer = [];
+            for (var row = 0; row < data.length; row++) {
+                var rowData = data[row];
+                var $row = renderer.renderRow(table, rowData);
+                buffer.push($row);
+            }
+
+            $tbody.append(buffer);
+        }
     };
 
     return renderer;
