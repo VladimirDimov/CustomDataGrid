@@ -320,7 +320,22 @@ var dataLoader = (function () {
         table.store.numberOfRows = rowsNumber;
         table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
 
-        selectable.initIdentifiers(table, identifiers);
+        initIdentifiers(table, identifiers);
+    }
+
+    function initIdentifiers(table, identifiers) {
+        if (table.store.identifiers || !identifiers) {
+            return;
+        }
+
+        table.store.identifiers = [];
+
+        for (var i = 0, l = identifiers.length; i < l; i += 1) {
+            table.store.identifiers.push({
+                selected: false,
+                identifier: identifiers[i]
+            });
+        }
     }
 
     return dataLoader;
@@ -760,21 +775,6 @@ var selectable = (function () {
             });
 
             console.log(selectedIdentifiers);
-        },
-
-        initIdentifiers(table, identifiers) {
-            if (table.store.identifiers || !identifiers) {
-                return;
-            }
-
-            table.store.identifiers = [];
-
-            for (var i = 0, l = identifiers.length; i < l; i += 1) {
-                table.store.identifiers.push({
-                    selected: false,
-                    identifier: identifiers[i]
-                });
-            }
         },
 
         unselectAll: function (table) {

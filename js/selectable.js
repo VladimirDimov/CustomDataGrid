@@ -50,21 +50,6 @@ var selectable = (function () {
             console.log(selectedIdentifiers);
         },
 
-        initIdentifiers(table, identifiers) {
-            if (table.store.identifiers || !identifiers) {
-                return;
-            }
-
-            table.store.identifiers = [];
-
-            for (var i = 0, l = identifiers.length; i < l; i += 1) {
-                table.store.identifiers.push({
-                    selected: false,
-                    identifier: identifiers[i]
-                });
-            }
-        },
-
         unselectAll: function (table) {
             var numberOfModifiedRows = 0;
             if (table.store.identifiers) {
