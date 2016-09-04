@@ -4,12 +4,9 @@
     using DataTables.CommonProviders;
     using DataTables.ProcessDataProviders;
     using System;
-    using System.Data.Entity;
-    using System.Linq;
-    using System.Linq.Dynamic;
     using System.Web.Mvc;
 
-    public class DataTableFilter : ActionFilterAttribute
+    public class DataTable : ActionFilterAttribute
     {
         private ActionResult result;
         private FilterProvider filterProvider;
@@ -17,7 +14,7 @@
         private RequestParamsManager requestParamsManager;
         private JsonProvider jsonProvider;
 
-        public DataTableFilter()
+        public DataTable()
         {
         }
 

@@ -90,7 +90,7 @@
     <Compile Include="CommonProviders\Contracts\IHttpContextHelpers.cs" />
     <Compile Include="CommonProviders\JsonProvider.cs" />
     <Compile Include="CommonProviders\ValidationProvider.cs" />
-    <Compile Include="DataTableFilter.cs" />
+    <Compile Include="DataTable.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Expressions\ICreateExpression.cs" />
     <Compile Include="Expressions\FilterExpression.cs" />

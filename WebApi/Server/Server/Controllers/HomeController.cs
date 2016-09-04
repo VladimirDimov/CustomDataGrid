@@ -16,7 +16,7 @@ namespace Server.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HomeController : Controller
     {
-        [DataTableFilter]
+        [DataTable]
         public ActionResult Index()
         {
             // Get data
@@ -32,7 +32,7 @@ namespace Server.Controllers
             return View(data.data.AsQueryable());
         }
 
-        [DataTableFilter]
+        [DataTable]
         public ActionResult IndexDb()
         {
             var dbContext = new ApplicationDbContext();
