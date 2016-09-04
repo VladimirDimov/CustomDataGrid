@@ -20,7 +20,7 @@ var dataLoader = (function () {
                     identifierPropName: table.settings.features.identifier,
                     getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
                     page: page,
-                    pageSize: table.settings.pageSize,
+                    pageSize: table.settings.paging.pageSize,
                     filter: JSON.stringify(formatFilterRequestValues(table.store.filter)),
                     orderBy: table.orderBy ? table.orderBy.Name : null,
                     asc: table.orderBy ? table.orderBy.Asc : true
@@ -71,7 +71,9 @@ var dataLoader = (function () {
         table.store.currentPage = currentPage;
         table.store.pageData = data;
         table.store.numberOfRows = rowsNumber;
-        table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+        if (table.settings.paging.enable) {
+            table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+        }
 
         initIdentifiers(table, identifiers);
     }

@@ -3,7 +3,6 @@ var defaultSettings = (function () {
         pageSize: 10,
 
         paginator: {
-            active: true,
             length: 5
         },
 

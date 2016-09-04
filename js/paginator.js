@@ -3,7 +3,6 @@ var dataLoader = require('../js/dataLoader.js');
 var paginator = (function (dataLoader) {
     var paginator = {
         init: function (table, start, end, activePage) {
-            paginator.setPaginator(table, start, end, activePage);
             table.events.onDataLoaded.push(paginator.updatePaginator);
         },
         setPaginator: function (table, start, end, activePage) {
@@ -45,7 +44,7 @@ var paginator = (function (dataLoader) {
 
         updatePaginator: function (table) {
             var page = table.store.currentPage || 1;
-            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.pageSize)
+            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
             var start, end;
             var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);

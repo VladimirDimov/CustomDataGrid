@@ -92,6 +92,10 @@ window.dataTable = (function (
     }
 
     function configurePaginator(table, dataLoader) {
+        if (table.settings != undefined && table.settings.paging != undefined && table.settings.paging.enable === false) {
+            return;
+        }
+
         if (!table.paginator) {
             table.paginator = {};
         }

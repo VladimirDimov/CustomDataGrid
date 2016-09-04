@@ -34,7 +34,7 @@ var tb = dataTable.init('#table', {
     },
 
     paging: {
-        active: true,
+        enable: true,
         pageSize: 20
     },
 

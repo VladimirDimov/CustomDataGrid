@@ -7,7 +7,10 @@ var settings = (function (defaultSettings, validator) {
             validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
 
             // Init default values
-            this.pageSize = defaultSettings.pageSize;
+            this.paging = {
+                enable: true,
+                pageSize: defaultSettings.pageSize
+            };
             this.paginator = defaultSettings.paginator;
             this.features = defaultSettings.features;
             // Set custom values
@@ -18,14 +21,6 @@ var settings = (function (defaultSettings, validator) {
             this.ajax = settings.ajax;
 
             return this;
-        },
-
-        get pageSize() {
-            return this._pageSize;
-        },
-        set pageSize(val) {
-            validator.ValidateMustBeAPositiveNumber(val, 'pageSize');
-            this._pageSize = val;
         },
 
         get paginator() {
@@ -70,7 +65,13 @@ var settings = (function (defaultSettings, validator) {
     function setCustomPaging(paging) {
         if (!paging) return;
         if (paging.pageSize) {
-            this.pageSize = paging.pageSize;
+            this.paging.pageSize = paging.pageSize;
+        }
+
+        if (paging.enable != undefined && paging.enable === false) {
+            this.paging.enable = false;
+        } else {
+            paging.enable = true;
         }
     }
 

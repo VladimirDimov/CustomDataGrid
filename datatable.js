@@ -214,6 +214,10 @@ window.dataTable = (function (
     }
 
     function configurePaginator(table, dataLoader) {
+        if (table.settings != undefined && table.settings.paging != undefined && table.settings.paging.enable === false) {
+            return;
+        }
+
         if (!table.paginator) {
             table.paginator = {};
         }
@@ -270,7 +274,7 @@ var dataLoader = (function () {
                     identifierPropName: table.settings.features.identifier,
                     getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
                     page: page,
-                    pageSize: table.settings.pageSize,
+                    pageSize: table.settings.paging.pageSize,
                     filter: JSON.stringify(formatFilterRequestValues(table.store.filter)),
                     orderBy: table.orderBy ? table.orderBy.Name : null,
                     asc: table.orderBy ? table.orderBy.Asc : true
@@ -321,7 +325,9 @@ var dataLoader = (function () {
         table.store.currentPage = currentPage;
         table.store.pageData = data;
         table.store.numberOfRows = rowsNumber;
-        table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+        if (table.settings.paging.enable) {
+            table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+        }
 
         initIdentifiers(table, identifiers);
     }
@@ -351,7 +357,6 @@ var defaultSettings = (function () {
         pageSize: 10,
 
         paginator: {
-            active: true,
             length: 5
         },
 
@@ -377,7 +382,10 @@ var settings = (function (defaultSettings, validator) {
             validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
 
             // Init default values
-            this.pageSize = defaultSettings.pageSize;
+            this.paging = {
+                enable: true,
+                pageSize: defaultSettings.pageSize
+            };
             this.paginator = defaultSettings.paginator;
             this.features = defaultSettings.features;
             // Set custom values
@@ -388,14 +396,6 @@ var settings = (function (defaultSettings, validator) {
             this.ajax = settings.ajax;
 
             return this;
-        },
-
-        get pageSize() {
-            return this._pageSize;
-        },
-        set pageSize(val) {
-            validator.ValidateMustBeAPositiveNumber(val, 'pageSize');
-            this._pageSize = val;
         },
 
         get paginator() {
@@ -440,7 +440,13 @@ var settings = (function (defaultSettings, validator) {
     function setCustomPaging(paging) {
         if (!paging) return;
         if (paging.pageSize) {
-            this.pageSize = paging.pageSize;
+            this.paging.pageSize = paging.pageSize;
+        }
+
+        if (paging.enable != undefined && paging.enable === false) {
+            this.paging.enable = false;
+        } else {
+            paging.enable = true;
         }
     }
 
@@ -620,7 +626,6 @@ var dataLoader = require('../js/dataLoader.js');
 var paginator = (function (dataLoader) {
     var paginator = {
         init: function (table, start, end, activePage) {
-            paginator.setPaginator(table, start, end, activePage);
             table.events.onDataLoaded.push(paginator.updatePaginator);
         },
         setPaginator: function (table, start, end, activePage) {
@@ -662,7 +667,7 @@ var paginator = (function (dataLoader) {
 
         updatePaginator: function (table) {
             var page = table.store.currentPage || 1;
-            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.pageSize)
+            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
             var start, end;
             var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
