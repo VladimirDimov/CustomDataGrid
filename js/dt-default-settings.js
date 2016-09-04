@@ -12,6 +12,11 @@ var defaultSettings = (function () {
                 cssCasses: 'active',
             }
         },
+
+        spinner: {
+            enable: true,
+            style: 0
+        }
     };
 
     return defaultSettings;

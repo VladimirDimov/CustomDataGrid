@@ -7,6 +7,7 @@ var filter = require('../js/filter.js');
 var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
+var spinner = require('../js/spinners.js');
 
 window.dataTable = (function (
     selectable,
@@ -31,6 +32,7 @@ window.dataTable = (function (
             configureStore(this);
             configurePaginator(this, dataLoader);
             features.init(this);
+            spinner.init(this);
 
             filter.setFilterEvent(this);
             sortable.formatSortables(this);

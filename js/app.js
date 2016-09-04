@@ -8,6 +8,12 @@ var tb = dataTable.init('#table', {
     ajax: {
         url: 'http://localhost:65219/home/indexDB'
     },
+
+    spinner: {
+        enable: true, // default value is "true"
+        style: 3
+    },
+
     columns: {
         Salary: {
             render: function (content) {
