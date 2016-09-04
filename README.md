@@ -6,16 +6,16 @@ This project is still in process!
  - Put [DataTable] attribute on the Action
  - Return IOrderedQueryable<>
 
-	[DataTable]
-	public ActionResult Index()
-	{
-		IOrderedQueryable<Employee> employees =
-										this.employeesService.
-										GetAll()
-										OrderedBy(x => x.Id);
-		
-		return View(employees);
-	}
+		[DataTable]
+		public ActionResult Index()
+		{
+			IOrderedQueryable<Employee> employees =
+											this.employeesService.
+											GetAll()
+											OrderedBy(x => x.Id);
+			
+			return View(employees);
+		}
 
 	public class Employee
     {
