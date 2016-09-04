@@ -616,12 +616,10 @@ var paginator = (function (dataLoader) {
             table.paginator.start = start;
             table.paginator.end = end;
 
-            var $footer = table._$table.children('tfoot').first();
+            var $footer = table._$table.find('[pagination]');
             $footer.children('.pagination').remove();
             var $paginator = $('<ul></ul>')
                 .addClass('pagination');
-
-            $footer.append($paginator);
 
             if (table.paginator.start > 1) {
                 var $firstPageElement = $('<li><a href="#" page-first>' + 1 + '</a></li>');
@@ -641,6 +639,8 @@ var paginator = (function (dataLoader) {
                 $paginator.append($nextPageElement);
                 $paginator.append($lastPageElement);
             }
+
+            $footer.append($paginator);
 
             return $paginator;
         },
@@ -673,10 +673,6 @@ var paginator = (function (dataLoader) {
             table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
                 var page = $(e.target).html();
 
-                // var isUpdatePagnator =
-                //     page == table.paginator.start ||
-                //     page == table.paginator.end ||
-                //     page == 1 || page == table.store.numberOfPages;
                 table.paginator.currentPage = page;
                 table.paginator.$paginator.children('li').removeClass('active');
 

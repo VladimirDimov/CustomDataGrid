@@ -33,20 +33,23 @@
             </tr>
             <tr>
                 <th colspan="7">
-                    <span>Last Name:</span>
-                    Starts with: <input type="text" data-props="LastName" filter="ss"> to
+                    <span>Last Name:</span> Starts with: <input type="text" data-props="LastName" filter="ss"> to
                 </th>
             </tr>
             <tr>
                 <th colspan="7">
-                    <span>Ends Name:</span>
-                    Starts with: <input type="text" data-props="LastName" filter="es"> to
+                    <span>Ends Name:</span> Starts with: <input type="text" data-props="LastName" filter="es"> to
                 </th>
             </tr>
             <tr>
                 <th colspan="7">
                     <button id="selectAll">Select All</button>
                     <button id="unselectAll">Unselect All</button>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7" class="center">
+                    <div pagination></div>
                 </th>
             </tr>
             <tr>
@@ -65,6 +68,11 @@
             <tr>
                 <th>Rows: <span number-of-rows></span></th>
                 <th>Pages: <span number-of-pages></span></th>
+            </tr>
+            <tr>
+                <th colspan="7" class="pager">
+                    <div pagination></div>
+                </th>
             </tr>
         </tfoot>
     </table>
