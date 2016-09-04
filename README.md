@@ -37,21 +37,21 @@ This project is still in process!
 #####HTML
 Set all column headers in the < thead >. Any column that expects result from the database should have data-name attribute value as the corresponding property name from the data class.
 
-    <table id="table">
-        <thead>
-            <tr>
-                <th data-name="FirstName">First Name</th>
-                <th data-name="LastName">Last Name</th>
-                <th data-name="Position">Position</th>
-                <th data-name="Occupation">Occupation</th>
-                <th data-name="StartDate">Start Date</th>
-                <th data-name="Salary">Salary</th>
-                <th data-name="Actions">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+		<table id="table">
+		    <thead>
+		        <tr>
+		            <th data-name="FirstName">First Name</th>
+		            <th data-name="LastName">Last Name</th>
+		            <th data-name="Position">Position</th>
+		            <th data-name="Occupation">Occupation</th>
+		            <th data-name="StartDate">Start Date</th>
+		            <th data-name="Salary">Salary</th>
+		            <th data-name="Actions">Actions</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    </tbody>
+		</table>
 
 #####JS
 	var myTable = dataTable.init('#table', {

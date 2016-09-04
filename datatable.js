@@ -276,14 +276,17 @@ var dataLoader = (function () {
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },
                 success: function (data) {
+                    // Add result to the dataTable object
                     refreshPageData(table, data.data, data.identifiers, data.rowsNumber, page);
 
+                    // Invoke events on dataLoaded
                     for (var index in table.events.onDataLoaded) {
                         table.events.onDataLoaded[index](table);
                     }
 
                     tableRenderer.RenderTableBody(table, data.data);
 
+                    // Invoke events on tableRendered
                     for (var index in table.events.onTableRendered) {
                         table.events.onTableRendered[index](table);
                     }
