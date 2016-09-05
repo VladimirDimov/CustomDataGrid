@@ -1,74 +1,24 @@
 ﻿using Data;
-using Newtonsoft.Json;
 using Server.filters;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Web;
-using System.Web.Http.Cors;
-using System.Web.Mvc;
-
 namespace Server.Controllers
 {
+    using System.Linq;
+    using System.Web.Http.Cors;
+    using System.Web.Mvc;
+
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HomeController : Controller
     {
         [DataTable]
-        public ActionResult Index()
-        {
-            // Get data
-            var reqData = Request.Params;
-            string jsonData = null;
-            using (var reader = new StreamReader(this.Server.MapPath("~/app_data/data.txt")))
-            {
-                jsonData = reader.ReadToEnd();
-            }
-
-            var data = JsonConvert.DeserializeObject<Data>(jsonData);
-
-            return View(data.data.AsQueryable());
-        }
-
-        [DataTable]
         public ActionResult IndexDb()
         {
             var dbContext = new ApplicationDbContext();
+            IOrderedQueryable<Employee> employees = dbContext
+                                                    .Employees
+                                                    .OrderBy(x => x.Id);
 
-            return View("Index", dbContext.Employees.OrderBy(x => x.Id));
+            return View("Index", employees);
         }
-
-        private string ConcatProperties(object obj)
-        {
-            var propInfos = obj.GetType().GetProperties();
-            var builder = new StringBuilder();
-            foreach (var propInfo in propInfos)
-            {
-                builder.Append(propInfo.GetValue(obj));
-            }
-
-            return builder.ToString();
-        }
-    }
-
-    public class OrderBy
-    {
-        public string Name { get; set; }
-
-        public bool Asc { get; set; }
-    }
-
-    public class Data
-    {
-        //public string draw { get; set; }
-
-        //public string recordsTotal { get; set; }
-
-        //public string recordsFiltered { get; set; }
-
-        public List<Person> data { get; set; }
     }
 
     public class Person
