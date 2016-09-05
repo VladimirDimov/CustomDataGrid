@@ -1,6 +1,10 @@
 #Data Table With Ajax Serversde Processing For.NET MVC
-This is an ajax data table with server side pagination for MVC.
-This project is still in process!
+
+----------
+
+##Description
+A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing.
+**This project is still in process!**
 ##Quick Start
 ###Server:
  - Put [DataTable] attribute on the Action

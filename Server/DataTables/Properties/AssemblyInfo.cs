@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DataTables")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Data Table With Ajax Serversde Processing For.NET MVC")]
+[assembly: AssemblyDescription("A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vladimir Dimov")]
 [assembly: AssemblyProduct("DataTables")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
