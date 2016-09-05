@@ -7,7 +7,7 @@ From the pacakege manager console in Visual Studio type `Install-Package DataTab
 
 ##Description
 A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing.
-**This project is still in process!**
+**This project is still in progress!**
 ##Quick Start
 ###Server:
  - Put [DataTable] attribute on the Action
