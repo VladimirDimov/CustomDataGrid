@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Package</id>
+    <version>1.0.0</version>
+    <authors>Vladimir Dimov</authors>
+    <owners>Vladimir Dimov</owners>
+    <!--<licenseUrl></licenseUrl>-->
+    <projectUrl>https://github.com/VladimirDimov/DataTablesServerSidePagination</projectUrl>
+    <!--<iconUrl></iconUrl>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing. This project is still in process!</description>
+    <releaseNotes>This is first unofficial release.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>data table datatable</tags>
+    <dependencies>
+      <dependency id="System.Web.Mvc" version="5.2.3.0" />
+      <dependency id="EntityFramework" version="6.0.0.0" />
+      <dependency id="System.Linq.Dynamic" version="1.0.5840.25917" />
+      <dependency id="Newtonsoft.Json" version="9.0.0.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Server\DataTables\bin\Release\DataTables.dll" target="..\packages\ServerSideDataTables\datatables.dll"/>
+    <file src="client\datatable.js" target="scripts\datatables-serverside\datatables-serverside.js"/>
+  </files>
+</package>
