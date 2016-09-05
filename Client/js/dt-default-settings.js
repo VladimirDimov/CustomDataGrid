@@ -8,7 +8,7 @@ var defaultSettings = (function () {
 
         features: {
             selectable: {
-                active: true,
+                enable: true,
                 cssCasses: 'active',
             }
         },

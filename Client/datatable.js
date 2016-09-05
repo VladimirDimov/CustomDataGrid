@@ -364,7 +364,7 @@ var defaultSettings = (function () {
 
         features: {
             selectable: {
-                active: true,
+                enable: true,
                 cssCasses: 'active',
             }
         },
@@ -474,9 +474,9 @@ var settings = (function (defaultSettings, validator) {
     function setCustomFeatures(features) {
         if (!features) return;
         if (features.selectable) {
-            if (features.selectable.active) {
-                validator.ValidateMustBeValidBoolean(features.selectable.active, "features.active");
-                this.features.selectable.active = features.selectable.active;
+            if (features.selectable.enable != undefined) {
+                validator.ValidateMustBeValidBoolean(features.selectable.enable, "features.selectable.enable");
+                this.features.selectable.enable = features.selectable.enable;
             }
 
             if (features.selectable.cssClasses) {
@@ -757,7 +757,10 @@ module.exports = paginator;
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
-            // table.events.onDataLoaded.push(selectable.refreshPageSelection);
+            if (table.settings.features.selectable.enable === false) {
+                return;
+            }
+
             table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
             var $tbody = table.$table.find('tbody');
@@ -797,6 +800,10 @@ var selectable = (function () {
         },
 
         getSelected: function (table) {
+            if (table.settings.features.selectable.enable === false) {
+                throw "The selectable option is disabled. You can enable it by setting the property settings.features.selectable.enable = true";
+            }
+
             var selectedIdentifiers = table.store.identifiers.filter(function (elem) {
                 return elem.selected === true;
             }).map(function (elem) {

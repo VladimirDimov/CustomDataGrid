@@ -92,9 +92,9 @@ var settings = (function (defaultSettings, validator) {
     function setCustomFeatures(features) {
         if (!features) return;
         if (features.selectable) {
-            if (features.selectable.active) {
-                validator.ValidateMustBeValidBoolean(features.selectable.active, "features.active");
-                this.features.selectable.active = features.selectable.active;
+            if (features.selectable.enable != undefined) {
+                validator.ValidateMustBeValidBoolean(features.selectable.enable, "features.selectable.enable");
+                this.features.selectable.enable = features.selectable.enable;
             }
 
             if (features.selectable.cssClasses) {

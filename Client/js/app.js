@@ -47,10 +47,8 @@ var tb = dataTable.init('#table', {
     features: {
         identifier: 'Id',
         selectable: {
+            enable: false,
             cssClasses: 'success'
-            // selectFunction: function ($row) {
-            //   // return $row.children().first('td').html();
-            // }
         },
         editable: {
             columns: {
