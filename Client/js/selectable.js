@@ -44,31 +44,33 @@ var selectable = (function () {
         },
 
         getSelected: function (table) {
+            var seletedIdentifiers = [];
+            var identifiers = table.store.identifiers;
             if (table.settings.features.selectable.enable === false) {
                 throw "The selectable option is disabled. You can enable it by setting the property settings.features.selectable.enable = true";
             }
 
-            var selectedIdentifiers = table.store.identifiers.filter(function (elem) {
-                return elem.selected === true;
-            }).map(function (elem) {
-                return elem.identifier;
-            });
+            for (var identifier in identifiers) {
+                var curIdentifier = identifiers[identifier];
+                if (curIdentifier.selected === true) {
+                    seletedIdentifiers.push(identifier);
+                }
+            }
 
-            console.log(selectedIdentifiers);
+            console.log(seletedIdentifiers);
         },
 
         unselectAll: function (table) {
             var numberOfModifiedRows = 0;
-            if (table.store.identifiers) {
-                table.store.identifiers.map(function (elem) {
-                    if (elem.selected == true) {
+            var identifiers = table.store.identifiers;
+            if (identifiers) {
+                for (var prop in identifiers) {
+                    if (identifiers[prop].selected == true) {
                         numberOfModifiedRows += 1;
                     }
 
-                    elem.selected = false;
-
-                    return elem;
-                });
+                    identifiers[prop].selected = false;
+                };
 
                 this.refreshPageSelection(table);
 
@@ -78,11 +80,9 @@ var selectable = (function () {
 
         selectAll: function (table) {
             if (table.store.identifiers) {
-                table.store.identifiers.map(function (elem) {
-                    elem.selected = true;
-
-                    return elem;
-                });
+                for (var prop in table.store.identifiers) {
+                    table.store.identifiers[prop].selected = true;
+                }
             }
         },
 
@@ -110,11 +110,23 @@ var selectable = (function () {
     }
 
     function isSelected(table, identifier) {
-        var identifierObj = table.store.identifiers.find(function (el) {
-            return el.identifier == identifier;
-        });
+        var identifierObj = GetIdentifierObj(table, identifier);
 
         return identifierObj.selected;
+    }
+
+    function GetIdentifierObj(table, identifier) {
+        if (!table.store.identifiers) {
+            throw "There are no identifiers loaded to the data table";
+        }
+
+        var identifierObj = table.store.identifiers[identifier];
+
+        if (!identifierObj) {
+            throw new "Invalid identifier value: " + identifier;
+        }
+
+        return identifierObj;
     }
 
     function RemoveFromArray(element, arr) {
@@ -124,12 +136,8 @@ var selectable = (function () {
 
     function setIdentifierSelectStatus(table, identifier, selected) {
         var identifiers = table.store.identifiers;
-
-        var element = identifiers.filter(function (element) {
-            return element.identifier == identifier;
-        })[0];
-
-        element.selected = selected;
+        var identifierObj = GetIdentifierObj(table, identifier);
+        identifierObj.selected = selected;
     }
 
     return selectable;

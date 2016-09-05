@@ -1,7 +1,7 @@
-﻿namespace Server.filters
+﻿namespace DataTables
 {
-    using DataTables;
     using System;
+    using System.Diagnostics;
     using System.Web.Mvc;
 
     public class DataTable : ActionFilterAttribute
@@ -27,6 +27,7 @@
             catch (Exception ex)
             {
 #if (!debug)
+                Debug.WriteLine(ex.Message);
                 filterContext.Result = new HttpStatusCodeResult(500, ex.Message);
 #else
                 throw ex;

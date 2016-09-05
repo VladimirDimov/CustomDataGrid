@@ -128,10 +128,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="WebGrease">
-      <Private>True</Private>
-      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
-    </Reference>
     <Reference Include="Antlr3.Runtime">
       <Private>True</Private>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
@@ -233,7 +229,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataTables\DataTables.csproj">
-      <Project>{125d27e5-011e-409c-b17e-14c0db740410}</Project>
+      <Project>{125D27E5-011E-409C-B17E-14C0DB740410}</Project>
       <Name>DataTables</Name>
     </ProjectReference>
     <ProjectReference Include="..\Data\Data.csproj">

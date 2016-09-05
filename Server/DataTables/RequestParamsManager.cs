@@ -1,13 +1,13 @@
-﻿namespace Server.filters
+﻿namespace DataTables
 {
     using DataTables.CommonProviders;
     using DataTables.CommonProviders.Contracts;
     using DataTables.Models.Filter;
     using DataTables.Models.Request;
+    using DataTables.ProcessDataProviders;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Dynamic;
     using System.Web.Mvc;
 
     public class RequestParamsManager
@@ -37,7 +37,7 @@
 
             var data = (IOrderedQueryable<object>)filterContext.Controller.ViewData.Model;
 
-            IQueryable identifiers = isGetIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
+            //IQueryable identifiers = isGetIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
 
             var requestModel = new RequestModel
             {
@@ -49,32 +49,10 @@
                 IdentifierPropName = identifierPropName,
                 GetIdentifiers = isGetIdentifiers,
                 Data = data,
-                Identifiers = identifiers,
+                //Identifiers = identifiers,
             };
 
             return requestModel;
-        }
-
-        private IQueryable GetIdentifiersCollection(string identifierPropName, IQueryable<object> data)
-        {
-            if (string.IsNullOrEmpty(identifierPropName))
-            {
-                throw new ArgumentNullException("Identifiers property name must be provided");
-            }
-
-            if (data == null)
-            {
-                throw new ArgumentNullException("Invalid null data");
-            }
-
-            var collectionDataType = data.GetType().GetGenericArguments().FirstOrDefault();
-
-            var identifierPropInfo = collectionDataType
-                .GetProperty(identifierPropName);
-
-            var identifiers = data.Select($"{identifierPropName}");
-
-            return identifiers;
         }
 
         private IEnumerable<KeyValuePair<string, FilterRequestModel>> GetFilterDictionary(ActionExecutedContext filterContext)

@@ -47,7 +47,7 @@ var tb = dataTable.init('#table', {
     features: {
         identifier: 'Id',
         selectable: {
-            enable: false,
+            enable: true,
             cssClasses: 'success'
         },
         editable: {

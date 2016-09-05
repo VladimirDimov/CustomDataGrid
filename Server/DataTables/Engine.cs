@@ -2,13 +2,14 @@
 {
     using CommonProviders;
     using ProcessDataProviders;
-    using Server.filters;
+    using System;
     using System.Linq;
     using System.Web.Mvc;
 
     class Engine
     {
         private FilterProvider filterProvider;
+        private GetIdentifiersProvider getIdentifiersProvider;
         private JsonProvider jsonProvider;
         private RequestParamsManager requestParamsManager;
         private SortProvider sortProvider;
@@ -19,6 +20,7 @@
             this.sortProvider = new SortProvider();
             this.jsonProvider = new JsonProvider();
             this.requestParamsManager = new RequestParamsManager();
+            this.getIdentifiersProvider = new GetIdentifiersProvider();
         }
 
         public void Run(ActionExecutedContext filterContext)
@@ -37,11 +39,17 @@
                 .Skip((requestModel.Page - 1) * requestModel.PageSize)
                 .Take(requestModel.PageSize);
 
+            IQueryable identifiers = null;
+            if (requestModel.GetIdentifiers)
+            {
+                identifiers = this.getIdentifiersProvider.GetIdentifierCollection(collectionDataType, requestModel.IdentifierPropName, orderedData);
+            }
+
             filterContext.Result = jsonProvider
                 .GetJsonResult(
                     new
                     {
-                        identifiers = requestModel.Identifiers,
+                        identifiers = identifiers,
                         data = resultData,
                         rowsNumber = filteredData.Count()
                     });

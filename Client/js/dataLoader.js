@@ -83,13 +83,12 @@ var dataLoader = (function () {
             return;
         }
 
-        table.store.identifiers = [];
+        table.store.identifiers = {};
 
         for (var i = 0, l = identifiers.length; i < l; i += 1) {
-            table.store.identifiers.push({
+            table.store.identifiers[identifiers[i]] = {
                 selected: false,
-                identifier: identifiers[i]
-            });
+            };
         }
     }
 

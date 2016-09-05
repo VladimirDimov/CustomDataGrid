@@ -1,7 +1,7 @@
-﻿using Data;
-using Server.filters;
-namespace Server.Controllers
+﻿namespace Server.Controllers
 {
+    using Data;
+    using DataTables;
     using System.Linq;
     using System.Web.Http.Cors;
     using System.Web.Mvc;
