@@ -71,6 +71,8 @@ Set all column headers in the < thead >. Any column that expects result from the
 			// The property name that identifies the object
 	        identifier: 'Id',
 	        selectable: {
+				// By default this option is set to true. Use it to disable the selectable option
+				enable: true;
 				// a custom class may be added to the selected rows
 	            cssClasses: 'success'
 	        }
@@ -125,5 +127,38 @@ The filters can be created by placing input elements anywhere in the table. The 
 - "<=" - less than or equal;
 - "si" - starts with (case insensitive);
 - "ei" - ends with (case insensitive);
+
+###Custom Column Rendering
+
+#####example:
+Add 'columns' property in the 'settings' object. For each column that you want to make a custom rendering add a property with the column name and inside create a property with a value equal to a function that accepts a single argument equal to the cell value. Return the rendered value;
+
+	var myTable = dataTable.init('#table', {
+		...
+	    columns: {
+	        Salary: {
+	            render: function (content) {
+	                return content + ' $';
+	            }
+	        },
+	
+	        Actions: {
+	            render: function () {
+	                return '<button class="btn-edit">Edit</button>' +
+	                    '<button class="btn-save">Save</button>';
+	            }
+	        },
+	
+	        StartDate: {
+	            render: function (content) {
+	                var formattedDate = formatDate(content);
+	
+	                return formattedDate;
+	            }
+	        }
+	    },
+		...
+	});
+
 
  
