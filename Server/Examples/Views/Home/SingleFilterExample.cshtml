@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "SingleFilterExample";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table id="table" class="table table-hover JColResizer" style="width: 701px;">
+    <thead>
+        <tr>
+            <th data-name="Id" sortable style="width: 139px;" data-field="id" tabindex="0">
+                <div class="th-inner sortable both">ID</div>
+                <div class="fht-cell" style="width: 135px;">
+                </div>
+            </th>
+            <th data-name="FirstName" sortable style="width: 294px;" data-field="name" tabindex="0">
+                <div class="th-inner sortable both">Item Name</div>
+                <div class="fht-cell" style="width: 286px;">
+                </div>
+            </th>
+            <th data-name="LastName" style="width: 285px;" data-field="price" tabindex="0">
+                <div class="th-inner sortable both">Item Price</div>
+                <div class="fht-cell" style="width: 278px;">
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+        <tr>
+            <th colspan="3" pagination>
+                
+            </th>
+        </tr>
+    </tfoot>
+</table>
+
+@section Scripts {
+    <script>
+        var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetData'
+            },
+            paging: {
+                enable: true,
+                pageSize: 20
+            },
+        });
+    </script>
+}

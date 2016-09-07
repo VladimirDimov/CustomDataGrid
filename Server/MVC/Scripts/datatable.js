@@ -237,12 +237,9 @@ window.dataTable = (function (
 
     function getColumnPropertyNames() {
         var colPropNames = [];
-        var $columns = table.$table.find('thead th');
+        var $columns = table.$table.find('thead tr:last-child').children();
         for (var i = 0; i < $columns.length; i++) {
-            var colName = $($columns[i]).attr('data-name');
-            if (colName) {
-                colPropNames.push(colName);
-            }
+            colPropNames.push($($columns[i]).attr('data-name'));
         }
 
         return colPropNames;
@@ -910,7 +907,7 @@ var sortable = (function (dataLoader) {
     'use strict';
     return {
         formatSortables: function (table) {
-            var $sortables = table.$table.find('th[sortable]');
+            var $sortables = table.$table.find('thead tr:last-child th[sortable]');
 
             $sortables.on('click', function (e) {
                 var name = $(e.target).attr('data-name');

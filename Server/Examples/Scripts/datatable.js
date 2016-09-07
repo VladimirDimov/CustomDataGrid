@@ -913,7 +913,7 @@ var sortable = (function (dataLoader) {
             var $sortables = table.$table.find('th[sortable]');
 
             $sortables.on('click', function (e) {
-                var name = $(e.target).attr('data-name');
+                var name = $(this).attr('data-name');
                 var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
                 table.orderBy = {
                     Name: name,

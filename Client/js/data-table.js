@@ -115,9 +115,12 @@ window.dataTable = (function (
 
     function getColumnPropertyNames() {
         var colPropNames = [];
-        var $columns = table.$table.find('thead tr:last-child').children();
+        var $columns = table.$table.find('thead th');
         for (var i = 0; i < $columns.length; i++) {
-            colPropNames.push($($columns[i]).attr('data-name'));
+            var colName = $($columns[i]).attr('data-name');
+            if (colName) {
+                colPropNames.push(colName);
+            }
         }
 
         return colPropNames;

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--CSS-->
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./data-table.css" charset="utf-8">
+    <!--JS-->
+    <script src="./node_modules/jquery/dist/jquery.js"></script>
+</head>
+
+<body>
+    <table id="table" class="display table table-hover table-condensed" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th colspan="7">
+                    <span>Name (contains):</span>
+                    <input type="text" data-columnNames="FirstName" filter="ci" class="form-control">
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
+                    <span>Occupation (exact match):</span>
+                    <input type="text" data-columnNames="Occupation" filter="=">
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
+                    <span>Salary:</span>
+                    <input type="text" data-columnNames="Salary" filter=">"> to
+                    <input type="text" data-columnNames="Salary" filter="<">
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
+                    <span>Last Name:</span> Starts with: <input type="text" data-columnNames="LastName" filter="ss"> to
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
+                    <span>Ends Name:</span> Starts with: <input type="text" data-columnNames="LastName" filter="es"> to
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7">
+                    <button id="selectAll">Select All</button>
+                    <button id="unselectAll">Unselect All</button>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="7" class="center">
+                    <div pagination></div>
+                </th>
+            </tr>
+            <tr>
+                <th data-name="FirstName" sortable>First Name</th>
+                <th data-name="LastName" sortable>Last Name</th>
+                <th data-name="Position">Position</th>
+                <th data-name="Occupation" sortable>Occupation</th>
+                <th data-name="StartDate" sortable>Start Date</th>
+                <th data-name="Salary" sortable>Salary</th>
+                <th data-name="Actions">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Rows: <span number-of-rows></span></th>
+                <th>Pages: <span number-of-pages></span></th>
+            </tr>
+            <tr>
+                <th colspan="7" class="pager">
+                    <div pagination></div>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button id="btnGetSelected">Get Selected</button>
+
+    <script src="datatable.js"></script>-->
+    <script src="js/app.js"></script>-->
+</body>
+
+</html>

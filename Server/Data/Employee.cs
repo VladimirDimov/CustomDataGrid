@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Data
+﻿namespace Data
 {
+    using System;
+
     public class Employee
     {
         public int Id { get; set; }

@@ -4,7 +4,7 @@ var sortable = (function (dataLoader) {
     'use strict';
     return {
         formatSortables: function (table) {
-            var $sortables = table.$table.find('thead tr:last-child th[sortable]');
+            var $sortables = table.$table.find('th[sortable]');
 
             $sortables.on('click', function (e) {
                 var name = $(e.target).attr('data-name');
