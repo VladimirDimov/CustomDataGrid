@@ -4,20 +4,42 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<table id="table" class="table table-hover JColResizer" style="width: 701px;">
+<div id="table2" class="panel panel-primary filterable">
+    <div class="panel-heading">
+        <h3 class="panel-title">Users</h3>
+        <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter">
+            <span class="glyphicon glyphicon-filter"></span> Filter</button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr class="filters">
+                <th data-name="Id"><input data-columnNames="Id" filter="cs" type="text" class="form-control" placeholder="#"></th>
+                <th data-name="FirstName"><input type="text" class="form-control" placeholder="First Name"></th>
+                <th data-name="nor"><input type="text" class="form-control" placeholder="Last Name"></th>
+                <th data-name="nor"><input type="text" class="form-control" placeholder="Username"></th>
+            </tr>
+        </thead>
+        <tbody>            
+        </tbody>
+    </table>
+</div>
+
+@*<table id="table" class="table table-hover JColResizer" style="width: 701px;">
     <thead>
         <tr>
-            <th data-name="Id" sortable style="width: 139px;" data-field="id" tabindex="0">
+            <th data-name="Id" sortable style="width: 139px;" data-field="id" tabindex="0" class="th-inner sortable both">
                 <div class="th-inner sortable both">ID</div>
                 <div class="fht-cell" style="width: 135px;">
                 </div>
             </th>
-            <th data-name="FirstName" sortable style="width: 294px;" data-field="name" tabindex="0">
+            <th data-name="FirstName" sortable style="width: 294px;" data-field="name" tabindex="0" class="asc">
                 <div class="th-inner sortable both">Item Name</div>
                 <div class="fht-cell" style="width: 286px;">
                 </div>
             </th>
-            <th data-name="LastName" style="width: 285px;" data-field="price" tabindex="0">
+            <th sortable data-name="LastName" style="width: 285px;" data-field="price" tabindex="0" class="th-inner sortable both desc">
                 <div class="th-inner sortable both">Item Price</div>
                 <div class="fht-cell" style="width: 278px;">
                 </div>
@@ -32,11 +54,21 @@
             </th>
         </tr>
     </tfoot>
-</table>
+</table>*@
 
 @section Scripts {
     <script>
         var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetData'
+            },
+            paging: {
+                enable: true,
+                pageSize: 20
+            },
+        });
+
+        var myTable2 = dataTable.init('#table2', {
             ajax: {
                 url: '/home/GetData'
             },

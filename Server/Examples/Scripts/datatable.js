@@ -913,7 +913,7 @@ var sortable = (function (dataLoader) {
             var $sortables = table.$table.find('th[sortable]');
 
             $sortables.on('click', function (e) {
-                var name = $(this).attr('data-name');
+                var name = $(e.target).attr('data-name');
                 var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
                 table.orderBy = {
                     Name: name,
@@ -1017,7 +1017,7 @@ var renderer = (function (selectable) {
         },
 
         RenderTableBody: function (table, data) {
-            var $tbody = table.$table.children('tbody').empty();
+            var $tbody = table.$table.find('tbody').empty();
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];

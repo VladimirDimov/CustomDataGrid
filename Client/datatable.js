@@ -1017,7 +1017,7 @@ var renderer = (function (selectable) {
         },
 
         RenderTableBody: function (table, data) {
-            var $tbody = table.$table.children('tbody').empty();
+            var $tbody = table.$table.find('tbody').empty();
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];
