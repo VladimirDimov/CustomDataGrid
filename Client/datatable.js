@@ -152,16 +152,11 @@ window.dataTable = (function (
             // Init objects
             configureEvents(this);
             configureStore(this);
+
             configurePaginator(this, dataLoader);
             features.init(this);
             spinner.init(this);
-
-            filter.setFilterEvent(this);
-            sortable.formatSortables(this);
-
-            if (settings.features) {
-                processFeatures(settings.features)
-            };
+            processFeatures(settings.features, this);
 
             dataLoader.loadData(table, 1, true);
 
@@ -206,9 +201,6 @@ window.dataTable = (function (
     function configureStore(table) {
         table.store = {
             columnPropertyNames: getColumnPropertyNames(),
-            filter: [],
-            selectedRows: [],
-            identifiers: null,
             pageData: null,
             data: {},
             requestIdentifiersOnDataLoad: false,
@@ -228,15 +220,19 @@ window.dataTable = (function (
         paginator.setPageClickEvents(table, dataLoader);
     }
 
-    function processFeatures(features) {
-        if (!features) return;
-        if (features.selectable) {
-            selectable.makeSelectable(table);
-        };
+    function processFeatures(features, table) {
+        if (features) {
+            if (features.selectable) {
+                selectable.makeSelectable(table);
+            };
 
-        if (features.editable) {
-            editable.init(table);
+            if (features.editable) {
+                editable.init(table);
+            }
         }
+
+        filter.init(table);
+        sortable.formatSortables(table);
     }
 
     function getColumnPropertyNames() {
@@ -335,7 +331,7 @@ var dataLoader = (function () {
     }
 
     function initIdentifiers(table, identifiers) {
-        if (table.store.identifiers || !identifiers) {
+        if (!identifiers) {
             return;
         }
 
@@ -605,6 +601,10 @@ var filter = (function (dataLoader) {
     'use strict';
 
     return {
+        init: function (table) {
+            table.store.filter = [];
+            filter.setFilterEvent(table);
+        },
         setFilterEvent: function (table) {
             var $filter = $(table.$table[0]).find('[filter]');
             $filter.on('change', function () {
@@ -760,10 +760,11 @@ var selectable = (function () {
                 return;
             }
 
+            table.store.identifiers = null;
             table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
-            var $tbody = table.$table.find('tbody');
 
+            var $tbody = table.$table.find('tbody');
             $tbody.on('click', function (e) {
                 var $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');

@@ -30,16 +30,11 @@ window.dataTable = (function (
             // Init objects
             configureEvents(this);
             configureStore(this);
+
             configurePaginator(this, dataLoader);
             features.init(this);
             spinner.init(this);
-
-            filter.setFilterEvent(this);
-            sortable.formatSortables(this);
-
-            if (settings.features) {
-                processFeatures(settings.features)
-            };
+            processFeatures(settings.features, this);
 
             dataLoader.loadData(table, 1, true);
 
@@ -84,9 +79,6 @@ window.dataTable = (function (
     function configureStore(table) {
         table.store = {
             columnPropertyNames: getColumnPropertyNames(),
-            filter: [],
-            selectedRows: [],
-            identifiers: null,
             pageData: null,
             data: {},
             requestIdentifiersOnDataLoad: false,
@@ -106,15 +98,19 @@ window.dataTable = (function (
         paginator.setPageClickEvents(table, dataLoader);
     }
 
-    function processFeatures(features) {
-        if (!features) return;
-        if (features.selectable) {
-            selectable.makeSelectable(table);
-        };
+    function processFeatures(features, table) {
+        if (features) {
+            if (features.selectable) {
+                selectable.makeSelectable(table);
+            };
 
-        if (features.editable) {
-            editable.init(table);
+            if (features.editable) {
+                editable.init(table);
+            }
         }
+
+        filter.init(table);
+        sortable.formatSortables(table);
     }
 
     function getColumnPropertyNames() {

@@ -79,7 +79,7 @@ var dataLoader = (function () {
     }
 
     function initIdentifiers(table, identifiers) {
-        if (table.store.identifiers || !identifiers) {
+        if (!identifiers) {
             return;
         }
 

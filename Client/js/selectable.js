@@ -5,10 +5,11 @@ var selectable = (function () {
                 return;
             }
 
+            table.store.identifiers = null;
             table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
-            var $tbody = table.$table.find('tbody');
 
+            var $tbody = table.$table.find('tbody');
             $tbody.on('click', function (e) {
                 var $row = $(e.target).parentsUntil('tbody').last();
                 var identifier = $row.attr('data-identifier');

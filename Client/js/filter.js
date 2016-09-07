@@ -4,6 +4,10 @@ var filter = (function (dataLoader) {
     'use strict';
 
     return {
+        init: function (table) {
+            table.store.filter = [];
+            filter.setFilterEvent(table);
+        },
         setFilterEvent: function (table) {
             var $filter = $(table.$table[0]).find('[filter]');
             $filter.on('change', function () {
