@@ -1,0 +1,22 @@
+.row-selected {
+    background-color: red;
+}
+
+th[asc] {
+  background-image: url('/assets/datatableserverside/img/asc.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: right;
+}
+
+th[desc] {
+  background-image: url('/assets/datatableserverside/img/desc.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: right;
+}
+
+th[sortable] {
+  cursor: pointer;
+  color: gray;
+}

@@ -21,7 +21,7 @@ var spinner = (function () {
         $spinnerCell.css('text-align', 'center');
 
         var $image = $('<img/>');
-        $image.attr('src', '../img/spinners/' + spinnerStyle + '.gif');
+        $image.attr('src', '/assets/datatableserverside/img/spinners/' + spinnerStyle + '.gif');
         $image.css('display', 'block');
         $image.css('margin', 'auto auto');
 
