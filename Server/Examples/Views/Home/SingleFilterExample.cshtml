@@ -98,7 +98,7 @@
         </div>
         <div class="fixed-table-pagination" style="display: block;">
             <div class="pull-left pagination-detail">
-                <span class="pagination-info">Showing 20 of <span number-of-rows/> rows</span>
+                <span class="pagination-info">Showing 20 of <span number-of-rows /> rows</span>
             </div>
             <div class="pull-right center pagination" pagination>
             </div>
@@ -120,6 +120,13 @@
                 enable: true, // default value is "true"
                 style: 3
             },
+            features: {
+                identifier: 'Id',
+                selectable: {
+                    enable: true,
+                    cssClasses: 'active'
+                },
+            }
         });
 
         $(document).ready(function () {

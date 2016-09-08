@@ -6,7 +6,7 @@ var sortable = (function (dataLoader) {
         formatSortables: function (table) {
             var $sortables = table.$table.find('th[sortable]');
             $sortables.find('.th-inner').addClass('sortable both');
-
+            table.store.$sortables = $sortables;
             $sortables.on('click', function (e) {
                 var $target = $(this);
                 console.log($target);
@@ -19,13 +19,13 @@ var sortable = (function (dataLoader) {
 
                 dataLoader.loadData(table, 1)
                     .then(function () {
-                        $sortables.removeAttr('asc desc');
+                        // table.store.$sortables.removeAttr('asc desc');
+                        table.store.$sortables.find('.th-inner').removeClass('asc desc');
+
                         if (isAsc) {
-                            // $target.attr('asc', '');
                             $target.find('.th-inner').addClass('sortable both asc');
                             $target.find('.th-inner').removeClass('desc');
                         } else {
-                            // $target.attr('desc', '');
                             $target.find('.th-inner').addClass('sortable both desc');
                             $target.find('.th-inner').removeClass('asc');
                         }
