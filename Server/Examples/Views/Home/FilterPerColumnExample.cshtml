@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "SingleFilterExample";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .filterable {
+        margin-top: 15px;
+    }
+
+        .filterable .panel-heading .pull-right {
+            margin-top: -20px;
+        }
+
+        .filterable .filters input[disabled] {
+            background-color: transparent;
+            border: none;
+            cursor: auto;
+            box-shadow: none;
+            padding: 0;
+            height: auto;
+        }
+
+            .filterable .filters input[disabled]::-webkit-input-placeholder {
+                color: #333;
+            }
+
+            .filterable .filters input[disabled]::-moz-placeholder {
+                color: #333;
+            }
+
+            .filterable .filters input[disabled]:-ms-input-placeholder {
+                color: #333;
+            }
+</style>
+
+<div id="table" class="container fixed-table-container">
+    <h3>The columns titles are merged with the filters inputs thanks to the placeholders attributes</h3>
+    <hr>
+    <p>Inspired by this <a href="http://bootsnipp.com/snippets/featured/panel-tables-with-filter">snippet</a></p>
+    <div class="row">
+        <div class="panel panel-primary filterable" style="display:block;">
+            <div class="panel-heading">
+                <h3 class="panel-title">Users</h3>
+                <div class="pull-right">
+                    <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter</button>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr class="filters">
+                        <th data-name="Id" sortable>
+                            <input data-columnNames="Id" filter="cs" type="text" class="form-control " placeholder="#" disabled>
+                        </th>
+                        <th data-name="FirstName" sortable>
+                            <input data-columnNames="FirstName" filter="cs" type="text" class="form-control th-inner" placeholder="First Name" disabled>
+                        </th>
+                        <th data-name="LastName">
+                            <input data-columnNames="LastName" filter="cs" type="text" class="form-control" placeholder="Last Name" disabled>
+                        </th>
+                        <th data-name="Salary">
+                            <input data-columnNames="Salary" filter=">=" type="text" class="form-control" placeholder="Salary" disabled>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div>
+                <div pagination class="text-center" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetData'
+            },
+            paging: {
+                enable: true,
+                pageSize: 20
+            },
+            spinner: {
+                enable: true, // default value is "true"
+                style: 3
+            },
+        });
+
+        $(document).ready(function () {
+            $('.filterable .btn-filter').click(function () {
+                var $panel = $(this).parents('.filterable'),
+                $filters = $panel.find('.filters input'),
+                $tbody = $panel.find('.table tbody');
+                if ($filters.prop('disabled') == true) {
+                    $filters.prop('disabled', false);
+                    $filters.first().focus();
+                } else {
+                    $filters.val('').prop('disabled', true);
+                    $tbody.find('.no-result').remove();
+                    $tbody.find('tr').show();
+                }
+            });
+        });
+    </script>
+}

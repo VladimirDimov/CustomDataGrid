@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "SingleFilterExample";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -35,52 +34,75 @@
             }
 </style>
 
-<div id="table" class="container fixed-table-container">
-    <h3>The columns titles are merged with the filters inputs thanks to the placeholders attributes</h3>
-    <hr>
-    <p>Inspired by this <a href="http://bootsnipp.com/snippets/featured/panel-tables-with-filter">snippet</a></p>
-    <div class="row">
-        <div class="panel panel-primary filterable" style="display:block;">
-            <div class="panel-heading">
-                <h3 class="panel-title">Users</h3>
-                <div class="pull-right">
-                    <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter</button>
-                </div>
+
+<div id="table" class="bootstrap-table">
+    <div class="fixed-table-toolbar">
+        <div class="columns columns-right btn-group pull-right">
+            <button class="btn btn-default" type="button" name="toggle" title="Toggle">
+                <i class="glyphicon glyphicon-list-alt icon-list-alt">
+                </i>
+            </button>
+            <div class="keep-open btn-group" title="Columns">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <i class="glyphicon glyphicon-th icon-th">
+                    </i> <span class="caret">
+                    </span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="id" value="0" checked="checked"> ID
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="name" value="1" checked="checked"> Item Name
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="price" value="2" checked="checked"> Item Price
+                        </label>
+                    </li>
+                </ul>
             </div>
-            <table class="table">
+        </div>
+        <div class="pull-right search">
+            <input data-columnNames="Id FirstName LastName" filter="cs" class="form-control" type="text" placeholder="Search">
+        </div>
+    </div>
+    <div class="fixed-table-container" style="height: 367px; padding-bottom: 40px;">
+        <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
+            <table class="table table-hover JColResizer">
                 <thead>
-                    <tr class="filters">
-                        <th data-name="Id">
-                            <input data-columnNames="Id" filter="cs" type="text" class="form-control" placeholder="#" disabled>
+                    <tr>
+                        <th @*sortable*@ data-name="Id" @*style="width: 175px;"*@ data-field="id" tabindex="0">
+                            <div class="th-inner th-inner">ID</div>
+                            <div class="fht-cell" style="width: 175px;">
+                            </div>
                         </th>
-                        <th data-name="FirstName" sortable>
-                            <input data-columnNames="FirstName" filter="cs" type="text" class="form-control th-inner" placeholder="First Name" disabled>
+                        <th sortable data-name="FirstName" @*style="width: 378px;"*@ data-field="name" tabindex="0">
+                            <div class="th-inner">Item Name</div>
+                            <div class="fht-cell" style="width: 377px;">
+                            </div>
                         </th>
-                        <th data-name="LastName">
-                            <input data-columnNames="LastName" filter="cs" type="text" class="form-control" placeholder="Last Name" disabled>
-                        </th>
-                        <th data-name="Salary">
-                            <input data-columnNames="Salary" filter=">=" type="text" class="form-control" placeholder="Salary" disabled>
+                        <th sortable data-name="LastName" @*style="width: 368px;"*@ data-field="price" tabindex="0">
+                            <div class="th-inner">Item Price</div>
+                            <div class="fht-cell" style="width: 367px;">
+                            </div>
                         </th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
-            <div>
-                <div pagination class="text-center" />
+        </div>
+        <div class="fixed-table-pagination" style="display: block;">
+            <div class="pull-left pagination-detail">
+                <span class="pagination-info">Showing 20 of <span number-of-rows/> rows</span>
+            </div>
+            <div class="pull-right center pagination" pagination>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="bootstrap-table">
-    <div class="fixed-table-toolbar"><div class="columns columns-right btn-group pull-right"><button class="btn btn-default" type="button" name="toggle" title="Toggle"><i class="glyphicon glyphicon-list-alt icon-list-alt"></i></button><div class="keep-open btn-group" title="Columns"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span></button><ul class="dropdown-menu" role="menu"><li><label><input type="checkbox" data-field="id" value="0" checked="checked"> ID</label></li><li><label><input type="checkbox" data-field="name" value="1" checked="checked"> Item Name</label></li><li><label><input type="checkbox" data-field="price" value="2" checked="checked"> Item Price</label></li></ul></div></div><div class="pull-right search"><input class="form-control" type="text" placeholder="Search"></div></div><div class="fixed-table-container" style="height: 367px; padding-bottom: 40px;">
-        <div class="fixed-table-header" style="margin-right: 0px;"><table class="table table-hover JColResizer" style="width: 921px;"><thead><tr><th style="width: 175px;" data-field="id" tabindex="0"><div class="th-inner sortable both">ID</div><div class="fht-cell" style="width: 175px;"></div></th><th style="width: 378px;" data-field="name" tabindex="0"><div class="th-inner sortable both">Item Name</div><div class="fht-cell" style="width: 377px;"></div></th><th style="width: 368px;" data-field="price" tabindex="0"><div class="th-inner sortable both">Item Price</div><div class="fht-cell" style="width: 367px;"></div></th></tr></thead></table></div><div class="fixed-table-body">
-            <div class="fixed-table-loading" style="top: 41px; display: none;">Loading, please wait...</div><div class="JCLRgrips" style="width: 905px;"><div class="JCLRgrip" style="left: 176px; height: 371px;"><div class="JColResizer"></div></div><div class="JCLRgrip" style="left: 554px; height: 371px;"><div class="JColResizer"></div></div><div class="JCLRgrip JCLRLastGrip" style="left: 922px; height: 371px;"></div></div><table id="table" data-toggle="table" data-height="480" data-show-columns="true" data-search="true" data-show-toggle="true" data-pagination="true" data-url="../json/data1.json" data-resizable="true" class="table table-hover JColResizer" style="margin-top: -40px;">
-                <thead><tr><th style="width: 175px;" data-field="id" tabindex="0"><div class="th-inner sortable both">ID</div><div class="fht-cell"></div></th><th style="width: 378px;" data-field="name" tabindex="0"><div class="th-inner sortable both">Item Name</div><div class="fht-cell"></div></th><th style="width: 368px;" data-field="price" tabindex="0"><div class="th-inner sortable both">Item Price</div><div class="fht-cell"></div></th></tr></thead>
-                <tbody><tr data-index="0"><td style="">0</td><td style="">Item 0</td><td style="">$0</td></tr><tr data-index="1"><td style="">1</td><td style="">Item 1</td><td style="">$1</td></tr><tr data-index="2"><td style="">2</td><td style="">Item 2</td><td style="">$2</td></tr><tr data-index="3"><td style="">3</td><td style="">Item 3</td><td style="">$3</td></tr><tr data-index="4"><td style="">4</td><td style="">Item 4</td><td style="">$4</td></tr><tr data-index="5"><td style="">5</td><td style="">Item 5</td><td style="">$5</td></tr><tr data-index="6"><td style="">6</td><td style="">Item 6</td><td style="">$6</td></tr><tr data-index="7"><td style="">7</td><td style="">Item 7</td><td style="">$7</td></tr><tr data-index="8"><td style="">8</td><td style="">Item 8</td><td style="">$8</td></tr><tr data-index="9"><td style="">9</td><td style="">Item 9</td><td style="">$9</td></tr></tbody>
-            </table>
-        </div><div class="fixed-table-footer" style="display: none;"><table><tbody><tr></tr></tbody></table></div><div class="fixed-table-pagination" style="display: block;"><div class="pull-left pagination-detail"><span class="pagination-info">Showing 1 to 10 of 21 rows</span><span class="page-list"><span class="btn-group dropup"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="page-size">10</span> <span class="caret"></span></button><ul class="dropdown-menu" role="menu"><li class="active"><a href="javascript:void(0)">10</a></li><li><a href="javascript:void(0)">25</a></li></ul></span> rows per page</span></div><div class="pull-right pagination"><ul class="pagination"><li class="page-pre"><a href="javascript:void(0)">‹</a></li><li class="page-number active"><a href="javascript:void(0)">1</a></li><li class="page-number"><a href="javascript:void(0)">2</a></li><li class="page-number"><a href="javascript:void(0)">3</a></li><li class="page-next"><a href="javascript:void(0)">›</a></li></ul></div></div>
     </div>
 </div>
 
