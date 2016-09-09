@@ -16,7 +16,7 @@ var tb = dataTable.init('#table', {
 
     columns: {
         Salary: {
-            render: function (content) {
+            render: function (content, rowData) {
                 return content + ' $';
             }
         },

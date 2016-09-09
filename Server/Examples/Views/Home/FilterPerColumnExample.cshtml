@@ -80,12 +80,23 @@
             },
             paging: {
                 enable: true,
-                pageSize: 20
+                pageSize: 5
             },
             spinner: {
                 enable: true, // default value is "true"
                 style: 3
             },
+            features: {
+                identifier: 'Id',
+                selectable: {
+                    enable: true,
+                    multi: true,
+                    cssClasses: 'active'
+                }
+            },
+            paginator: {
+                length: 10
+            }
         });
 
         $(document).ready(function () {

@@ -16,6 +16,7 @@ var settings = (function (defaultSettings, validator) {
             this.spinner = defaultSettings.spinner;
             // Set custom values
             setCustomPaging.call(this, settings.paging);
+            setCustomPaginator.call(this, settings.paginator);
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomSpinner.call(this, settings.spinner);
@@ -86,6 +87,14 @@ var settings = (function (defaultSettings, validator) {
             this.paging.enable = false;
         } else {
             paging.enable = true;
+        }
+    }
+
+    function setCustomPaginator(paginator) {
+        if (!paginator) return;
+        if (paginator.length) {
+            validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
+            this.paginator.length = paginator.length;
         }
     }
 
