@@ -9,6 +9,7 @@ var defaultSettings = (function () {
         features: {
             selectable: {
                 enable: false,
+                multi: false,
                 cssClasses: 'active',
             }
         },

@@ -363,6 +363,7 @@ var defaultSettings = (function () {
         features: {
             selectable: {
                 enable: false,
+                multi: false,
                 cssClasses: 'active',
             }
         },
@@ -489,6 +490,11 @@ var settings = (function (defaultSettings, validator) {
             if (features.selectable.cssClasses) {
                 validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
                 this.features.selectable.cssClasses = features.selectable.cssClasses;
+            }
+
+            if (features.selectable.multi != undefined) {
+                validator.ValidateMustBeValidBoolean(features.selectable.multi);
+                this.features.selectable.multi = features.selectable.multi;
             }
 
             if (features.identifier) {
@@ -783,8 +789,8 @@ var selectable = (function () {
                 var rowIsSelected = isSelected(table, identifier);
                 var numberOfSelectedRows;
 
-                // No Ctrl && Row is not selected
-                if (!e.ctrlKey) {
+                // No Ctrl && is not multiselect
+                if (!e.ctrlKey || !table.settings.features.selectable.multi) {
                     numberOfSelectedRows = selectable.unselectAll(table);
                 }
 

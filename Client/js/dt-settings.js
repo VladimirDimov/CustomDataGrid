@@ -111,6 +111,11 @@ var settings = (function (defaultSettings, validator) {
                 this.features.selectable.cssClasses = features.selectable.cssClasses;
             }
 
+            if (features.selectable.multi != undefined) {
+                validator.ValidateMustBeValidBoolean(features.selectable.multi);
+                this.features.selectable.multi = features.selectable.multi;
+            }
+
             if (features.identifier) {
                 validator.ValidateMustBeValidString(features.identifier, 'features.identifier');
                 this.features.identifier = features.identifier;

@@ -16,8 +16,8 @@ var selectable = (function () {
                 var rowIsSelected = isSelected(table, identifier);
                 var numberOfSelectedRows;
 
-                // No Ctrl && Row is not selected
-                if (!e.ctrlKey) {
+                // No Ctrl && is not multiselect
+                if (!e.ctrlKey || !table.settings.features.selectable.multi) {
                     numberOfSelectedRows = selectable.unselectAll(table);
                 }
 
