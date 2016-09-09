@@ -27,6 +27,12 @@ namespace Examples.Controllers
             return View();
         }
 
+
+        public ActionResult FilterPerColumnExample()
+        {
+            return View();
+        }
+
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

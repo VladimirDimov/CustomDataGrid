@@ -5,9 +5,9 @@ var renderer = (function (selectable) {
 
     var renderer = {
 
-        renderCell: function (table, colName, content) {
+        renderCell: function (table, colName, content, rowData) {
             if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-                return table.settings.columns[colName].render(content);
+                return table.settings.columns[colName].render(content, rowData);
             };
 
             return content;
@@ -26,7 +26,7 @@ var renderer = (function (selectable) {
 
                 propValue = rowData[propName];
 
-                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue));
+                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
                 $row.append($col);
             }
 
