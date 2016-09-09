@@ -79,14 +79,16 @@ Set all column headers in the < thead >. Any column that expects result from the
 	        identifier: 'Id',
 	        selectable: {
 				// By default this option is set to true. Use it to disable the selectable option
-				enable: true;
+				enable: true,
+				// Enable/disable rows multiselect. By default it is set to false
+				multi: true,
 				// a custom class may be added to the selected rows
 	            cssClasses: 'success'
 	        }
 	    }
 	});
 
-The selected rows identifiers can be get by:
+The selected rows identifiers can be got by:
 
 	myTable.getSelected();
 
@@ -162,7 +164,13 @@ Add 'columns' property in the 'settings' object. For each column that you want t
 	
 	                return formattedDate;
 	            }
-	        }
+	        },
+			
+			FullName: {
+	            render: function (content, rowData) {	
+	                return rowData.FirstName + ' ' + rowData.LastName;
+	            }
+	        },
 	    },
 		...
 	});
