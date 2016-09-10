@@ -1,14 +1,15 @@
 ﻿namespace DataTables.CommonProviders
 {
-    using System.Web.Helpers;
+    using System.Text;
     using System.Web.Mvc;
     using DataTables.CommonProviders.Contracts;
+    using Newtonsoft.Json;
 
     internal class JsonProvider : IJsonProvider
     {
         public T Deserialize<T>(string json)
         {
-            T obj = Json.Decode<T>(json);
+            T obj = JsonConvert.DeserializeObject<T>(json);
 
             return obj;
         }

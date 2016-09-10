@@ -57,7 +57,13 @@
 
         private IEnumerable<KeyValuePair<string, FilterRequestModel>> GetFilterDictionary(ActionExecutedContext filterContext)
         {
-            var dictAsObject = filterContext.Controller.ValueProvider.GetValue("filter").AttemptedValue;
+            var keyObj = filterContext.Controller.ValueProvider.GetValue("filter");
+            if (keyObj == null)
+            {
+                return null;
+            }
+
+            var dictAsObject = keyObj.AttemptedValue;
             var dictObj = this.jsonProvider.Deserialize<IEnumerable<KeyValuePair<string, FilterRequestModel>>>(dictAsObject);
             var dict = dictObj as IEnumerable<KeyValuePair<string, FilterRequestModel>>;
 

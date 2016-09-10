@@ -14,14 +14,18 @@ var dataLoader = (function () {
                 table.events.onDataLoading[index](table);
             }
 
+            var filter = formatFilterRequestValues(table.store.filter);
+
             $.ajax({
                 url: table.settings.ajax.url,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
                 data: {
                     identifierPropName: table.settings.features.identifier,
                     getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
                     page: page,
                     pageSize: table.settings.paging.pageSize,
-                    filter: JSON.stringify(formatFilterRequestValues(table.store.filter)),
+                    filter: JSON.stringify(filter),
                     orderBy: table.orderBy ? table.orderBy.Name : null,
                     asc: table.orderBy ? table.orderBy.Asc : true
                 },

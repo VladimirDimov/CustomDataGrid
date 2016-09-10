@@ -31,7 +31,10 @@
                                         .GetGenericArguments()
                                         .FirstOrDefault();
 
-            IQueryable<object> filteredData = this.filterProvider.FilterData(collectionDataType, requestModel.Data, requestModel.Filter);
+            IQueryable<object> filteredData =
+                                                requestModel.Filter == null ?
+                                                requestModel.Data :
+                                                this.filterProvider.FilterData(collectionDataType, requestModel.Data, requestModel.Filter);
 
             IQueryable<object> orderedData = this.sortProvider.SortCollection(filteredData, requestModel.OrderByPropName, requestModel.IsAscending, collectionDataType);
 

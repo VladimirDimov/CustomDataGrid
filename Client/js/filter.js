@@ -10,6 +10,7 @@ var filter = (function (dataLoader) {
         },
         setFilterEvent: function (table) {
             var $filter = $(table.$table[0]).find('[filter]');
+            // var $filter = $(table.$table[0].querySelectorAll('[filter]'));
             $filter.on('change', function () {
                 var $target = $(this);
                 var dictKey = this;
