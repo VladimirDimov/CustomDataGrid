@@ -15,28 +15,24 @@ var spinner = (function () {
     function setSpinner(table) {
         var width = 200;
         var spinnerStyle = table.settings.spinner.style;
-        var $spinnerRow = $('<tr/>');
+        var $spinnerRow = $('<div/>');
         table.$table.children('tbody').css('position', 'relative');
 
-        $spinnerRow.css('z-index', 1000);
+        $spinnerRow.css('z-index', 0);
         $spinnerRow.css('position', 'absolute');
         $spinnerRow.css('width', '100%');
         $spinnerRow.css('top', '40%');
-
-        var $spinnerCell = $('<td/>');
-        $spinnerCell.attr('colSpan', table.store.columnPropertyNames.length);
-        $spinnerCell.css('display', 'block');
-        $spinnerCell.css('width', '100%');
-        $spinnerCell.css('text-align', 'center');
+        $spinnerRow.css('border-style', 'none');
+        $spinnerRow.css('text-align', 'center');
 
         var $image = $('<img/>');
         $image.attr('src', '/assets/datatableserverside/img/spinners/' + spinnerStyle + '.gif');
         $image.css('width', width + 'px');
         $image.css('position', 'relative');
         $image.css('margin', 'auto');
+        $image.css('z-index', 1000);
 
-        $spinnerCell.append($image);
-        $spinnerRow.append($spinnerCell);
+        $spinnerRow.append($image);
         table.settings.$spinner = $spinnerRow;
     }
 

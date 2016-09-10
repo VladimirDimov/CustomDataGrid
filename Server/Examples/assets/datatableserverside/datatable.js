@@ -1036,28 +1036,24 @@ var spinner = (function () {
     function setSpinner(table) {
         var width = 200;
         var spinnerStyle = table.settings.spinner.style;
-        var $spinnerRow = $('<tr/>');
+        var $spinnerRow = $('<div/>');
         table.$table.children('tbody').css('position', 'relative');
 
-        $spinnerRow.css('z-index', 1000);
+        $spinnerRow.css('z-index', 0);
         $spinnerRow.css('position', 'absolute');
         $spinnerRow.css('width', '100%');
         $spinnerRow.css('top', '40%');
-
-        var $spinnerCell = $('<td/>');
-        $spinnerCell.attr('colSpan', table.store.columnPropertyNames.length);
-        $spinnerCell.css('display', 'block');
-        $spinnerCell.css('width', '100%');
-        $spinnerCell.css('text-align', 'center');
+        $spinnerRow.css('border-style', 'none');
+        $spinnerRow.css('text-align', 'center');
 
         var $image = $('<img/>');
         $image.attr('src', '/assets/datatableserverside/img/spinners/' + spinnerStyle + '.gif');
         $image.css('width', width + 'px');
         $image.css('position', 'relative');
         $image.css('margin', 'auto');
+        $image.css('z-index', 1000);
 
-        $spinnerCell.append($image);
-        $spinnerRow.append($spinnerCell);
+        $spinnerRow.append($image);
         table.settings.$spinner = $spinnerRow;
     }
 
@@ -1129,45 +1125,45 @@ module.exports = renderer;
 },{"../js/selectable.js":10}],14:[function(require,module,exports){
 var validator = (function () {
     var validator = {
-        ValidateValueCannotBeNullOrUndefined(val, name, message) {
+        ValidateValueCannotBeNullOrUndefined: function(val, name, message) {
             if (val === null || val === undefined) {
                 throw message || "Value cannot be null or undefined. Parameter name: \"" + name + "\".";
             }
         },
 
-        ValidateShouldBeANumber(val, name, message) {
+        ValidateShouldBeANumber: function(val, name, message) {
             if (!typeof (val) === 'number') {
                 throw message || 'The value of ' + name + ' must be a number';
             }
         },
 
-        ValidateMustBeAPositiveNumber(val, name, message) {
+        ValidateMustBeAPositiveNumber: function(val, name, message) {
             this.ValidateShouldBeANumber(val);
             if (val < 0) {
                 throw message || 'The value of ' + name + ' must be a positive number';
             }
         },
 
-        ValidateMustBeValidBoolean(val, name, message) {
+        ValidateMustBeValidBoolean: function(val, name, message) {
             this.ValidateValueCannotBeNullOrUndefined(val);
             if (typeof (val) !== 'boolean') {
                 throw message || 'The value of ' + name + ' must be a valid boolean.';
             }
         },
 
-        ValidateMustBeValidStringOrNull(val, name, message) {
+        ValidateMustBeValidStringOrNull: function(val, name, message) {
             if (!val) return;
             if (typeof (val) !== 'string') {
                 throw message || 'The value of ' + name + ' must be a valid string';
             }
         },
 
-        ValidateMustBeValidString(val, name, message) {
+        ValidateMustBeValidString: function(val, name, message) {
             this.ValidateValueCannotBeNullOrUndefined(val, name, message);
             this.ValidateMustBeValidStringOrNull(val, name, message);
         },
 
-        ValidateMustBeAFunction(val, name, message) {
+        ValidateMustBeAFunction: function(val, name, message) {
             if (typeof (val) !== 'function') {
                 throw message || 'The type of ' + name + ' must be a function.';
             }
