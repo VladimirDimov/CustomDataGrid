@@ -10,6 +10,9 @@
     using System.Linq;
     using System.Web.Mvc;
 
+    /// <summary>
+    /// Handles the passed params from the filter context
+    /// </summary>
     public class RequestParamsManager
     {
         private JsonProvider jsonProvider;
@@ -21,6 +24,10 @@
             this.httpContextHelpers = new HttpContextHelpers();
         }
 
+        /// <summary>
+        /// Returns a model with all passed values from the filter context
+        /// </summary>
+        /// <returns>RequestModel</returns>
         public RequestModel GetRequestModel(ActionExecutedContext filterContext)
         {
             var pageSizeString = httpContextHelpers.GetRequestParameter("pageSize", filterContext);
@@ -37,8 +44,6 @@
 
             var data = (IOrderedQueryable<object>)filterContext.Controller.ViewData.Model;
 
-            //IQueryable identifiers = isGetIdentifiers ? this.GetIdentifiersCollection(identifierPropName, data) : null;
-
             var requestModel = new RequestModel
             {
                 PageSize = pageSize,
@@ -48,8 +53,7 @@
                 IsAscending = asc,
                 IdentifierPropName = identifierPropName,
                 GetIdentifiers = isGetIdentifiers,
-                Data = data,
-                //Identifiers = identifiers,
+                Data = data
             };
 
             return requestModel;

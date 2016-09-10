@@ -14,8 +14,6 @@
 
         public string IdentifierPropName { get; internal set; }
 
-        public IQueryable Identifiers { get; internal set; }
-
         public bool IsAscending { get; internal set; }
 
         public string OrderByPropName { get; internal set; }

@@ -4,6 +4,9 @@
     using System.Diagnostics;
     using System.Web.Mvc;
 
+    /// <summary>
+    /// Provides processinbg of the passed IOrderedQueryable collection according to passed data table parameters
+    /// </summary>
     public class DataTable : ActionFilterAttribute
     {
         private ActionResult result;
