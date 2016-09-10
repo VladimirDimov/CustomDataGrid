@@ -15,12 +15,16 @@ var filter = (function (dataLoader) {
                 var $target = $(this);
                 var dictKey = this;
                 var filterOperator = $target.attr('filter');
-
+                var availableKeyElement;
                 var keyIndex = -1;
-                var availableKeyElement = table.store.filter.find(function (el) {
+
+                for (var index in table.store.filter) {
                     keyIndex += 1;
-                    return el.key === dictKey;
-                });
+                    if (table.store.filter[index].key === dictKey) {
+                        availableKeyElement = true;
+                        break;
+                    }
+                }
 
                 var keyToAdd = {
                     key: dictKey,
