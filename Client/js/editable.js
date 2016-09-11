@@ -27,21 +27,40 @@ var editable = (function () {
 
             var $allRows = table.$table.find('tr');
             Array.prototype.forEach.call($allRows, function (el) {
-                // TODO: Apply style on other rows;
+                // var $el = $(el);
+                // if ($el.attr('data-identifier') != $row.attr('data-identifier')) {
+                //     $el.css('visibility', 'hidden');
+                // }
             }, this);
         },
 
         updateRow: function (table, $row) {
             var $inputs = $row.find('.td-inner');
-            var result = {};
+            var postData = {};
+            var identifier = $row.attr('data-identifier');
             Array.prototype.forEach.call($inputs, function (el) {
                 var $el = $(el);
                 var curColName = $el.prop('name');
-                result[curColName] = $el.prop('value');
+                postData[curColName] = $el.prop('value');
             });
 
-            debugger;
-            return result;
+            var rowData = table.store.pageData[identifier];
+            table.settings.editable.update(
+                postData,
+                // SUCCESS
+                function () {
+                    for (var prop in postData) {
+                        rowData[prop] = postData[prop];
+                    }
+                },
+                // ERROR
+                function () {
+
+                });
+            var $updatedRow = renderer.renderRow(table, rowData);
+            $row.html($updatedRow.html());
+
+            return postData;
         }
     };
 

@@ -20,6 +20,7 @@ var settings = (function (defaultSettings, validator) {
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomSpinner.call(this, settings.spinner);
+            setCustomEditable.call(this, settings.editable);
 
             this.ajax = settings.ajax;
 
@@ -126,6 +127,13 @@ var settings = (function (defaultSettings, validator) {
     function setCustomColumns(columns) {
         if (!columns) return;
         this.columns = columns;
+    }
+
+    function setCustomEditable(editable) {
+        if (!editable) return;
+        validator.ValidateMustBeAFunction(editable.update);
+        this.editable = Object.create(Object.prototype);
+        this.editable.update = editable.update;
     }
 
     return settings;
