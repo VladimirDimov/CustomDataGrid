@@ -72,8 +72,17 @@ var dataLoader = (function () {
     }
 
     function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        var dataObj = {};
+        var identifierName = table.settings.features.identifier;
+
         table.store.currentPage = currentPage;
-        table.store.pageData = data;
+
+        for (var i = 0, l = data.length; i < l; i += 1) {
+            var curDataRow = data[i];
+            dataObj[curDataRow[identifierName]] = curDataRow;
+        }
+        table.store.pageData = dataObj;
+
         table.store.numberOfRows = rowsNumber;
         if (table.settings.paging.enable) {
             table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);

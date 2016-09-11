@@ -59,18 +59,24 @@
                             <div class="fht-cell" style="width: 367px;">
                             </div>
                         </th>
+                        <th data-name="Actions">
+                            Actions
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr template-editable>
+                    <tr dt-template-editable>
                         <td>
-                            <input type="text" name="FirstName" value="" class="dt-inner" />
+                            <input type="text" name="FirstName" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <input type="text" name="LastName" value="" class="dt-inner" />
+                            <input type="text" name="LastName" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <input type="text" name="Salary" value="" class="dt-inner" />
+                            <input type="text" name="Salary" value="" class="td-inner form-control" />
+                        </td>
+                        <td>
+                            <button dt-btn-update>Update</button>
                         </td>
                     </tr>
                 </tbody>
@@ -107,6 +113,13 @@
                     multi: true,
                     cssClasses: 'active'
                 },
+            },
+            columns: {
+                Actions: {
+                    render: function () {
+                        return '<button dt-btn-edit>Edit</button>';
+                    }
+                }
             }
         });
 

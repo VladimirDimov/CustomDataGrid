@@ -324,8 +324,17 @@ var dataLoader = (function () {
     }
 
     function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        var dataObj = {};
+        var identifierName = table.settings.features.identifier;
+
         table.store.currentPage = currentPage;
-        table.store.pageData = data;
+
+        for (var i = 0, l = data.length; i < l; i += 1) {
+            var curDataRow = data[i];
+            dataObj[curDataRow[identifierName]] = curDataRow;
+        }
+        table.store.pageData = dataObj;
+
         table.store.numberOfRows = rowsNumber;
         if (table.settings.paging.enable) {
             table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
@@ -521,28 +530,57 @@ var editable = (function () {
     'use strict';
     var editable = {
         init: function (table) {
+            // Init objects
+            table.store.editable = {};
+
             var $template = table.$table.find('[dt-template-editable]');
-            table.settings.editable.$template = $template;
-            debugger;
+            table.store.editable.$template = $template;
+            setOnClickEvents(table);
+            // debugger;
         },
+
+        // Replaces the content of a row with the edit template
+        renderEditRow: function (table, $row) {
+            $row.html(table.store.editable.$template.html());
+            // Fill inputs with the current values
+            var $inputs = $row.find('.td-inner');
+            var identifier = $row.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            Array.prototype.forEach.call($inputs, function (el) {
+                var $el = $(el);
+                $el.attr('value', rowData[$el.attr('name')]);
+            }, this);
+
+            var $allRows = table.$table.find('tr');
+            Array.prototype.forEach.call($allRows, function (el) {
+                // TODO: Apply style on other rows;
+            }, this);
+        },
+
+        updateRow: function (table, $row) {
+            var $inputs = $row.find('.td-inner');
+            var result = {};
+            Array.prototype.forEach.call($inputs, function (el) {
+                var $el = $(el);
+                var curColName = $el.prop('name');
+                result[curColName] = $el.prop('value');
+            });
+
+            debugger;
+            return result;
+        }
     };
 
+    function setOnClickEvents(table) {
+        table.$table.on('click', '[dt-btn-edit]', function (e) {
+            var $row = $(this).parentsUntil('tr').parent();
+            editable.renderEditRow(table, $row);
+        });
 
-    function update(table, rowData) {
-        table.settings.features.editable.update(rowData);
-    }
-
-
-    function renderRow(table, rowData) {
-        var identifierName = table.settings.features.identifier;
-        var identifierVal = rowData[identifierName];
-        var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
-        var $newRow = renderer.renderRow(table, rowData);
-        $row.html($newRow.html());
-    }
-
-    function getColumnIndex(table, colName) {
-        return table.store.columnPropertyNames.indexOf(colName);
+        table.$table.on('click', '[dt-btn-update]', function (e) {
+            var $row = $(this).parentsUntil('tr').parent();
+            editable.updateRow(table, $row);
+        });
     }
 
     return editable;
