@@ -984,7 +984,6 @@ var sortable = (function (dataLoader) {
             table.store.$sortables = $sortables;
             $sortables.on('click', function (e) {
                 var $target = $(this);
-                console.log($target);
                 var name = $target.attr('data-name');
                 var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
                 table.orderBy = {
