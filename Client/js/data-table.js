@@ -94,7 +94,7 @@ window.dataTable = (function (
             table.paginator = {};
         }
 
-        table._paginator.$paginator = paginator.init(table, 1, table.settings.paginator.length, 1);
+        paginator.init(table, 1, table.settings.paginator.length, 1);
         paginator.setPageClickEvents(table, dataLoader);
     }
 

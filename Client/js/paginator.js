@@ -4,6 +4,8 @@ var paginator = (function (dataLoader) {
     var paginator = {
         init: function (table, start, end, activePage) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
+            // paginator.setPaginator(table, start, end, activePage);
+            // paginator.setPageClickEvents(table, dataLoader);
         },
         setPaginator: function (table, start, end, activePage) {
             if (!table.paginator) {
@@ -49,9 +51,9 @@ var paginator = (function (dataLoader) {
             var length = table.settings.paginator.length;
             var halfLength = Math.floor((length - 1) / 2);
             var currentPaginatorLength = Math.min(length, numberOfPages);
-            
+
             table.paginator.currentPage = page;
-            
+
             table.store.numberOfPages = numberOfPages;
             if (currentPaginatorLength > 0) {
                 start = Math.max(Math.floor(page - halfLength), 1);
