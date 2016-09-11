@@ -2,12 +2,12 @@
 
 ----------
 ##Installation
-From the pacakege manager console in Visual Studio type `Install-Package DataTableServerSide`. On the client side reference the `dataTablesServerSide.js` from the scripts folder.
+From the pacakege manager console in Visual Studio type `Install-Package DataTableServerSide`. On the client side reference the `dataTablesServerSide.js` from the 'assets/datatableServerside' folder. Also add the `bootstrap-tables.css` ([http://bootstrap-table.wenzhixin.net.cn/](http://bootstrap-table.wenzhixin.net.cn/ "link")) 
 
 
 ##Description
 A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing.
-**This project is still in progress!**
+**This project is still under development!**
 ##Quick Start
 ###Server:
  - Put [DataTable] attribute on the Action
