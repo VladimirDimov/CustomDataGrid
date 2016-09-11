@@ -4,32 +4,9 @@ var editable = (function () {
     'use strict';
     var editable = {
         init: function (table) {
-            table.edit = function ($row) {
-                var $tds = $row.find('td');
-                for (var editObj in table.settings.features.editable.columns) {
-                    var colIndex = getColumnIndex(table, editObj);
-                    table.settings.features.editable.columns[editObj].edit($($tds[colIndex]));
-                }
-            };
-
-            table.save = function ($row) {
-                var $tds = $row.find('td');
-                var pageData = table.store.pageData;
-                var identifierName = table.settings.features.identifier;
-                var identifierVal = $row.attr('data-identifier');
-                var rowData = pageData.filter(function (item) {
-                    return item[identifierName] == identifierVal;
-                })[0];
-
-                for (var editObj in table.settings.features.editable.columns) {
-                    var colIndex = getColumnIndex(table, editObj);
-                    var content = table.settings.features.editable.columns[editObj].save($($tds[colIndex]));
-                    rowData[editObj] = content;
-                }
-
-                update(table, rowData);
-                renderRow(table, rowData);
-            };
+            var $template = table.$table.find('[dt-template-editable]');
+            table.settings.editable.$template = $template;
+            debugger;
         },
     };
 

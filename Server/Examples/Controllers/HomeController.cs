@@ -33,6 +33,11 @@ namespace Examples.Controllers
         }
 
 
+        public ActionResult EditableExample()
+        {
+            return View();
+        }
+
         public ActionResult FilterPerColumnExample()
         {
             return View();

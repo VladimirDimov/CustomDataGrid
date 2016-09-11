@@ -103,14 +103,11 @@ window.dataTable = (function (
             if (features.selectable) {
                 selectable.makeSelectable(table);
             };
-
-            if (features.editable) {
-                editable.init(table);
-            }
         }
 
         filter.init(table);
         sortable.formatSortables(table);
+        editable.init(table);
     }
 
     function getColumnPropertyNames() {
