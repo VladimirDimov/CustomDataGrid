@@ -747,32 +747,20 @@ var paginator = (function (dataLoader) {
                 table.paginator.currentPage = page;
                 table.paginator.$paginator.children('li').removeClass('active');
 
-                dataLoader.loadData(table, page)
-                    .then(function () {
-                        $(e.target).parent().addClass('active');
-                        if (true) {
-                            paginator.updatePaginator(table, page, table.store.numberOfRows);
-                        }
-                    });
+                dataLoader.loadData(table, page);
             });
 
             table.$table.on('click', 'li>a[page-next]', function (e) {
                 var page = parseInt(table.paginator.currentPage) + 1;
 
-                dataLoader.loadData(table, page, true)
-                    .then(function () {
-                        paginator.updatePaginator(table, page, table.store.numberOfRows);
-                    })
+                dataLoader.loadData(table, page, true);
             });
 
             table.$table.on('click', 'li>a[page-previous]', function (e) {
                 var page = parseInt(table.paginator.currentPage) - 1;
                 table.paginator.currentPage = page;
 
-                dataLoader.loadData(table, page, true)
-                    .then(function () {
-                        paginator.updatePaginator(table, page, table.store.numberOfRows);
-                    })
+                dataLoader.loadData(table, page, true);
             });
         }
     };
