@@ -1,5 +1,5 @@
 var editable = (function () {
-    var tableRenderer = require('../js/table-renderer.js');
+    var renderer = require('../js/renderer.js');
 
     'use strict';
     var editable = {
@@ -43,7 +43,7 @@ var editable = (function () {
         var identifierName = table.settings.features.identifier;
         var identifierVal = rowData[identifierName];
         var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
-        var $newRow = tableRenderer.renderRow(table, rowData);
+        var $newRow = renderer.renderRow(table, rowData);
         $row.html($newRow.html());
     }
 

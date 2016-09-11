@@ -252,11 +252,11 @@ window.dataTable = (function (
 })(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features);
 
 module.exports = window.dataTable;
-},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/selectable.js":10,"../js/sortable.js":11,"../js/spinners.js":12,"../js/validator.js":14}],3:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/selectable.js":11,"../js/sortable.js":12,"../js/spinners.js":13,"../js/validator.js":14}],3:[function(require,module,exports){
 
 var paginator = require('../js/paginator.js');
 var selectable = require('../js/selectable.js');
-var tableRenderer = require('../js/table-renderer.js');
+var tableRenderer = require('../js/renderer.js');
 var q = require('../node_modules/q/q.js')
 
 var dataLoader = (function () {
@@ -355,7 +355,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":9,"../js/selectable.js":10,"../js/table-renderer.js":13,"../node_modules/q/q.js":15}],4:[function(require,module,exports){
+},{"../js/paginator.js":9,"../js/renderer.js":10,"../js/selectable.js":11,"../node_modules/q/q.js":15}],4:[function(require,module,exports){
 var defaultSettings = (function () {
     var defaultSettings = {
         pageSize: 10,
@@ -519,7 +519,7 @@ var settings = (function (defaultSettings, validator) {
 module.exports = settings;
 },{"../js/dt-default-settings.js":4,"../js/validator.js":14}],6:[function(require,module,exports){
 var editable = (function () {
-    var tableRenderer = require('../js/table-renderer.js');
+    var renderer = require('../js/renderer.js');
 
     'use strict';
     var editable = {
@@ -563,7 +563,7 @@ var editable = (function () {
         var identifierName = table.settings.features.identifier;
         var identifierVal = rowData[identifierName];
         var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
-        var $newRow = tableRenderer.renderRow(table, rowData);
+        var $newRow = renderer.renderRow(table, rowData);
         $row.html($newRow.html());
     }
 
@@ -575,11 +575,11 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../js/table-renderer.js":13}],7:[function(require,module,exports){
+},{"../js/renderer.js":10}],7:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
-var tableRenderer = require('../js/table-renderer.js');
+var renderer = require('../js/renderer.js');
 
-var features = (function (dataLoader, tableRenderer) {
+var features = (function (dataLoader, renderer) {
     'use strict';
 
     var features = {
@@ -613,10 +613,10 @@ var features = (function (dataLoader, tableRenderer) {
     }
 
     return features;
-} (dataLoader, tableRenderer));
+} (dataLoader, renderer));
 
 module.exports = features;
-},{"../js/dataLoader.js":3,"../js/table-renderer.js":13}],8:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/renderer.js":10}],8:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var filter = (function (dataLoader) {
@@ -782,6 +782,61 @@ var paginator = (function (dataLoader) {
 
 module.exports = paginator;
 },{"../js/dataLoader.js":3}],10:[function(require,module,exports){
+var selectable = require('../js/selectable.js');
+
+var renderer = (function (selectable) {
+    'use strict';
+
+    var renderer = {
+
+        renderCell: function (table, colName, content, rowData) {
+            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
+                return table.settings.columns[colName].render(content, rowData);
+            };
+
+            return content;
+        },
+
+        renderRow: function (table, rowData) {
+            var identifier = rowData[table.settings.features.identifier];
+            var $row = $('<tr>');
+            var propValue;
+            for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
+                var propName = table.store.columnPropertyNames[col];
+
+                if (!propName) {
+                    throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+                }
+
+                propValue = rowData[propName];
+
+                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
+                $row.append($col);
+            }
+
+            $row.attr('data-identifier', identifier);
+
+            return $row;
+        },
+
+        RenderTableBody: function (table, data) {
+            var $tbody = table.$table.find('tbody').empty();
+            var buffer = [];
+            for (var row = 0; row < data.length; row++) {
+                var rowData = data[row];
+                var $row = renderer.renderRow(table, rowData);
+                buffer.push($row);
+            }
+
+            $tbody.append(buffer);
+        }
+    };
+
+    return renderer;
+} (selectable));
+
+module.exports = renderer;
+},{"../js/selectable.js":11}],11:[function(require,module,exports){
 var selectable = (function () {
     var selectable = {
         makeSelectable: function (table) {
@@ -929,7 +984,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
@@ -968,7 +1023,7 @@ var sortable = (function (dataLoader) {
 })(dataLoader);
 
 module.exports = sortable;
-},{"../js/dataLoader.js":3}],12:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],13:[function(require,module,exports){
 var spinner = (function () {
     'use strict';
 
@@ -1017,62 +1072,7 @@ var spinner = (function () {
 } ());
 
 module.exports = spinner;
-},{}],13:[function(require,module,exports){
-var selectable = require('../js/selectable.js');
-
-var renderer = (function (selectable) {
-    'use strict';
-
-    var renderer = {
-
-        renderCell: function (table, colName, content, rowData) {
-            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-                return table.settings.columns[colName].render(content, rowData);
-            };
-
-            return content;
-        },
-
-        renderRow: function (table, rowData) {
-            var identifier = rowData[table.settings.features.identifier];
-            var $row = $('<tr>');
-            var propValue;
-            for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
-                var propName = table.store.columnPropertyNames[col];
-
-                if (!propName) {
-                    throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
-                }
-
-                propValue = rowData[propName];
-
-                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
-                $row.append($col);
-            }
-
-            $row.attr('data-identifier', identifier);
-
-            return $row;
-        },
-
-        RenderTableBody: function (table, data) {
-            var $tbody = table.$table.find('tbody').empty();
-            var buffer = [];
-            for (var row = 0; row < data.length; row++) {
-                var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData);
-                buffer.push($row);
-            }
-
-            $tbody.append(buffer);
-        }
-    };
-
-    return renderer;
-} (selectable));
-
-module.exports = renderer;
-},{"../js/selectable.js":10}],14:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function(val, name, message) {

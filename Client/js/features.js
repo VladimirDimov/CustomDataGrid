@@ -1,7 +1,7 @@
 var dataLoader = require('../js/dataLoader.js');
-var tableRenderer = require('../js/table-renderer.js');
+var renderer = require('../js/renderer.js');
 
-var features = (function (dataLoader, tableRenderer) {
+var features = (function (dataLoader, renderer) {
     'use strict';
 
     var features = {
@@ -35,6 +35,6 @@ var features = (function (dataLoader, tableRenderer) {
     }
 
     return features;
-} (dataLoader, tableRenderer));
+} (dataLoader, renderer));
 
 module.exports = features;
