@@ -65,35 +65,47 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr dt-template-editable>
+                    <tr dt-template="editable">
                         <td>
-                            <input type="text" name="FirstName" value="" class="td-inner form-control" />
+                            <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <input type="text" name="LastName" value="" class="td-inner form-control" />
+                            <input type="text" data-name="LastName" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <input type="text" name="Salary" value="" class="td-inner form-control" />
+                            <input type="text" data-name="Salary" value="" class="td-inner form-control" />
+                        </td>
+                        <td>
+                            <button dt-btn-update>Update</button>
+                            <button dt-btn-template="custom">Custom</button>
+                        </td>
+                    </tr>
+                    <tr dt-template="main">
+                        <td>
+                            <div data-name="Id"></div>
+                            <div data-name="Salary"></div>
+                        </td>
+                        <td>
+                            <div data-name="FirstName"></div>
+                            <input type="text" name="name" value="" data-name="FirstName" />
+                        </td>
+                        <td>
+                            <div data-name="Salary"></div>
+                            <textarea data-name="Salary"></textarea>
+                        </td>
+                        <td>
+                            <div data-name="Actions"></div>
+                        </td>
+                    </tr>
+
+                    <tr dt-template="custom">
+                        <td colspan="3">
+                            <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
                         </td>
                         <td>
                             <button dt-btn-update>Update</button>
                         </td>
                     </tr>
-                    <tr dt-template-main>
-                        <td data-name="Id">
-                            <div td-inner></div>
-                        </td>
-                        <td data-name="FirstName">
-                            <div td-inner></div>
-                        </td>
-                        <td data-name="Salary">
-                            <div td-inner></div>
-                        </td>
-                        <td>
-                            <div td-inner></div>
-                        </td>
-                    </tr>
-
                 </tbody>
             </table>
         </div>

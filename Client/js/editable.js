@@ -16,15 +16,16 @@ var editable = (function () {
 
         // Replaces the content of a row with the edit template
         renderEditRow: function (table, $row) {
-            $row.html(table.store.templates.$editable.html());
+            $row.html(table.store.templates.editable.$template.html());
             // Fill inputs with the current values
             var $inputs = $row.find('.td-inner');
             var identifier = $row.attr('data-identifier');
             var rowData = table.store.pageData[identifier];
             Array.prototype.forEach.call($inputs, function (el) {
                 var $el = $(el);
-                $el.attr('value', rowData[$el.attr('name')]);
+                $el.attr('value', rowData[$el.attr('data-name')]);
             }, this);
+
 
             var $allRows = table.$table.find('tr');
             Array.prototype.forEach.call($allRows, function (el) {
@@ -36,7 +37,7 @@ var editable = (function () {
         },
 
         updateRow: function (table, $row) {
-            var $inputs = $row.find('.td-inner');
+            var $inputs = $row.find('[data-name]');
             var postData = {};
             var identifier = $row.attr('data-identifier');
             Array.prototype.forEach.call($inputs, function (el) {

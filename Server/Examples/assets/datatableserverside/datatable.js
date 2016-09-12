@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // shim for using process in browser
+
 var process = module.exports = {};
 
 // cached from whatever global is present so that test runners that stub it
@@ -10,84 +11,22 @@ var process = module.exports = {};
 var cachedSetTimeout;
 var cachedClearTimeout;
 
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
 (function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
     }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
+  }
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
     }
+  }
 } ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
 var queue = [];
 var draining = false;
 var currentQueue;
@@ -112,7 +51,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = runTimeout(cleanUpNextTick);
+    var timeout = cachedSetTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -129,7 +68,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    runClearTimeout(timeout);
+    cachedClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -141,7 +80,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
+        cachedSetTimeout(drainQueue, 0);
     }
 };
 
@@ -614,15 +553,16 @@ var editable = (function () {
 
         // Replaces the content of a row with the edit template
         renderEditRow: function (table, $row) {
-            $row.html(table.store.templates.$editable.html());
+            $row.html(table.store.templates.editable.$template.html());
             // Fill inputs with the current values
             var $inputs = $row.find('.td-inner');
             var identifier = $row.attr('data-identifier');
             var rowData = table.store.pageData[identifier];
             Array.prototype.forEach.call($inputs, function (el) {
                 var $el = $(el);
-                $el.attr('value', rowData[$el.attr('name')]);
+                $el.attr('value', rowData[$el.attr('data-name')]);
             }, this);
+
 
             var $allRows = table.$table.find('tr');
             Array.prototype.forEach.call($allRows, function (el) {
@@ -634,7 +574,7 @@ var editable = (function () {
         },
 
         updateRow: function (table, $row) {
-            var $inputs = $row.find('.td-inner');
+            var $inputs = $row.find('[data-name]');
             var postData = {};
             var identifier = $row.attr('data-identifier');
             Array.prototype.forEach.call($inputs, function (el) {
@@ -882,7 +822,18 @@ var renderer = (function (selectable) {
     var renderer = {
 
         init: function (table) {
-            table.store.templates.$main = table.$table.find('table[dt-table] tr[dt-template-main]');
+            setButtonEvents(table);
+            var $templateMain = table.$table.find('table[dt-table] tr[dt-template-main]');
+            var $templates = table.$table.find('table[dt-table] tr[dt-template]'); Array.prototype.forEach
+            if ($templates.length != 0) {
+                Array.prototype.forEach.call($templates, function (el) {
+                    var $el = $(el);
+                    var template = {};
+                    template.$template = $el;
+                    template.$containers = $el.find('[data-name]');
+                    table.store.templates[$el.attr('dt-template')] = template;
+                });
+            }
         },
 
         renderCell: function (table, colName, content, rowData) {
@@ -893,27 +844,42 @@ var renderer = (function (selectable) {
             return content;
         },
 
-        renderRow: function (table, rowData) {
+        renderRow: function (table, rowData, templateName) {
             var identifier = rowData[table.settings.features.identifier];
-            var $row = $('<tr>');
+            var $row;
             var propValue, $template;
 
-            if (table.store.templates.$main != undefined) {
-                // Handle when there is main template
-            }
-
-            // If there is no main template provided the renderer will render the cells directly into the td elements
-            for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
-                var propName = table.store.columnPropertyNames[col];
-
-                if (!propName) {
-                    throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+            if (templateName != undefined) {
+                var $containers = table.store.templates[templateName].$containers;
+                for (var i = 0, l = $containers.length; i < l; i += 1) {
+                    var $container = $($containers[i]);
+                    var propName = $container.attr('data-name');
+                    var propValue = rowData[propName];
+                    var cellData = renderer.renderCell(table, propName, propValue, rowData);
+                    var attributeValue = $container.attr('value');
+                    if (typeof attributeValue === typeof undefined || attributeValue === false) {
+                        $container.html(cellData);
+                    } else {
+                        $container.attr('value', cellData);
+                    }
                 }
 
-                propValue = rowData[propName];
+                $row = table.store.templates[templateName].$template.clone();
+            } else {
+                // If there is no main template provided the renderer will render the cells directly into the td elements
+                $row = $('<tr>');
+                for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
+                    var propName = table.store.columnPropertyNames[col];
 
-                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
-                $row.append($col);
+                    if (!propName) {
+                        throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+                    }
+
+                    propValue = rowData[propName];
+
+                    var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
+                    $row.append($col);
+                }
             }
 
             $row.attr('data-identifier', identifier);
@@ -926,13 +892,23 @@ var renderer = (function (selectable) {
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData);
+                var $row = renderer.renderRow(table, rowData, 'main');
                 buffer.push($row);
             }
 
             $tbody.append(buffer);
         }
     };
+
+    function setButtonEvents(table) {
+        table.$table.on('click', '[dt-btn-template]', function () {
+            var $curRow = $(this).parentsUntil('tr').parent();
+            var identifier = $curRow.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
+            $curRow.html($rowFromTemplate.html());
+        })
+    }
 
     return renderer;
 } (selectable));
