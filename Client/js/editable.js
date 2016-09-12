@@ -9,6 +9,7 @@ var editable = (function () {
 
             var $template = table.$table.find('[dt-template-editable]');
             table.store.editable.$template = $template;
+            $template.remove();
             setOnClickEvents(table);
             // debugger;
         },
@@ -55,7 +56,7 @@ var editable = (function () {
                 },
                 // ERROR
                 function () {
-
+                    // Nothing to do if error.
                 });
             var $updatedRow = renderer.renderRow(table, rowData);
             $row.html($updatedRow.html());
