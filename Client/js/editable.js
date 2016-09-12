@@ -5,10 +5,10 @@ var editable = (function () {
     var editable = {
         init: function (table) {
             // Init objects
-            table.store.editable = {};
+            table.store.templates = {};
 
             var $template = table.$table.find('[dt-template-editable]');
-            table.store.editable.$template = $template;
+            table.store.templates.$editable = $template;
             $template.remove();
             setOnClickEvents(table);
             // debugger;
@@ -16,7 +16,7 @@ var editable = (function () {
 
         // Replaces the content of a row with the edit template
         renderEditRow: function (table, $row) {
-            $row.html(table.store.editable.$template.html());
+            $row.html(table.store.templates.$editable.html());
             // Fill inputs with the current values
             var $inputs = $row.find('.td-inner');
             var identifier = $row.attr('data-identifier');

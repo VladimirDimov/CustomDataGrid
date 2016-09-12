@@ -8,6 +8,7 @@ var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
 var spinner = require('../js/spinners.js');
+var renderer = require('../js/renderer.js');
 
 window.dataTable = (function (
     selectable,
@@ -18,7 +19,8 @@ window.dataTable = (function (
     editable,
     validator,
     settingsExternal,
-    features) {
+    features,
+    renderer) {
     'use strict'
 
     var table = {
@@ -35,6 +37,7 @@ window.dataTable = (function (
             features.init(this);
             spinner.init(this);
             processFeatures(settings.features, this);
+            renderer.init(this);
 
             dataLoader.loadData(table, 1, true);
 
@@ -124,6 +127,6 @@ window.dataTable = (function (
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer);
 
 module.exports = window.dataTable;

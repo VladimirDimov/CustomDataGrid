@@ -191,6 +191,7 @@ var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
 var spinner = require('../js/spinners.js');
+var renderer = require('../js/renderer.js');
 
 window.dataTable = (function (
     selectable,
@@ -201,7 +202,8 @@ window.dataTable = (function (
     editable,
     validator,
     settingsExternal,
-    features) {
+    features,
+    renderer) {
     'use strict'
 
     var table = {
@@ -218,6 +220,7 @@ window.dataTable = (function (
             features.init(this);
             spinner.init(this);
             processFeatures(settings.features, this);
+            renderer.init(this);
 
             dataLoader.loadData(table, 1, true);
 
@@ -307,10 +310,10 @@ window.dataTable = (function (
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer);
 
 module.exports = window.dataTable;
-},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/selectable.js":11,"../js/sortable.js":12,"../js/spinners.js":13,"../js/validator.js":14}],3:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/renderer.js":10,"../js/selectable.js":11,"../js/sortable.js":12,"../js/spinners.js":13,"../js/validator.js":14}],3:[function(require,module,exports){
 
 var paginator = require('../js/paginator.js');
 var selectable = require('../js/selectable.js');
@@ -600,10 +603,10 @@ var editable = (function () {
     var editable = {
         init: function (table) {
             // Init objects
-            table.store.editable = {};
+            table.store.templates = {};
 
             var $template = table.$table.find('[dt-template-editable]');
-            table.store.editable.$template = $template;
+            table.store.templates.$editable = $template;
             $template.remove();
             setOnClickEvents(table);
             // debugger;
@@ -611,7 +614,7 @@ var editable = (function () {
 
         // Replaces the content of a row with the edit template
         renderEditRow: function (table, $row) {
-            $row.html(table.store.editable.$template.html());
+            $row.html(table.store.templates.$editable.html());
             // Fill inputs with the current values
             var $inputs = $row.find('.td-inner');
             var identifier = $row.attr('data-identifier');
@@ -878,6 +881,10 @@ var renderer = (function (selectable) {
 
     var renderer = {
 
+        init: function (table) {
+            table.store.templates.$main = table.$table.find('table[dt-table] tr[dt-template-main]');
+        },
+
         renderCell: function (table, colName, content, rowData) {
             if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
                 return table.settings.columns[colName].render(content, rowData);
@@ -889,8 +896,14 @@ var renderer = (function (selectable) {
         renderRow: function (table, rowData) {
             var identifier = rowData[table.settings.features.identifier];
             var $row = $('<tr>');
-            var propValue;
-            for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
+            var propValue, $template;
+
+            if (table.store.templates.$main != undefined) {
+                // Handle when there is main template
+            }
+
+            // If there is no main template provided the renderer will render the cells directly into the td elements
+            for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
                 var propName = table.store.columnPropertyNames[col];
 
                 if (!propName) {

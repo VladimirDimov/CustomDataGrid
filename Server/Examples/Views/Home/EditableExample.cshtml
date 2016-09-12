@@ -41,7 +41,7 @@
     </div>
     <div class="fixed-table-container" style="height: 367px; padding-bottom: 40px;">
         <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
-            <table class="table table-hover JColResizer">
+            <table dt-table class="table table-hover JColResizer">
                 <thead>
                     <tr>
                         <th @*sortable*@ data-name="Id" @*style="width: 175px;"*@ data-field="id" tabindex="0">
@@ -80,13 +80,13 @@
                         </td>
                     </tr>
                     <tr dt-template-main>
-                        <td>
+                        <td data-name="Id">
                             <div td-inner></div>
                         </td>
-                        <td>
+                        <td data-name="FirstName">
                             <div td-inner></div>
                         </td>
-                        <td>
+                        <td data-name="Salary">
                             <div td-inner></div>
                         </td>
                         <td>

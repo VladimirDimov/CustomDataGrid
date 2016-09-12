@@ -5,6 +5,10 @@ var renderer = (function (selectable) {
 
     var renderer = {
 
+        init: function (table) {
+            table.store.templates.$main = table.$table.find('table[dt-table] tr[dt-template-main]');
+        },
+
         renderCell: function (table, colName, content, rowData) {
             if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
                 return table.settings.columns[colName].render(content, rowData);
@@ -16,8 +20,14 @@ var renderer = (function (selectable) {
         renderRow: function (table, rowData) {
             var identifier = rowData[table.settings.features.identifier];
             var $row = $('<tr>');
-            var propValue;
-            for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
+            var propValue, $template;
+
+            if (table.store.templates.$main != undefined) {
+                // Handle when there is main template
+            }
+
+            // If there is no main template provided the renderer will render the cells directly into the td elements
+            for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
                 var propName = table.store.columnPropertyNames[col];
 
                 if (!propName) {
