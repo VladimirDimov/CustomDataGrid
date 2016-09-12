@@ -3,6 +3,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    [dt-template] {
+        visibility: hidden;
+    }
+</style>
+
 <div id="table" class="bootstrap-table">
     <div class="fixed-table-toolbar">
         <div class="columns columns-right btn-group pull-right">
@@ -65,9 +71,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr dt-template="editable">
+                    <tr dt-template="edit">
                         <td>
-                            <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
+                            <div data-name="FirstName"></div>
                         </td>
                         <td>
                             <input type="text" data-name="LastName" value="" class="td-inner form-control" />
@@ -76,7 +82,7 @@
                             <input type="text" data-name="Salary" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <button dt-btn-update>Update</button>
+                            <button dt-btn-update="edit">Update</button>
                             <button dt-btn-template="custom">Custom</button>
                         </td>
                     </tr>
@@ -94,13 +100,13 @@
                             <textarea data-name="Salary"></textarea>
                         </td>
                         <td>
-                            <div data-name="Actions"></div>
+                            <button dt-btn-template="edit">Edit</button>
                         </td>
                     </tr>
 
                     <tr dt-template="custom">
                         <td colspan="3">
-                            <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
+                            <div data-name="FirstName"></div>
                         </td>
                         <td>
                             <button dt-btn-update>Update</button>
@@ -121,42 +127,44 @@
 
 @section Scripts {
     <script>
-        var myTable = dataTable.init('#table', {
-            ajax: {
-                url: '/home/GetData'
-            },
-            paging: {
-                enable: true,
-                pageSize: 20
-            },
-            spinner: {
-                enable: true, // default value is "true"
-                style: 2
-            },
-            features: {
-                identifier: 'Id',
-                selectable: {
-                    enable: true,
-                    multi: true,
-                    cssClasses: 'active'
+        
+        $(document).ready(function () {
+            var myTable = dataTable.init('#table', {
+                ajax: {
+                    url: '/home/GetData'
                 },
-            },
-            columns: {
-                Actions: {
-                    render: function () {
-                        return '<button dt-btn-edit>Edit</button>';
+                paging: {
+                    enable: true,
+                    pageSize: 20
+                },
+                spinner: {
+                    enable: true, // default value is "true"
+                    style: 2
+                },
+                features: {
+                    identifier: 'Id',
+                    selectable: {
+                        enable: true,
+                        multi: true,
+                        cssClasses: 'active'
+                    },
+                },
+                columns: {
+                    Actions: {
+                        render: function () {
+                            return '<button dt-btn-edit>Edit</button>';
+                        }
+                    }
+                },
+                editable: {
+                    update: function (data, success, error) {
+                        debugger;
+                        //success();
+                        error();
                     }
                 }
-            },
-            editable: {
-                update: function (data, success, error) {
-                    //success();
-                    error();
-                }
-            }
-        });
+            });
 
-        $(document).ready(function () {
             $('.filterable .btn-filter').click(function () {
                 var $panel = $(this).parents('.filterable'),
                 $filters = $panel.find('.filters input'),

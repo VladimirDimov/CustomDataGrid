@@ -541,12 +541,12 @@ var editable = (function () {
     'use strict';
     var editable = {
         init: function (table) {
-            // Init objects
-            table.store.templates = {};
+            // // Init objects
+            // table.store.templates = {};
 
-            var $template = table.$table.find('[dt-template-editable]');
-            table.store.templates.$editable = $template;
-            $template.remove();
+            // var $template = table.$table.find('[dt-template-editable]');
+            // table.store.templates.$editable = $template;
+            // $template.remove();
             setOnClickEvents(table);
             // debugger;
         },
@@ -579,8 +579,8 @@ var editable = (function () {
             var identifier = $row.attr('data-identifier');
             Array.prototype.forEach.call($inputs, function (el) {
                 var $el = $(el);
-                var curColName = $el.prop('name');
-                postData[curColName] = $el.prop('value');
+                var curColName = $el.attr('data-name');
+                postData[curColName] = $el.prop('value') || $el.html();
             });
 
             var rowData = table.store.pageData[identifier];
@@ -823,8 +823,10 @@ var renderer = (function (selectable) {
 
         init: function (table) {
             setButtonEvents(table);
-            var $templateMain = table.$table.find('table[dt-table] tr[dt-template-main]');
-            var $templates = table.$table.find('table[dt-table] tr[dt-template]'); Array.prototype.forEach
+            table.store.templates = {};
+            var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+            $templatesOrigin.remove();
+            var $templates = $templatesOrigin.clone();
             if ($templates.length != 0) {
                 Array.prototype.forEach.call($templates, function (el) {
                     var $el = $(el);
@@ -832,6 +834,7 @@ var renderer = (function (selectable) {
                     template.$template = $el;
                     template.$containers = $el.find('[data-name]');
                     table.store.templates[$el.attr('dt-template')] = template;
+                    $el.removeAttr('dt-template');
                 });
             }
         },

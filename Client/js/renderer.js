@@ -7,8 +7,10 @@ var renderer = (function (selectable) {
 
         init: function (table) {
             setButtonEvents(table);
-            var $templateMain = table.$table.find('table[dt-table] tr[dt-template-main]');
-            var $templates = table.$table.find('table[dt-table] tr[dt-template]'); Array.prototype.forEach
+            table.store.templates = {};
+            var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+            $templatesOrigin.remove();
+            var $templates = $templatesOrigin.clone();
             if ($templates.length != 0) {
                 Array.prototype.forEach.call($templates, function (el) {
                     var $el = $(el);
@@ -16,6 +18,7 @@ var renderer = (function (selectable) {
                     template.$template = $el;
                     template.$containers = $el.find('[data-name]');
                     table.store.templates[$el.attr('dt-template')] = template;
+                    $el.removeAttr('dt-template');
                 });
             }
         },

@@ -4,12 +4,12 @@ var editable = (function () {
     'use strict';
     var editable = {
         init: function (table) {
-            // Init objects
-            table.store.templates = {};
+            // // Init objects
+            // table.store.templates = {};
 
-            var $template = table.$table.find('[dt-template-editable]');
-            table.store.templates.$editable = $template;
-            $template.remove();
+            // var $template = table.$table.find('[dt-template-editable]');
+            // table.store.templates.$editable = $template;
+            // $template.remove();
             setOnClickEvents(table);
             // debugger;
         },
@@ -42,8 +42,8 @@ var editable = (function () {
             var identifier = $row.attr('data-identifier');
             Array.prototype.forEach.call($inputs, function (el) {
                 var $el = $(el);
-                var curColName = $el.prop('name');
-                postData[curColName] = $el.prop('value');
+                var curColName = $el.attr('data-name');
+                postData[curColName] = $el.prop('value') || $el.html();
             });
 
             var rowData = table.store.pageData[identifier];
