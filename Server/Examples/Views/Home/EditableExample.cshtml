@@ -45,7 +45,7 @@
             <input data-columnNames="Id FirstName Salary" filter="cs" class="form-control" type="text" placeholder="Search">
         </div>
     </div>
-    <div class="fixed-table-container" style="height: 367px; padding-bottom: 40px;">
+    <div class="fixed-table-container" style="height: 500px; padding-bottom: 40px;">
         <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
             <table dt-table class="table table-hover JColResizer">
                 <thead>
@@ -82,8 +82,8 @@
                             <input type="text" data-name="Salary" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <button dt-btn-update>Update</button>
-                            <button dt-btn-template="main">Cancel</button>
+                            <button dt-btn-update class="btn btn-primary">Update</button>
+                            <button dt-btn-template="main" class="btn btn-default">Cancel</button>
                         </td>
                     </tr>
                     <tr dt-template="main">
@@ -97,17 +97,18 @@
                             <div data-name="Salary"></div>
                         </td>
                         <td>
-                            <button dt-btn-template="edit">Edit</button>
-                            <button dt-btn-template="info">Info</button>
+                            <button dt-btn-template="edit" class="btn btn-warning">Edit</button>
+                            <button dt-btn-template="info" class="btn btn-info">Info</button>
                         </td>
                     </tr>
 
                     <tr dt-template="info">
                         <td colspan="4">
-                            <div data-name="FirstName"></div>
-                            <div data-name="LastName"></div>
-                            <div data-name="Salary"></div>
-                            <button dt-btn-template="main">Return</button>
+                            <div class="jumbotron">
+                                <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
+                                <p>Salary: <span data-name="Salary" /></p>
+                                <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -125,7 +126,7 @@
 
 @section Scripts {
     <script>
-        
+
         $(document).ready(function () {
             var myTable = dataTable.init('#table', {
                 ajax: {
@@ -151,6 +152,12 @@
                     Actions: {
                         render: function () {
                             return '<button dt-btn-edit>Edit</button>';
+                        }
+                    },
+
+                    Salary: {
+                        render: function (data) {
+                            return data + ' $';
                         }
                     }
                 },
