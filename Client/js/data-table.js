@@ -1,4 +1,3 @@
-var features = require('../js/features.js');
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -7,20 +6,12 @@ var filter = require('../js/filter.js');
 var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
-var spinner = require('../js/spinners.js');
+var features = require('../js/features.js');
 var renderer = require('../js/renderer.js');
+var spinner = require('../js/spinners.js');
 
-window.dataTable = (function (
-    selectable,
-    sortable,
-    dataLoader,
-    paginator,
-    filter,
-    editable,
-    validator,
-    settingsExternal,
-    features,
-    renderer) {
+window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
+    editable, validator, settingsExternal, features, renderer, spinner) {
     'use strict'
 
     var table = {
@@ -36,6 +27,7 @@ window.dataTable = (function (
             configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
             editable.init(this, settings);
+            selectable.init(this, settings);
             features.init(this);
             processFeatures(settings.features, this);
             renderer.init(this);
@@ -95,12 +87,6 @@ window.dataTable = (function (
     }
 
     function processFeatures(features, table) {
-        if (features) {
-            if (features.selectable) {
-                selectable.makeSelectable(table);
-            };
-        }
-
         filter.init(table);
         sortable.formatSortables(table);
     }
@@ -119,6 +105,6 @@ window.dataTable = (function (
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner);
 
 module.exports = window.dataTable;

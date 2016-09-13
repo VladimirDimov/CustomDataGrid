@@ -1,7 +1,10 @@
+var validator = require('../js/validator.js');
+var defaultSettings = require('../js/dt-default-settings.js');
+
 var selectable = (function () {
     var selectable = {
-        makeSelectable: function (table) {
-            if (table.settings.features.selectable.enable === false) {
+        init: function (table, settings) {
+            if (!isSelectable(settings)) {
                 return;
             }
 
@@ -9,39 +12,8 @@ var selectable = (function () {
             table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
 
-            var $tbody = table.$table.find('tbody');
-            $tbody.on('click', function (e) {
-                var $row = $(e.target).parentsUntil('tbody').last();
-                var identifier = $row.attr('data-identifier');
-                var rowIsSelected = isSelected(table, identifier);
-                var numberOfSelectedRows;
-
-                // No Ctrl && is not multiselect
-                if (!e.ctrlKey || !table.settings.features.selectable.multi) {
-                    numberOfSelectedRows = selectable.unselectAll(table);
-                }
-
-                if (rowIsSelected) {
-                    if (numberOfSelectedRows > 1) {
-                        setIdentifierSelectStatus(table, identifier, true);
-                    } else {
-                        setIdentifierSelectStatus(table, identifier, false);
-                    }
-                } else {
-                    setIdentifierSelectStatus(table, identifier, true);
-                }
-
-                selectable.refreshPageSelection(table);
-            });
-
-            table.selectAll = function () {
-                selectable.selectAll(table);
-                selectable.refreshPageSelection(table);
-            };
-
-            table.unselectAll = function () {
-                selectable.unselectAll(table);
-            };
+            setEvents(table);
+            setFunctions(table);
         },
 
         getSelected: function (table) {
@@ -100,6 +72,54 @@ var selectable = (function () {
             }
         }
     };
+
+    function setFunctions(table) {
+        table.selectAll = function () {
+            selectable.selectAll(table);
+            selectable.refreshPageSelection(table);
+        };
+
+        table.unselectAll = function () {
+            selectable.unselectAll(table);
+        };
+    }
+
+    function setEvents(table) {
+        var $tbody = table.$table.find('tbody');
+
+        $tbody.on('click', function (e) {
+            var $row = $(e.target).parentsUntil('tbody').last();
+            var identifier = $row.attr('data-identifier');
+            var rowIsSelected = isSelected(table, identifier);
+            var numberOfSelectedRows;
+
+            // No Ctrl && is not multiselect
+            if (!e.ctrlKey || !table.settings.features.selectable.multi) {
+                numberOfSelectedRows = selectable.unselectAll(table);
+            }
+
+            if (rowIsSelected) {
+                if (numberOfSelectedRows > 1) {
+                    setIdentifierSelectStatus(table, identifier, true);
+                } else {
+                    setIdentifierSelectStatus(table, identifier, false);
+                }
+            } else {
+                setIdentifierSelectStatus(table, identifier, true);
+            }
+
+            selectable.refreshPageSelection(table);
+        });
+    }
+
+    function isSelectable(settings) {
+        if (settings.features && settings.features.selectable && settings.features.selectable.enable !== undefined) {
+            validator.ValidateMustBeValidBoolean(settings.features.selectable.enable, 'settings.features.selectable.enable');
+            return settings.features.selectable.enable;
+        }
+
+        return defaultSettings.features.selectable.enable;
+    }
 
     function setRowSelectCssClasses(table, $row, isSelected) {
         var cssClasses = table.settings.features.selectable.cssClasses;

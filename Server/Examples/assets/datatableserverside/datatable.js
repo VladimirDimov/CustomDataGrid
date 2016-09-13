@@ -120,7 +120,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-var features = require('../js/features.js');
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -129,20 +128,12 @@ var filter = require('../js/filter.js');
 var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
-var spinner = require('../js/spinners.js');
+var features = require('../js/features.js');
 var renderer = require('../js/renderer.js');
+var spinner = require('../js/spinners.js');
 
-window.dataTable = (function (
-    selectable,
-    sortable,
-    dataLoader,
-    paginator,
-    filter,
-    editable,
-    validator,
-    settingsExternal,
-    features,
-    renderer) {
+window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
+    editable, validator, settingsExternal, features, renderer, spinner) {
     'use strict'
 
     var table = {
@@ -158,6 +149,7 @@ window.dataTable = (function (
             configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
             editable.init(this, settings);
+            selectable.init(this, settings);
             features.init(this);
             processFeatures(settings.features, this);
             renderer.init(this);
@@ -217,12 +209,6 @@ window.dataTable = (function (
     }
 
     function processFeatures(features, table) {
-        if (features) {
-            if (features.selectable) {
-                selectable.makeSelectable(table);
-            };
-        }
-
         filter.init(table);
         sortable.formatSortables(table);
     }
@@ -241,7 +227,7 @@ window.dataTable = (function (
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner);
 
 module.exports = window.dataTable;
 },{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/renderer.js":10,"../js/selectable.js":11,"../js/sortable.js":12,"../js/spinners.js":13,"../js/validator.js":14}],3:[function(require,module,exports){
@@ -909,10 +895,13 @@ var renderer = (function (selectable) {
 
 module.exports = renderer;
 },{"../js/selectable.js":11}],11:[function(require,module,exports){
+var validator = require('../js/validator.js');
+var defaultSettings = require('../js/dt-default-settings.js');
+
 var selectable = (function () {
     var selectable = {
-        makeSelectable: function (table) {
-            if (table.settings.features.selectable.enable === false) {
+        init: function (table, settings) {
+            if (!isSelectable(settings)) {
                 return;
             }
 
@@ -920,39 +909,8 @@ var selectable = (function () {
             table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
 
-            var $tbody = table.$table.find('tbody');
-            $tbody.on('click', function (e) {
-                var $row = $(e.target).parentsUntil('tbody').last();
-                var identifier = $row.attr('data-identifier');
-                var rowIsSelected = isSelected(table, identifier);
-                var numberOfSelectedRows;
-
-                // No Ctrl && is not multiselect
-                if (!e.ctrlKey || !table.settings.features.selectable.multi) {
-                    numberOfSelectedRows = selectable.unselectAll(table);
-                }
-
-                if (rowIsSelected) {
-                    if (numberOfSelectedRows > 1) {
-                        setIdentifierSelectStatus(table, identifier, true);
-                    } else {
-                        setIdentifierSelectStatus(table, identifier, false);
-                    }
-                } else {
-                    setIdentifierSelectStatus(table, identifier, true);
-                }
-
-                selectable.refreshPageSelection(table);
-            });
-
-            table.selectAll = function () {
-                selectable.selectAll(table);
-                selectable.refreshPageSelection(table);
-            };
-
-            table.unselectAll = function () {
-                selectable.unselectAll(table);
-            };
+            setEvents(table);
+            setFunctions(table);
         },
 
         getSelected: function (table) {
@@ -1012,6 +970,54 @@ var selectable = (function () {
         }
     };
 
+    function setFunctions(table) {
+        table.selectAll = function () {
+            selectable.selectAll(table);
+            selectable.refreshPageSelection(table);
+        };
+
+        table.unselectAll = function () {
+            selectable.unselectAll(table);
+        };
+    }
+
+    function setEvents(table) {
+        var $tbody = table.$table.find('tbody');
+
+        $tbody.on('click', function (e) {
+            var $row = $(e.target).parentsUntil('tbody').last();
+            var identifier = $row.attr('data-identifier');
+            var rowIsSelected = isSelected(table, identifier);
+            var numberOfSelectedRows;
+
+            // No Ctrl && is not multiselect
+            if (!e.ctrlKey || !table.settings.features.selectable.multi) {
+                numberOfSelectedRows = selectable.unselectAll(table);
+            }
+
+            if (rowIsSelected) {
+                if (numberOfSelectedRows > 1) {
+                    setIdentifierSelectStatus(table, identifier, true);
+                } else {
+                    setIdentifierSelectStatus(table, identifier, false);
+                }
+            } else {
+                setIdentifierSelectStatus(table, identifier, true);
+            }
+
+            selectable.refreshPageSelection(table);
+        });
+    }
+
+    function isSelectable(settings) {
+        if (settings.features && settings.features.selectable && settings.features.selectable.enable !== undefined) {
+            validator.ValidateMustBeValidBoolean(settings.features.selectable.enable, 'settings.features.selectable.enable');
+            return settings.features.selectable.enable;
+        }
+
+        return defaultSettings.features.selectable.enable;
+    }
+
     function setRowSelectCssClasses(table, $row, isSelected) {
         var cssClasses = table.settings.features.selectable.cssClasses;
         if (isSelected) {
@@ -1056,7 +1062,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],12:[function(require,module,exports){
+},{"../js/dt-default-settings.js":4,"../js/validator.js":14}],12:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
