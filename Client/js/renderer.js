@@ -7,22 +7,10 @@ var renderer = (function (selectable) {
 
         init: function (table) {
             setButtonEvents(table);
-            table.store.templates = {};
-            var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
-            $templatesOrigin.remove();
-            var $templates = $templatesOrigin.clone();
-            if ($templates.length != 0) {
-                Array.prototype.forEach.call($templates, function (el) {
-                    var $el = $(el);
-                    var template = {};
-                    template.$template = $el;
-                    template.$containers = $el.find('[data-name]');
-                    table.store.templates[$el.attr('dt-template')] = template;
-                    $el.removeAttr('dt-template');
-                });
-            }
+            setTemplates(table);
         },
 
+        // Renders table cell. If there is a custom defined render function calls it first.
         renderCell: function (table, colName, content, rowData) {
             if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
                 return table.settings.columns[colName].render(content, rowData);
@@ -36,7 +24,7 @@ var renderer = (function (selectable) {
             var $row;
             var propValue, $template;
 
-            if (templateName != undefined) {
+            if (templateName != undefined && table.store.templates.main) {
                 var $containers = table.store.templates[templateName].$containers;
                 for (var i = 0, l = $containers.length; i < l; i += 1) {
                     var $container = $($containers[i]);
@@ -86,6 +74,23 @@ var renderer = (function (selectable) {
             $tbody.append(buffer);
         }
     };
+
+    function setTemplates(table) {
+        table.store.templates = {};
+        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+        $templatesOrigin.remove();
+        var $templates = $templatesOrigin.clone();
+        if ($templates.length != 0) {
+            Array.prototype.forEach.call($templates, function (el) {
+                var $el = $(el);
+                var template = {};
+                template.$template = $el;
+                template.$containers = $el.find('[data-name]');
+                table.store.templates[$el.attr('dt-template')] = template;
+                $el.removeAttr('dt-template');
+            });
+        }
+    }
 
     function setButtonEvents(table) {
         table.$table.on('click', '[dt-btn-template]', function () {
