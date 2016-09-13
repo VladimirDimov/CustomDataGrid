@@ -35,6 +35,7 @@ window.dataTable = (function (
 
             configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
+            editable.init(this, settings);
             features.init(this);
             processFeatures(settings.features, this);
             renderer.init(this);
@@ -102,7 +103,6 @@ window.dataTable = (function (
 
         filter.init(table);
         sortable.formatSortables(table);
-        editable.init(table);
     }
 
     function getColumnPropertyNames() {

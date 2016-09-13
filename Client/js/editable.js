@@ -1,17 +1,13 @@
+var renderer = require('../js/renderer.js');
+var validator = require('../js/validator.js');
+
 var editable = (function () {
-    var renderer = require('../js/renderer.js');
 
     'use strict';
     var editable = {
-        init: function (table) {
-            // // Init objects
-            // table.store.templates = {};
-
-            // var $template = table.$table.find('[dt-template-editable]');
-            // table.store.templates.$editable = $template;
-            // $template.remove();
+        init: function (table, settings) {
             setOnClickEvents(table);
-            // debugger;
+            configureSettings(table, settings)
         },
 
         // Replaces the content of a row with the edit template
@@ -64,6 +60,13 @@ var editable = (function () {
             return postData;
         }
     };
+
+    function configureSettings(table, settings) {
+        if (!settings.editable) return;
+        validator.ValidateMustBeAFunction(settings.editable.update);
+        table.settings.editable = Object.create(Object.prototype);
+        table.settings.editable.update = editable.update;
+    }
 
     function setOnClickEvents(table) {
         table.$table.on('click', '[dt-btn-edit]', function (e) {

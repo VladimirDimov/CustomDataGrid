@@ -157,6 +157,7 @@ window.dataTable = (function (
 
             configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
+            editable.init(this, settings);
             features.init(this);
             processFeatures(settings.features, this);
             renderer.init(this);
@@ -224,7 +225,6 @@ window.dataTable = (function (
 
         filter.init(table);
         sortable.formatSortables(table);
-        editable.init(table);
     }
 
     function getColumnPropertyNames() {
@@ -466,14 +466,6 @@ var settings = (function (defaultSettings, validator) {
         }
     }
 
-    // function setCustomPaginator(paginator) {
-    //     if (!paginator) return;
-    //     if (paginator.length) {
-    //         validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
-    //         this.paginator.length = paginator.length;
-    //     }
-    // }
-
     function setCustomFeatures(features) {
         if (!features) return;
         if (features.selectable) {
@@ -516,20 +508,16 @@ var settings = (function (defaultSettings, validator) {
 
 module.exports = settings;
 },{"../js/dt-default-settings.js":4,"../js/validator.js":14}],6:[function(require,module,exports){
+var renderer = require('../js/renderer.js');
+var validator = require('../js/validator.js');
+
 var editable = (function () {
-    var renderer = require('../js/renderer.js');
 
     'use strict';
     var editable = {
-        init: function (table) {
-            // // Init objects
-            // table.store.templates = {};
-
-            // var $template = table.$table.find('[dt-template-editable]');
-            // table.store.templates.$editable = $template;
-            // $template.remove();
+        init: function (table, settings) {
             setOnClickEvents(table);
-            // debugger;
+            configureSettings(table, settings)
         },
 
         // Replaces the content of a row with the edit template
@@ -583,6 +571,13 @@ var editable = (function () {
         }
     };
 
+    function configureSettings(table, settings) {
+        if (!settings.editable) return;
+        validator.ValidateMustBeAFunction(settings.editable.update);
+        table.settings.editable = Object.create(Object.prototype);
+        table.settings.editable.update = editable.update;
+    }
+
     function setOnClickEvents(table) {
         table.$table.on('click', '[dt-btn-edit]', function (e) {
             var $row = $(this).parentsUntil('tr').parent();
@@ -599,7 +594,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../js/renderer.js":10}],7:[function(require,module,exports){
+},{"../js/renderer.js":10,"../js/validator.js":14}],7:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 var renderer = require('../js/renderer.js');
 

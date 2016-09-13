@@ -78,14 +78,6 @@ var settings = (function (defaultSettings, validator) {
         }
     }
 
-    // function setCustomPaginator(paginator) {
-    //     if (!paginator) return;
-    //     if (paginator.length) {
-    //         validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
-    //         this.paginator.length = paginator.length;
-    //     }
-    // }
-
     function setCustomFeatures(features) {
         if (!features) return;
         if (features.selectable) {
