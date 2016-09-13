@@ -148,10 +148,11 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 
             configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
+            filter.init(table);
+            sortable.init(table);
             editable.init(this, settings);
             selectable.init(this, settings);
             features.init(this);
-            processFeatures(settings.features, this);
             renderer.init(this);
 
             dataLoader.loadData(table, 1, true);
@@ -206,11 +207,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
     function configurePaginator(table, settings, dataLoader) {
         paginator.init(table, settings);
         paginator.setPageClickEvents(table, dataLoader);
-    }
-
-    function processFeatures(features, table) {
-        filter.init(table);
-        sortable.formatSortables(table);
     }
 
     function getColumnPropertyNames() {
@@ -591,9 +587,7 @@ var features = (function (dataLoader, renderer) {
         init: function (table) {
             table.events.onDataLoaded.push(renderNumberOfRows);
             table.events.onDataLoaded.push(renderNumberOfPages);
-        },
-
-        test: "123"
+        }
     };
 
 
@@ -1068,7 +1062,7 @@ var dataLoader = require('../js/dataLoader.js');
 var sortable = (function (dataLoader) {
     'use strict';
     return {
-        formatSortables: function (table) {
+        init: function (table) {
             var $sortables = table.$table.find('th[sortable]');
             $sortables.find('.th-inner').addClass('sortable both');
             table.store.$sortables = $sortables;

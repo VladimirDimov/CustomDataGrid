@@ -8,9 +8,7 @@ var features = (function (dataLoader, renderer) {
         init: function (table) {
             table.events.onDataLoaded.push(renderNumberOfRows);
             table.events.onDataLoaded.push(renderNumberOfPages);
-        },
-
-        test: "123"
+        }
     };
 
 

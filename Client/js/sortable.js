@@ -3,7 +3,7 @@ var dataLoader = require('../js/dataLoader.js');
 var sortable = (function (dataLoader) {
     'use strict';
     return {
-        formatSortables: function (table) {
+        init: function (table) {
             var $sortables = table.$table.find('th[sortable]');
             $sortables.find('.th-inner').addClass('sortable both');
             table.store.$sortables = $sortables;
