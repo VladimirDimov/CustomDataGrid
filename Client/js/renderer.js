@@ -30,7 +30,8 @@ var renderer = (function (selectable) {
                     var $container = $($containers[i]);
                     var propName = $container.attr('data-name');
                     var propValue = rowData[propName];
-                    var cellData = renderer.renderCell(table, propName, propValue, rowData);
+                    var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
+                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
                     var attributeValue = $container.attr('value');
                     if (typeof attributeValue === typeof undefined || attributeValue === false) {
                         $container.html(cellData);
