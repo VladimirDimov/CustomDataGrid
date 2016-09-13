@@ -156,8 +156,8 @@ window.dataTable = (function (
             configureStore(this);
 
             configurePaginator(this, dataLoader);
+            spinner.init(this, settings);
             features.init(this);
-            spinner.init(this);
             processFeatures(settings.features, this);
             renderer.init(this);
 
@@ -407,13 +407,12 @@ var settings = (function (defaultSettings, validator) {
             };
             this.paginator = defaultSettings.paginator;
             this.features = defaultSettings.features;
-            this.spinner = defaultSettings.spinner;
+
             // Set custom values
             setCustomPaging.call(this, settings.paging);
             setCustomPaginator.call(this, settings.paginator);
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
-            setCustomSpinner.call(this, settings.spinner);
             setCustomEditable.call(this, settings.editable);
 
             this.ajax = settings.ajax;
@@ -459,18 +458,6 @@ var settings = (function (defaultSettings, validator) {
             this._columns = val;
         }
     };
-
-    function setCustomSpinner(spinner) {
-        if (!spinner) return;
-
-        if (spinner.enable != undefined && spinner.enable === false) {
-            this.spinner.enable = false;
-        }
-
-        if (spinner.style != undefined) {
-            this.spinner.style = spinner.style;
-        }
-    }
 
     function setCustomPaging(paging) {
         if (!paging) return;
@@ -1108,14 +1095,18 @@ var sortable = (function (dataLoader) {
 
 module.exports = sortable;
 },{"../js/dataLoader.js":3}],13:[function(require,module,exports){
-var spinner = (function () {
+var defaultSettings = require('../js/dt-default-settings');
+
+var spinner = (function (defaultSettings) {
     'use strict';
 
     var spinner = {
-        init: function (table) {
-            if (table.settings.spinner.enable === false) {
+        init: function (table, settings) {
+            if (settings.spinner && settings.spinner.enable === false) {
                 return;
             }
+
+            configureSettings(table, settings);
 
             setSpinner(table);
             table.events.onDataLoading.push(renderSpinner);
@@ -1152,11 +1143,24 @@ var spinner = (function () {
         $tableBody.append(table.settings.$spinner);
     }
 
+    function configureSettings(table, settings) {
+        table.settings.spinner = defaultSettings.spinner;
+        if (!settings.spinner) return;
+
+        if (settings.spinner.enable != undefined && settings.spinner.enable === false) {
+            table.settings.spinner.enable = false;
+        }
+
+        if (settings.spinner.style != undefined) {
+            table.settings.spinner.style = settings.spinner.style;
+        }
+    }
+
     return spinner;
-} ());
+} (defaultSettings));
 
 module.exports = spinner;
-},{}],14:[function(require,module,exports){
+},{"../js/dt-default-settings":4}],14:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function (val, name, message) {

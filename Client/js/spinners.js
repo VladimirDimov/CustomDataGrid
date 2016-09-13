@@ -1,11 +1,15 @@
-var spinner = (function () {
+var defaultSettings = require('../js/dt-default-settings');
+
+var spinner = (function (defaultSettings) {
     'use strict';
 
     var spinner = {
-        init: function (table) {
-            if (table.settings.spinner.enable === false) {
+        init: function (table, settings) {
+            if (settings.spinner && settings.spinner.enable === false) {
                 return;
             }
+
+            configureSettings(table, settings);
 
             setSpinner(table);
             table.events.onDataLoading.push(renderSpinner);
@@ -42,7 +46,20 @@ var spinner = (function () {
         $tableBody.append(table.settings.$spinner);
     }
 
+    function configureSettings(table, settings) {
+        table.settings.spinner = defaultSettings.spinner;
+        if (!settings.spinner) return;
+
+        if (settings.spinner.enable != undefined && settings.spinner.enable === false) {
+            table.settings.spinner.enable = false;
+        }
+
+        if (settings.spinner.style != undefined) {
+            table.settings.spinner.style = settings.spinner.style;
+        }
+    }
+
     return spinner;
-} ());
+} (defaultSettings));
 
 module.exports = spinner;

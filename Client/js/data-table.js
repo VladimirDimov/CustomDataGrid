@@ -34,8 +34,8 @@ window.dataTable = (function (
             configureStore(this);
 
             configurePaginator(this, dataLoader);
+            spinner.init(this, settings);
             features.init(this);
-            spinner.init(this);
             processFeatures(settings.features, this);
             renderer.init(this);
 

@@ -13,13 +13,12 @@ var settings = (function (defaultSettings, validator) {
             };
             this.paginator = defaultSettings.paginator;
             this.features = defaultSettings.features;
-            this.spinner = defaultSettings.spinner;
+
             // Set custom values
             setCustomPaging.call(this, settings.paging);
             setCustomPaginator.call(this, settings.paginator);
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
-            setCustomSpinner.call(this, settings.spinner);
             setCustomEditable.call(this, settings.editable);
 
             this.ajax = settings.ajax;
@@ -65,18 +64,6 @@ var settings = (function (defaultSettings, validator) {
             this._columns = val;
         }
     };
-
-    function setCustomSpinner(spinner) {
-        if (!spinner) return;
-
-        if (spinner.enable != undefined && spinner.enable === false) {
-            this.spinner.enable = false;
-        }
-
-        if (spinner.style != undefined) {
-            this.spinner.style = spinner.style;
-        }
-    }
 
     function setCustomPaging(paging) {
         if (!paging) return;
