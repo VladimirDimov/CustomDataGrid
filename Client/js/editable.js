@@ -26,7 +26,6 @@ var editable = (function () {
                 $el.attr('value', rowData[$el.attr('data-name')]);
             }, this);
 
-
             var $allRows = table.$table.find('tr');
             Array.prototype.forEach.call($allRows, function (el) {
                 // var $el = $(el);
@@ -59,7 +58,7 @@ var editable = (function () {
                 function () {
                     // Nothing to do if error.
                 });
-            var $updatedRow = renderer.renderRow(table, rowData);
+            var $updatedRow = renderer.renderRow(table, rowData, $row.attr('dt-btn-upload') || 'main');
             $row.html($updatedRow.html());
 
             return postData;

@@ -82,34 +82,32 @@
                             <input type="text" data-name="Salary" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <button dt-btn-update="edit">Update</button>
-                            <button dt-btn-template="custom">Custom</button>
+                            <button dt-btn-update>Update</button>
+                            <button dt-btn-template="main">Cancel</button>
                         </td>
                     </tr>
                     <tr dt-template="main">
                         <td>
                             <div data-name="Id"></div>
-                            <div data-name="Salary"></div>
                         </td>
                         <td>
                             <div data-name="FirstName"></div>
-                            <input type="text" name="name" value="" data-name="FirstName" />
                         </td>
                         <td>
                             <div data-name="Salary"></div>
-                            <textarea data-name="Salary"></textarea>
                         </td>
                         <td>
                             <button dt-btn-template="edit">Edit</button>
+                            <button dt-btn-template="info">Info</button>
                         </td>
                     </tr>
 
-                    <tr dt-template="custom">
-                        <td colspan="3">
+                    <tr dt-template="info">
+                        <td colspan="4">
                             <div data-name="FirstName"></div>
-                        </td>
-                        <td>
-                            <button dt-btn-update>Update</button>
+                            <div data-name="LastName"></div>
+                            <div data-name="Salary"></div>
+                            <button dt-btn-template="main">Return</button>
                         </td>
                     </tr>
                 </tbody>
@@ -159,8 +157,8 @@
                 editable: {
                     update: function (data, success, error) {
                         debugger;
-                        //success();
-                        error();
+                        success();
+                        //error();
                     }
                 }
             });
