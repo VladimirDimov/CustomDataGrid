@@ -16,7 +16,7 @@ var settings = (function (defaultSettings, validator) {
 
             // Set custom values
             setCustomPaging.call(this, settings.paging);
-            setCustomPaginator.call(this, settings.paginator);
+            // setCustomPaginator.call(this, settings.paginator);
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomEditable.call(this, settings.editable);
@@ -78,13 +78,13 @@ var settings = (function (defaultSettings, validator) {
         }
     }
 
-    function setCustomPaginator(paginator) {
-        if (!paginator) return;
-        if (paginator.length) {
-            validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
-            this.paginator.length = paginator.length;
-        }
-    }
+    // function setCustomPaginator(paginator) {
+    //     if (!paginator) return;
+    //     if (paginator.length) {
+    //         validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
+    //         this.paginator.length = paginator.length;
+    //     }
+    // }
 
     function setCustomFeatures(features) {
         if (!features) return;

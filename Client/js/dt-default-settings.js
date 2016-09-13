@@ -16,7 +16,9 @@ var defaultSettings = (function () {
 
         spinner: {
             enable: true,
-            style: 0
+            style: 0,
+            width: '100px',
+            opacity: 1,
         }
     };
 

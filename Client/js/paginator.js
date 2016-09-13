@@ -2,8 +2,10 @@ var dataLoader = require('../js/dataLoader.js');
 
 var paginator = (function (dataLoader) {
     var paginator = {
-        init: function (table, start, end, activePage) {
+        init: function (table, settings) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
+            table.paginator = table.paginator || {};
+            setCustomPaginator(table, settings)
             // paginator.setPaginator(table, start, end, activePage);
             // paginator.setPageClickEvents(table, dataLoader);
         },
@@ -94,6 +96,14 @@ var paginator = (function (dataLoader) {
             });
         }
     };
+
+    function setCustomPaginator(table, settings) {
+        if (!settings.paginator) return;
+        if (settings.paginator.length) {
+            validator.ValidateShouldBeANumber(settings.paginator.length, "settings.paginator.length");
+            table.settings.paginator.length = settings.paginator.length;
+        }
+    }
 
     return paginator;
 } (dataLoader));

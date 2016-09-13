@@ -155,7 +155,7 @@ window.dataTable = (function (
             configureEvents(this);
             configureStore(this);
 
-            configurePaginator(this, dataLoader);
+            configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
             features.init(this);
             processFeatures(settings.features, this);
@@ -210,16 +210,8 @@ window.dataTable = (function (
         };
     }
 
-    function configurePaginator(table, dataLoader) {
-        if (table.settings != undefined && table.settings.paging != undefined && table.settings.paging.enable === false) {
-            return;
-        }
-
-        if (!table.paginator) {
-            table.paginator = {};
-        }
-
-        paginator.init(table, 1, table.settings.paginator.length, 1);
+    function configurePaginator(table, settings, dataLoader) {
+        paginator.init(table, settings);
         paginator.setPageClickEvents(table, dataLoader);
     }
 
@@ -383,7 +375,9 @@ var defaultSettings = (function () {
 
         spinner: {
             enable: true,
-            style: 0
+            style: 0,
+            width: '100px',
+            opacity: 1,
         }
     };
 
@@ -410,7 +404,7 @@ var settings = (function (defaultSettings, validator) {
 
             // Set custom values
             setCustomPaging.call(this, settings.paging);
-            setCustomPaginator.call(this, settings.paginator);
+            // setCustomPaginator.call(this, settings.paginator);
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomEditable.call(this, settings.editable);
@@ -472,13 +466,13 @@ var settings = (function (defaultSettings, validator) {
         }
     }
 
-    function setCustomPaginator(paginator) {
-        if (!paginator) return;
-        if (paginator.length) {
-            validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
-            this.paginator.length = paginator.length;
-        }
-    }
+    // function setCustomPaginator(paginator) {
+    //     if (!paginator) return;
+    //     if (paginator.length) {
+    //         validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
+    //         this.paginator.length = paginator.length;
+    //     }
+    // }
 
     function setCustomFeatures(features) {
         if (!features) return;
@@ -702,8 +696,10 @@ var dataLoader = require('../js/dataLoader.js');
 
 var paginator = (function (dataLoader) {
     var paginator = {
-        init: function (table, start, end, activePage) {
+        init: function (table, settings) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
+            table.paginator = table.paginator || {};
+            setCustomPaginator(table, settings)
             // paginator.setPaginator(table, start, end, activePage);
             // paginator.setPageClickEvents(table, dataLoader);
         },
@@ -794,6 +790,14 @@ var paginator = (function (dataLoader) {
             });
         }
     };
+
+    function setCustomPaginator(table, settings) {
+        if (!settings.paginator) return;
+        if (settings.paginator.length) {
+            validator.ValidateShouldBeANumber(settings.paginator.length, "settings.paginator.length");
+            table.settings.paginator.length = settings.paginator.length;
+        }
+    }
 
     return paginator;
 } (dataLoader));
@@ -1097,6 +1101,16 @@ module.exports = sortable;
 },{"../js/dataLoader.js":3}],13:[function(require,module,exports){
 var defaultSettings = require('../js/dt-default-settings');
 
+// =====================================================================
+// Example Configuration:
+// =====================================================================
+//       spinner: {
+//          enable: true, // default value is "true"
+//          style: 2,
+//          opacity: 0.2,
+//          width: '200px'
+//       }
+// =====================================================================
 var spinner = (function (defaultSettings) {
     'use strict';
 
@@ -1114,7 +1128,8 @@ var spinner = (function (defaultSettings) {
     };
 
     function setSpinner(table) {
-        var width = 200;
+        var width = table.settings.spinner.width;
+        var opacity = table.settings.spinner.opacity;
         var spinnerStyle = table.settings.spinner.style;
         var $spinnerRow = $('<div/>');
         table.$table.children('tbody').css('position', 'relative');
@@ -1128,10 +1143,11 @@ var spinner = (function (defaultSettings) {
 
         var $image = $('<img/>');
         $image.attr('src', '/assets/datatableserverside/img/spinners/' + spinnerStyle + '.gif');
-        $image.css('width', width + 'px');
+        $image.css('width', width);
         $image.css('position', 'relative');
         $image.css('margin', 'auto');
         $image.css('z-index', 1000);
+        $image.css('opacity', opacity);
 
         $spinnerRow.append($image);
         table.settings.$spinner = $spinnerRow;
@@ -1146,14 +1162,10 @@ var spinner = (function (defaultSettings) {
     function configureSettings(table, settings) {
         table.settings.spinner = defaultSettings.spinner;
         if (!settings.spinner) return;
-
-        if (settings.spinner.enable != undefined && settings.spinner.enable === false) {
-            table.settings.spinner.enable = false;
-        }
-
-        if (settings.spinner.style != undefined) {
-            table.settings.spinner.style = settings.spinner.style;
-        }
+        table.settings.spinner.enable = settings.spinner.enable || defaultSettings.spinner.enable;
+        table.settings.spinner.style = settings.spinner.style || defaultSettings.spinner.style;
+        table.settings.spinner.width = settings.spinner.width || defaultSettings.spinner.width;
+        table.settings.spinner.opacity = settings.spinner.opacity || defaultSettings.spinner.opacity;
     }
 
     return spinner;

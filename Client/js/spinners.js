@@ -1,5 +1,15 @@
 var defaultSettings = require('../js/dt-default-settings');
 
+// =====================================================================
+// Example Configuration:
+// =====================================================================
+//       spinner: {
+//          enable: true, // default value is "true"
+//          style: 2,
+//          opacity: 0.2,
+//          width: '200px'
+//       }
+// =====================================================================
 var spinner = (function (defaultSettings) {
     'use strict';
 
@@ -17,7 +27,8 @@ var spinner = (function (defaultSettings) {
     };
 
     function setSpinner(table) {
-        var width = 200;
+        var width = table.settings.spinner.width;
+        var opacity = table.settings.spinner.opacity;
         var spinnerStyle = table.settings.spinner.style;
         var $spinnerRow = $('<div/>');
         table.$table.children('tbody').css('position', 'relative');
@@ -31,10 +42,11 @@ var spinner = (function (defaultSettings) {
 
         var $image = $('<img/>');
         $image.attr('src', '/assets/datatableserverside/img/spinners/' + spinnerStyle + '.gif');
-        $image.css('width', width + 'px');
+        $image.css('width', width);
         $image.css('position', 'relative');
         $image.css('margin', 'auto');
         $image.css('z-index', 1000);
+        $image.css('opacity', opacity);
 
         $spinnerRow.append($image);
         table.settings.$spinner = $spinnerRow;
@@ -49,14 +61,10 @@ var spinner = (function (defaultSettings) {
     function configureSettings(table, settings) {
         table.settings.spinner = defaultSettings.spinner;
         if (!settings.spinner) return;
-
-        if (settings.spinner.enable != undefined && settings.spinner.enable === false) {
-            table.settings.spinner.enable = false;
-        }
-
-        if (settings.spinner.style != undefined) {
-            table.settings.spinner.style = settings.spinner.style;
-        }
+        table.settings.spinner.enable = settings.spinner.enable || defaultSettings.spinner.enable;
+        table.settings.spinner.style = settings.spinner.style || defaultSettings.spinner.style;
+        table.settings.spinner.width = settings.spinner.width || defaultSettings.spinner.width;
+        table.settings.spinner.opacity = settings.spinner.opacity || defaultSettings.spinner.opacity;
     }
 
     return spinner;

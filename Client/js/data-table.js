@@ -33,7 +33,7 @@ window.dataTable = (function (
             configureEvents(this);
             configureStore(this);
 
-            configurePaginator(this, dataLoader);
+            configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
             features.init(this);
             processFeatures(settings.features, this);
@@ -88,16 +88,8 @@ window.dataTable = (function (
         };
     }
 
-    function configurePaginator(table, dataLoader) {
-        if (table.settings != undefined && table.settings.paging != undefined && table.settings.paging.enable === false) {
-            return;
-        }
-
-        if (!table.paginator) {
-            table.paginator = {};
-        }
-
-        paginator.init(table, 1, table.settings.paginator.length, 1);
+    function configurePaginator(table, settings, dataLoader) {
+        paginator.init(table, settings);
         paginator.setPageClickEvents(table, dataLoader);
     }
 
