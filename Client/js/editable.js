@@ -65,7 +65,7 @@ var editable = (function () {
         if (!settings.editable) return;
         validator.ValidateMustBeAFunction(settings.editable.update);
         table.settings.editable = Object.create(Object.prototype);
-        table.settings.editable.update = editable.update;
+        table.settings.editable.update = settings.editable.update;
     }
 
     function setOnClickEvents(table) {

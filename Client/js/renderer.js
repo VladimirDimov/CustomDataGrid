@@ -105,7 +105,7 @@ var renderer = (function (selectable) {
             var delay = $this.attr('dt-delay') || 0;
             $($curRow).fadeOut(0,0);
             $curRow.html($rowFromTemplate.html());
-            $($curRow).fadeIn(parseInt(delay * 2));
+            $($curRow).fadeIn(parseInt(delay));
         })
     }
 

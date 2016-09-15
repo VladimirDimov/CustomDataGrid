@@ -618,7 +618,7 @@ var editable = (function () {
         if (!settings.editable) return;
         validator.ValidateMustBeAFunction(settings.editable.update);
         table.settings.editable = Object.create(Object.prototype);
-        table.settings.editable.update = editable.update;
+        table.settings.editable.update = settings.editable.update;
     }
 
     function setOnClickEvents(table) {
@@ -947,7 +947,7 @@ var renderer = (function (selectable) {
             var delay = $this.attr('dt-delay') || 0;
             $($curRow).fadeOut(0,0);
             $curRow.html($rowFromTemplate.html());
-            $($curRow).fadeIn(parseInt(delay * 2));
+            $($curRow).fadeIn(parseInt(delay));
         })
     }
 
