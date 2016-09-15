@@ -95,11 +95,17 @@ var renderer = (function (selectable) {
 
     function setButtonEvents(table) {
         table.$table.on('click', '[dt-btn-template]', function () {
-            var $curRow = $(this).parentsUntil('tr').parent();
+            var $this = $(this);
+            var $curRow = $this.parentsUntil('tr').parent();
             var identifier = $curRow.attr('data-identifier');
             var rowData = table.store.pageData[identifier];
             var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
+
+            // fade in the new template
+            var delay = $this.attr('dt-delay') || 0;
+            $($curRow).fadeOut(0,0);
             $curRow.html($rowFromTemplate.html());
+            $($curRow).fadeIn(parseInt(delay * 2));
         })
     }
 
