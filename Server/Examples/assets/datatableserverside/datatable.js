@@ -523,7 +523,7 @@ var editable = (function () {
             }, this);
         },
 
-        updateRow: function (table, $row) {
+        updateRow: function (table, $row, template) {
             var $inputs = $row.find('[data-name]');
             var postData = {};
             var identifier = $row.attr('data-identifier');
@@ -544,9 +544,9 @@ var editable = (function () {
                 },
                 // ERROR
                 function () {
-                    // Nothing to do if error.
+                    // Igonore error.
                 });
-            var $updatedRow = renderer.renderRow(table, rowData, $row.attr('dt-btn-upload') || 'main');
+            var $updatedRow = renderer.renderRow(table, rowData, template || 'main');
             $row.html($updatedRow.html());
 
             return postData;
@@ -568,7 +568,7 @@ var editable = (function () {
 
         table.$table.on('click', '[dt-btn-update]', function (e) {
             var $row = $(this).parentsUntil('tr').parent();
-            editable.updateRow(table, $row);
+            editable.updateRow(table, $row, $(this).attr('dt-btn-update'));
         });
     }
 
