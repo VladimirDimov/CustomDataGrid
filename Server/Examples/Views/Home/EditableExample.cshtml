@@ -128,63 +128,60 @@
 
 @section Scripts {
     <script>
-
-        $(document).ready(function () {
-            var myTable = dataTable.init('#table', {
-                ajax: {
-                    url: '/home/GetData'
-                },
-                paging: {
+        var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetData'
+            },
+            paging: {
+                enable: true,
+                pageSize: 20
+            },
+            spinner: {
+                enable: true, // default value is "true"
+                style: 2
+            },
+            features: {
+                identifier: 'Id',
+                selectable: {
                     enable: true,
-                    pageSize: 20
+                    multi: true,
+                    cssClasses: 'active'
                 },
-                spinner: {
-                    enable: true, // default value is "true"
-                    style: 2
-                },
-                features: {
-                    identifier: 'Id',
-                    selectable: {
-                        enable: true,
-                        multi: true,
-                        cssClasses: 'active'
-                    },
-                },
-                columns: {
-                    Actions: {
-                        render: function () {
-                            return '<button dt-btn-edit>Edit</button>';
-                        }
-                    },
-
-                    Salary: {
-                        render: function (data) {
-                            return data + ' $';
-                        }
+            },
+            columns: {
+                Actions: {
+                    render: function () {
+                        return '<button dt-btn-edit>Edit</button>';
                     }
                 },
-                editable: {
-                    update: function (data, success, error) {
-                        debugger;
-                        success();
-                        //error();
+
+                Salary: {
+                    render: function (data) {
+                        return data + ' $';
                     }
                 }
-            });
-
-            $('.filterable .btn-filter').click(function () {
-                var $panel = $(this).parents('.filterable'),
-                $filters = $panel.find('.filters input'),
-                $tbody = $panel.find('.table tbody');
-                if ($filters.prop('disabled') == true) {
-                    $filters.prop('disabled', false);
-                    $filters.first().focus();
-                } else {
-                    $filters.val('').prop('disabled', true);
-                    $tbody.find('.no-result').remove();
-                    $tbody.find('tr').show();
+            },
+            editable: {
+                update: function (data, success, error) {
+                    debugger;
+                    success();
+                    //error();
                 }
-            });
+            }
+        });
+
+        $('.filterable .btn-filter').click(function () {
+            var $panel = $(this).parents('.filterable'),
+            $filters = $panel.find('.filters input'),
+            $tbody = $panel.find('.table tbody');
+            if ($filters.prop('disabled') == true) {
+                $filters.prop('disabled', false);
+                $filters.first().focus();
+            } else {
+                $filters.val('').prop('disabled', true);
+                $tbody.find('.no-result').remove();
+                $tbody.find('tr').show();
+            }
         });
     </script>
 }
