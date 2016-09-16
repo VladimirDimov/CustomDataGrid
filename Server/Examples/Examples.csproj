@@ -174,7 +174,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\FilterPerColumnExample.cshtml" />
     <Content Include="Views\Home\SingleFilterExample.cshtml" />
-    <Content Include="Views\Home\FilterIconExample.cshtml" />
     <Content Include="Views\Home\EditableExample.cshtml" />
   </ItemGroup>
   <ItemGroup>

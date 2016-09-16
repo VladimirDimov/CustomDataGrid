@@ -668,8 +668,9 @@ var filter = (function (dataLoader) {
 module.exports = filter;
 },{"../js/dataLoader.js":3}],9:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
+var validator = require('../js/validator.js');
 
-var paginator = (function (dataLoader) {
+var paginator = (function (dataLoader, validator) {
     var paginator = {
         init: function (table, settings) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
@@ -775,10 +776,10 @@ var paginator = (function (dataLoader) {
     }
 
     return paginator;
-} (dataLoader));
+} (dataLoader, validator));
 
 module.exports = paginator;
-},{"../js/dataLoader.js":3}],10:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/validator.js":14}],10:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = (function (selectable) {

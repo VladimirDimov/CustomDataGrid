@@ -27,12 +27,6 @@ namespace Examples.Controllers
             return View();
         }
 
-        public ActionResult FilterIconExample()
-        {
-            return View();
-        }
-
-
         public ActionResult EditableExample()
         {
             return View();

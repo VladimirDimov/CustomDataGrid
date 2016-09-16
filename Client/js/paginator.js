@@ -1,6 +1,7 @@
 var dataLoader = require('../js/dataLoader.js');
+var validator = require('../js/validator.js');
 
-var paginator = (function (dataLoader) {
+var paginator = (function (dataLoader, validator) {
     var paginator = {
         init: function (table, settings) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
@@ -106,6 +107,6 @@ var paginator = (function (dataLoader) {
     }
 
     return paginator;
-} (dataLoader));
+} (dataLoader, validator));
 
 module.exports = paginator;
