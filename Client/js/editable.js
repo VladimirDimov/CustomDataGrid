@@ -7,7 +7,7 @@ var editable = (function () {
     var editable = {
         init: function (table, settings) {
             setOnClickEvents(table);
-            configureSettings(table, settings)
+            configureSettings(table, settings);
         },
 
         // Replaces the content of a row with the edit template
