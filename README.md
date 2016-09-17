@@ -1,13 +1,14 @@
 #Data Table With Ajax Serversde Processing For.NET MVC
 
 ----------
-##Installation
-From the package manager console in Visual Studio type `Install-Package DataTableServerSide`. On the client side reference the `dataTablesServerSide.js` from the `assets/datatableServerside` folder. Also add the `bootstrap-tables.css` ([http://bootstrap-table.wenzhixin.net.cn/](http://bootstrap-table.wenzhixin.net.cn/ "link")) 
-
 
 ##Description
 A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with server side processing.
 **This project is still under development!**
+
+##Installation
+From the package manager console in Visual Studio type `Install-Package DataTableServerSide`. On the client side reference the `dataTablesServerSide.js` from the `assets/datatableServerside` folder. Also add the `bootstrap-tables.css` ([http://bootstrap-table.wenzhixin.net.cn/](http://bootstrap-table.wenzhixin.net.cn/ "link")).
+
 ##Quick Start
 ###Server:
  - Put [DataTable] attribute on the Action
