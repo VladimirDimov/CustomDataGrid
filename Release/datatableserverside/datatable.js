@@ -120,7 +120,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-var features = require('../js/features.js');
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -129,18 +128,12 @@ var filter = require('../js/filter.js');
 var editable = require('../js/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
+var features = require('../js/features.js');
+var renderer = require('../js/renderer.js');
 var spinner = require('../js/spinners.js');
 
-window.dataTable = (function (
-    selectable,
-    sortable,
-    dataLoader,
-    paginator,
-    filter,
-    editable,
-    validator,
-    settingsExternal,
-    features) {
+window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
+    editable, validator, settingsExternal, features, renderer, spinner) {
     'use strict'
 
     var table = {
@@ -153,10 +146,14 @@ window.dataTable = (function (
             configureEvents(this);
             configureStore(this);
 
-            configurePaginator(this, dataLoader);
+            configurePaginator(this, settings, dataLoader);
+            spinner.init(this, settings);
+            filter.init(table);
+            sortable.init(table);
+            editable.init(this, settings);
+            selectable.init(this, settings);
             features.init(this);
-            spinner.init(this);
-            processFeatures(settings.features, this);
+            renderer.init(this);
 
             dataLoader.loadData(table, 1, true);
 
@@ -207,32 +204,9 @@ window.dataTable = (function (
         };
     }
 
-    function configurePaginator(table, dataLoader) {
-        if (table.settings != undefined && table.settings.paging != undefined && table.settings.paging.enable === false) {
-            return;
-        }
-
-        if (!table.paginator) {
-            table.paginator = {};
-        }
-
-        paginator.init(table, 1, table.settings.paginator.length, 1);
+    function configurePaginator(table, settings, dataLoader) {
+        paginator.init(table, settings);
         paginator.setPageClickEvents(table, dataLoader);
-    }
-
-    function processFeatures(features, table) {
-        if (features) {
-            if (features.selectable) {
-                selectable.makeSelectable(table);
-            };
-
-            if (features.editable) {
-                editable.init(table);
-            }
-        }
-
-        filter.init(table);
-        sortable.formatSortables(table);
     }
 
     function getColumnPropertyNames() {
@@ -249,10 +223,10 @@ window.dataTable = (function (
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner);
 
 module.exports = window.dataTable;
-},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/selectable.js":11,"../js/sortable.js":12,"../js/spinners.js":13,"../js/validator.js":14}],3:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/renderer.js":10,"../js/selectable.js":11,"../js/sortable.js":12,"../js/spinners.js":13,"../js/validator.js":14}],3:[function(require,module,exports){
 
 var paginator = require('../js/paginator.js');
 var selectable = require('../js/selectable.js');
@@ -327,8 +301,17 @@ var dataLoader = (function () {
     }
 
     function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        var dataObj = {};
+        var identifierName = table.settings.features.identifier;
+
         table.store.currentPage = currentPage;
-        table.store.pageData = data;
+
+        for (var i = 0, l = data.length; i < l; i += 1) {
+            var curDataRow = data[i];
+            dataObj[curDataRow[identifierName]] = curDataRow;
+        }
+        table.store.pageData = dataObj;
+
         table.store.numberOfRows = rowsNumber;
         if (table.settings.paging.enable) {
             table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
@@ -374,7 +357,9 @@ var defaultSettings = (function () {
 
         spinner: {
             enable: true,
-            style: 0
+            style: 0,
+            width: '100px',
+            opacity: 1,
         }
     };
 
@@ -398,13 +383,13 @@ var settings = (function (defaultSettings, validator) {
             };
             this.paginator = defaultSettings.paginator;
             this.features = defaultSettings.features;
-            this.spinner = defaultSettings.spinner;
+
             // Set custom values
             setCustomPaging.call(this, settings.paging);
-            setCustomPaginator.call(this, settings.paginator);
+            // setCustomPaginator.call(this, settings.paginator);
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
-            setCustomSpinner.call(this, settings.spinner);
+            setCustomEditable.call(this, settings.editable);
 
             this.ajax = settings.ajax;
 
@@ -450,18 +435,6 @@ var settings = (function (defaultSettings, validator) {
         }
     };
 
-    function setCustomSpinner(spinner) {
-        if (!spinner) return;
-
-        if (spinner.enable != undefined && spinner.enable === false) {
-            this.spinner.enable = false;
-        }
-
-        if (spinner.style != undefined) {
-            this.spinner.style = spinner.style;
-        }
-    }
-
     function setCustomPaging(paging) {
         if (!paging) return;
         if (paging.pageSize) {
@@ -472,14 +445,6 @@ var settings = (function (defaultSettings, validator) {
             this.paging.enable = false;
         } else {
             paging.enable = true;
-        }
-    }
-
-    function setCustomPaginator(paginator) {
-        if (!paginator) return;
-        if (paginator.length) {
-            validator.ValidateShouldBeANumber(paginator.length, "settings.paginator.length");
-            this.paginator.length = paginator.length;
         }
     }
 
@@ -513,69 +478,105 @@ var settings = (function (defaultSettings, validator) {
         this.columns = columns;
     }
 
+    function setCustomEditable(editable) {
+        if (!editable) return;
+        validator.ValidateMustBeAFunction(editable.update);
+        this.editable = Object.create(Object.prototype);
+        this.editable.update = editable.update;
+    }
+
     return settings;
 })(defaultSettings, validator);
 
 module.exports = settings;
 },{"../js/dt-default-settings.js":4,"../js/validator.js":14}],6:[function(require,module,exports){
+var renderer = require('../js/renderer.js');
+var validator = require('../js/validator.js');
+
 var editable = (function () {
-    var renderer = require('../js/renderer.js');
 
     'use strict';
     var editable = {
-        init: function (table) {
-            table.edit = function ($row) {
-                var $tds = $row.find('td');
-                for (var editObj in table.settings.features.editable.columns) {
-                    var colIndex = getColumnIndex(table, editObj);
-                    table.settings.features.editable.columns[editObj].edit($($tds[colIndex]));
-                }
-            };
-
-            table.save = function ($row) {
-                var $tds = $row.find('td');
-                var pageData = table.store.pageData;
-                var identifierName = table.settings.features.identifier;
-                var identifierVal = $row.attr('data-identifier');
-                var rowData = pageData.filter(function (item) {
-                    return item[identifierName] == identifierVal;
-                })[0];
-
-                for (var editObj in table.settings.features.editable.columns) {
-                    var colIndex = getColumnIndex(table, editObj);
-                    var content = table.settings.features.editable.columns[editObj].save($($tds[colIndex]));
-                    rowData[editObj] = content;
-                }
-
-                update(table, rowData);
-                renderRow(table, rowData);
-            };
+        init: function (table, settings) {
+            setOnClickEvents(table);
+            configureSettings(table, settings);
         },
+
+        // Replaces the content of a row with the edit template
+        renderEditRow: function (table, $row) {
+            $row.html(table.store.templates.editable.$template.html());
+            // Fill inputs with the current values
+            var $inputs = $row.find('.td-inner');
+            var identifier = $row.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            Array.prototype.forEach.call($inputs, function (el) {
+                var $el = $(el);
+                $el.attr('value', rowData[$el.attr('data-name')]);
+            }, this);
+
+            var $allRows = table.$table.find('tr');
+            Array.prototype.forEach.call($allRows, function (el) {
+                // var $el = $(el);
+                // if ($el.attr('data-identifier') != $row.attr('data-identifier')) {
+                //     $el.css('visibility', 'hidden');
+                // }
+            }, this);
+        },
+
+        updateRow: function (table, $row, template) {
+            var $inputs = $row.find('[data-name]');
+            var postData = {};
+            var identifier = $row.attr('data-identifier');
+            Array.prototype.forEach.call($inputs, function (el) {
+                var $el = $(el);
+                var curColName = $el.attr('data-name');
+                postData[curColName] = $el.prop('value') || $el.html();
+            });
+
+            var rowData = table.store.pageData[identifier];
+            table.settings.editable.update(
+                postData,
+                // SUCCESS
+                function () {
+                    for (var prop in postData) {
+                        rowData[prop] = postData[prop];
+                    }
+                },
+                // ERROR
+                function () {
+                    // Igonore error.
+                });
+            var $updatedRow = renderer.renderRow(table, rowData, template || 'main');
+            $row.html($updatedRow.html());
+
+            return postData;
+        }
     };
 
-
-    function update(table, rowData) {
-        table.settings.features.editable.update(rowData);
+    function configureSettings(table, settings) {
+        if (!settings.editable) return;
+        validator.ValidateMustBeAFunction(settings.editable.update);
+        table.settings.editable = Object.create(Object.prototype);
+        table.settings.editable.update = settings.editable.update;
     }
 
+    function setOnClickEvents(table) {
+        table.$table.on('click', '[dt-btn-edit]', function (e) {
+            var $row = $(this).parentsUntil('tr').parent();
+            editable.renderEditRow(table, $row);
+        });
 
-    function renderRow(table, rowData) {
-        var identifierName = table.settings.features.identifier;
-        var identifierVal = rowData[identifierName];
-        var $row = table.$table.find('tr[data-identifier=' + identifierVal + ']');
-        var $newRow = renderer.renderRow(table, rowData);
-        $row.html($newRow.html());
-    }
-
-    function getColumnIndex(table, colName) {
-        return table.store.columnPropertyNames.indexOf(colName);
+        table.$table.on('click', '[dt-btn-update]', function (e) {
+            var $row = $(this).parentsUntil('tr').parent();
+            editable.updateRow(table, $row, $(this).attr('dt-btn-update'));
+        });
     }
 
     return editable;
 } ());
 
 module.exports = editable;
-},{"../js/renderer.js":10}],7:[function(require,module,exports){
+},{"../js/renderer.js":10,"../js/validator.js":14}],7:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 var renderer = require('../js/renderer.js');
 
@@ -586,9 +587,7 @@ var features = (function (dataLoader, renderer) {
         init: function (table) {
             table.events.onDataLoaded.push(renderNumberOfRows);
             table.events.onDataLoaded.push(renderNumberOfPages);
-        },
-
-        test: "123"
+        }
     };
 
 
@@ -669,11 +668,14 @@ var filter = (function (dataLoader) {
 module.exports = filter;
 },{"../js/dataLoader.js":3}],9:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
+var validator = require('../js/validator.js');
 
-var paginator = (function (dataLoader) {
+var paginator = (function (dataLoader, validator) {
     var paginator = {
-        init: function (table, start, end, activePage) {
+        init: function (table, settings) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
+            table.paginator = table.paginator || {};
+            setCustomPaginator(table, settings)
             // paginator.setPaginator(table, start, end, activePage);
             // paginator.setPageClickEvents(table, dataLoader);
         },
@@ -765,11 +767,19 @@ var paginator = (function (dataLoader) {
         }
     };
 
+    function setCustomPaginator(table, settings) {
+        if (!settings.paginator) return;
+        if (settings.paginator.length) {
+            validator.ValidateShouldBeANumber(settings.paginator.length, "settings.paginator.length");
+            table.settings.paginator.length = settings.paginator.length;
+        }
+    }
+
     return paginator;
-} (dataLoader));
+} (dataLoader, validator));
 
 module.exports = paginator;
-},{"../js/dataLoader.js":3}],10:[function(require,module,exports){
+},{"../js/dataLoader.js":3,"../js/validator.js":14}],10:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = (function (selectable) {
@@ -777,6 +787,12 @@ var renderer = (function (selectable) {
 
     var renderer = {
 
+        init: function (table) {
+            setButtonEvents(table);
+            setTemplates(table);
+        },
+
+        // Renders table cell. If there is a custom defined render function calls it first.
         renderCell: function (table, colName, content, rowData) {
             if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
                 return table.settings.columns[colName].render(content, rowData);
@@ -785,21 +801,43 @@ var renderer = (function (selectable) {
             return content;
         },
 
-        renderRow: function (table, rowData) {
+        renderRow: function (table, rowData, templateName) {
             var identifier = rowData[table.settings.features.identifier];
-            var $row = $('<tr>');
-            var propValue;
-            for (var col = 0; col < table.store.columnPropertyNames.length; col++) {
-                var propName = table.store.columnPropertyNames[col];
+            var $row;
+            var propValue, $template;
 
-                if (!propName) {
-                    throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+            if (templateName != undefined && table.store.templates.main) {
+                var $containers = table.store.templates[templateName].$containers;
+                for (var i = 0, l = $containers.length; i < l; i += 1) {
+                    var $container = $($containers[i]);
+                    var propName = $container.attr('data-name');
+                    var propValue = rowData[propName];
+                    var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
+                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
+                    var attributeValue = $container.attr('value');
+                    if (typeof attributeValue === typeof undefined || attributeValue === false) {
+                        $container.html(cellData);
+                    } else {
+                        $container.attr('value', cellData);
+                    }
                 }
 
-                propValue = rowData[propName];
+                $row = table.store.templates[templateName].$template.clone();
+            } else {
+                // If there is no main template provided the renderer will render the cells directly into the td elements
+                $row = $('<tr>');
+                for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
+                    var propName = table.store.columnPropertyNames[col];
 
-                var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
-                $row.append($col);
+                    if (!propName) {
+                        throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+                    }
+
+                    propValue = rowData[propName];
+
+                    var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
+                    $row.append($col);
+                }
             }
 
             $row.attr('data-identifier', identifier);
@@ -812,7 +850,7 @@ var renderer = (function (selectable) {
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData);
+                var $row = renderer.renderRow(table, rowData, 'main');
                 buffer.push($row);
             }
 
@@ -820,15 +858,51 @@ var renderer = (function (selectable) {
         }
     };
 
+    function setTemplates(table) {
+        table.store.templates = {};
+        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+        $templatesOrigin.remove();
+        var $templates = $templatesOrigin.clone();
+        if ($templates.length != 0) {
+            Array.prototype.forEach.call($templates, function (el) {
+                var $el = $(el);
+                var template = {};
+                template.$template = $el;
+                template.$containers = $el.find('[data-name]');
+                table.store.templates[$el.attr('dt-template')] = template;
+                $el.removeAttr('dt-template');
+            });
+        }
+    }
+
+    function setButtonEvents(table) {
+        table.$table.on('click', '[dt-btn-template]', function () {
+            var $this = $(this);
+            var $curRow = $this.parentsUntil('tr').parent();
+            var identifier = $curRow.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
+
+            // fade in the new template
+            var delay = $this.attr('dt-delay') || 0;
+            $($curRow).fadeOut(0,0);
+            $curRow.html($rowFromTemplate.html());
+            $($curRow).fadeIn(parseInt(delay));
+        })
+    }
+
     return renderer;
 } (selectable));
 
 module.exports = renderer;
 },{"../js/selectable.js":11}],11:[function(require,module,exports){
+var validator = require('../js/validator.js');
+var defaultSettings = require('../js/dt-default-settings.js');
+
 var selectable = (function () {
     var selectable = {
-        makeSelectable: function (table) {
-            if (table.settings.features.selectable.enable === false) {
+        init: function (table, settings) {
+            if (!isSelectable(settings)) {
                 return;
             }
 
@@ -836,39 +910,8 @@ var selectable = (function () {
             table.events.onTableRendered.push(selectable.refreshPageSelection);
             table.store.requestIdentifiersOnDataLoad = true;
 
-            var $tbody = table.$table.find('tbody');
-            $tbody.on('click', function (e) {
-                var $row = $(e.target).parentsUntil('tbody').last();
-                var identifier = $row.attr('data-identifier');
-                var rowIsSelected = isSelected(table, identifier);
-                var numberOfSelectedRows;
-
-                // No Ctrl && is not multiselect
-                if (!e.ctrlKey || !table.settings.features.selectable.multi) {
-                    numberOfSelectedRows = selectable.unselectAll(table);
-                }
-
-                if (rowIsSelected) {
-                    if (numberOfSelectedRows > 1) {
-                        setIdentifierSelectStatus(table, identifier, true);
-                    } else {
-                        setIdentifierSelectStatus(table, identifier, false);
-                    }
-                } else {
-                    setIdentifierSelectStatus(table, identifier, true);
-                }
-
-                selectable.refreshPageSelection(table);
-            });
-
-            table.selectAll = function () {
-                selectable.selectAll(table);
-                selectable.refreshPageSelection(table);
-            };
-
-            table.unselectAll = function () {
-                selectable.unselectAll(table);
-            };
+            setEvents(table);
+            setFunctions(table);
         },
 
         getSelected: function (table) {
@@ -928,6 +971,54 @@ var selectable = (function () {
         }
     };
 
+    function setFunctions(table) {
+        table.selectAll = function () {
+            selectable.selectAll(table);
+            selectable.refreshPageSelection(table);
+        };
+
+        table.unselectAll = function () {
+            selectable.unselectAll(table);
+        };
+    }
+
+    function setEvents(table) {
+        var $tbody = table.$table.find('tbody');
+
+        $tbody.on('click', function (e) {
+            var $row = $(e.target).parentsUntil('tbody').last();
+            var identifier = $row.attr('data-identifier');
+            var rowIsSelected = isSelected(table, identifier);
+            var numberOfSelectedRows;
+
+            // No Ctrl && is not multiselect
+            if (!e.ctrlKey || !table.settings.features.selectable.multi) {
+                numberOfSelectedRows = selectable.unselectAll(table);
+            }
+
+            if (rowIsSelected) {
+                if (numberOfSelectedRows > 1) {
+                    setIdentifierSelectStatus(table, identifier, true);
+                } else {
+                    setIdentifierSelectStatus(table, identifier, false);
+                }
+            } else {
+                setIdentifierSelectStatus(table, identifier, true);
+            }
+
+            selectable.refreshPageSelection(table);
+        });
+    }
+
+    function isSelectable(settings) {
+        if (settings.features && settings.features.selectable && settings.features.selectable.enable !== undefined) {
+            validator.ValidateMustBeValidBoolean(settings.features.selectable.enable, 'settings.features.selectable.enable');
+            return settings.features.selectable.enable;
+        }
+
+        return defaultSettings.features.selectable.enable;
+    }
+
     function setRowSelectCssClasses(table, $row, isSelected) {
         var cssClasses = table.settings.features.selectable.cssClasses;
         if (isSelected) {
@@ -972,13 +1063,13 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{}],12:[function(require,module,exports){
+},{"../js/dt-default-settings.js":4,"../js/validator.js":14}],12:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
     'use strict';
     return {
-        formatSortables: function (table) {
+        init: function (table) {
             var $sortables = table.$table.find('th[sortable]');
             $sortables.find('.th-inner').addClass('sortable both');
             table.store.$sortables = $sortables;
@@ -1011,14 +1102,28 @@ var sortable = (function (dataLoader) {
 
 module.exports = sortable;
 },{"../js/dataLoader.js":3}],13:[function(require,module,exports){
-var spinner = (function () {
+var defaultSettings = require('../js/dt-default-settings');
+
+// =====================================================================
+// Example Configuration:
+// =====================================================================
+//       spinner: {
+//          enable: true, // default value is "true"
+//          style: 2,
+//          opacity: 0.2,
+//          width: '200px'
+//       }
+// =====================================================================
+var spinner = (function (defaultSettings) {
     'use strict';
 
     var spinner = {
-        init: function (table) {
-            if (table.settings.spinner.enable === false) {
+        init: function (table, settings) {
+            if (settings.spinner && settings.spinner.enable === false) {
                 return;
             }
+
+            configureSettings(table, settings);
 
             setSpinner(table);
             table.events.onDataLoading.push(renderSpinner);
@@ -1026,7 +1131,8 @@ var spinner = (function () {
     };
 
     function setSpinner(table) {
-        var width = 200;
+        var width = table.settings.spinner.width;
+        var opacity = table.settings.spinner.opacity;
         var spinnerStyle = table.settings.spinner.style;
         var $spinnerRow = $('<div/>');
         table.$table.children('tbody').css('position', 'relative');
@@ -1040,10 +1146,11 @@ var spinner = (function () {
 
         var $image = $('<img/>');
         $image.attr('src', '/assets/datatableserverside/img/spinners/' + spinnerStyle + '.gif');
-        $image.css('width', width + 'px');
+        $image.css('width', width);
         $image.css('position', 'relative');
         $image.css('margin', 'auto');
         $image.css('z-index', 1000);
+        $image.css('opacity', opacity);
 
         $spinnerRow.append($image);
         table.settings.$spinner = $spinnerRow;
@@ -1055,52 +1162,62 @@ var spinner = (function () {
         $tableBody.append(table.settings.$spinner);
     }
 
+    function configureSettings(table, settings) {
+        table.settings.spinner = defaultSettings.spinner;
+        if (!settings.spinner) return;
+        table.settings.spinner.enable = settings.spinner.enable || defaultSettings.spinner.enable;
+        table.settings.spinner.style = settings.spinner.style || defaultSettings.spinner.style;
+        table.settings.spinner.width = settings.spinner.width || defaultSettings.spinner.width;
+        table.settings.spinner.opacity = settings.spinner.opacity || defaultSettings.spinner.opacity;
+    }
+
     return spinner;
-} ());
+} (defaultSettings));
 
 module.exports = spinner;
-},{}],14:[function(require,module,exports){
+},{"../js/dt-default-settings":4}],14:[function(require,module,exports){
 var validator = (function () {
     var validator = {
-        ValidateValueCannotBeNullOrUndefined: function(val, name, message) {
+        ValidateValueCannotBeNullOrUndefined: function (val, name, message) {
             if (val === null || val === undefined) {
                 throw message || "Value cannot be null or undefined. Parameter name: \"" + name + "\".";
             }
         },
 
-        ValidateShouldBeANumber: function(val, name, message) {
+        ValidateShouldBeANumber: function (val, name, message) {
             if (!typeof (val) === 'number') {
                 throw message || 'The value of ' + name + ' must be a number';
             }
         },
 
-        ValidateMustBeAPositiveNumber: function(val, name, message) {
+        ValidateMustBeAPositiveNumber: function (val, name, message) {
             this.ValidateShouldBeANumber(val);
             if (val < 0) {
                 throw message || 'The value of ' + name + ' must be a positive number';
             }
         },
 
-        ValidateMustBeValidBoolean: function(val, name, message) {
+        ValidateMustBeValidBoolean: function (val, name, message) {
             this.ValidateValueCannotBeNullOrUndefined(val);
             if (typeof (val) !== 'boolean') {
                 throw message || 'The value of ' + name + ' must be a valid boolean.';
             }
         },
 
-        ValidateMustBeValidStringOrNull: function(val, name, message) {
+        ValidateMustBeValidStringOrNull: function (val, name, message) {
             if (!val) return;
             if (typeof (val) !== 'string') {
                 throw message || 'The value of ' + name + ' must be a valid string';
             }
         },
 
-        ValidateMustBeValidString: function(val, name, message) {
+        ValidateMustBeValidString: function (val, name, message) {
             this.ValidateValueCannotBeNullOrUndefined(val, name, message);
             this.ValidateMustBeValidStringOrNull(val, name, message);
         },
 
-        ValidateMustBeAFunction: function(val, name, message) {
+        ValidateMustBeAFunction: function (val, name, message) {
+            validator.ValidateValueCannotBeNullOrUndefined(val, name, message);
             if (typeof (val) !== 'function') {
                 throw message || 'The type of ' + name + ' must be a function.';
             }

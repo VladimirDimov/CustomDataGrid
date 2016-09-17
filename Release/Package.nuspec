@@ -10,9 +10,9 @@
     <!--<iconUrl></iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing.</description>
-    <releaseNotes>Some functionalities are still not tested.</releaseNotes>
+    <releaseNotes>Added templates support. Some functionalities are still not tested!</releaseNotes>
     <copyright>Copyright 2016</copyright>
-    <tags>data table datatable</tags>
+    <tags>data table datatable serverside</tags>
     <dependencies>
       <!--<dependency id="System.Web.Mvc" version="5.2.3.0" />
       <dependency id="EntityFramework" version="6.0.0.0" />-->
