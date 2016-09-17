@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>DataTableServerSide</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <authors>Vladimir Dimov</authors>
     <owners>Vladimir Dimov</owners>
     <!--<licenseUrl></licenseUrl>-->
     <projectUrl>https://github.com/VladimirDimov/DataTablesServerSidePagination</projectUrl>
     <!--<iconUrl></iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing. This project is still in process!</description>
-    <releaseNotes>This is first unofficial release.</releaseNotes>
+    <description>A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing.</description>
+    <releaseNotes>Some functionalities are still not tested.</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>data table datatable</tags>
     <dependencies>

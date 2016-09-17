@@ -175,5 +175,52 @@ Add 'columns' property in the 'settings' object. For each column that you want t
 		...
 	});
 
+###Templates
+You may add custom templates in the table body. Add a row with attribute `dt-template="templateName"`. Inside the `<td>` elements may be any nested elements. The elements which hold the table data must have a tag `data-name="propertyName"`. The property name can be the name of any property of the database object.
+The first template which will be rendered will be the template with a name "main". If there is not such template the values will be rendered directly into the `<td>` elements.
 
- 
+You can switch the templates through buttons with attribute `dt-btn-template="targetTemplateName"`. Clicking the button will switch the row to template with the provided name. You can add some animation to the template switching by adding an attribute `dt-delay="timeInMilliseconds"` in the button element.
+
+#####Example:
+	<tbody>
+	    <tr dt-template="edit">
+	        <td>
+	            <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
+	        </td>
+	        <td>
+	            <input type="text" data-name="LastName" value="" class="td-inner form-control" />
+	        </td>
+	        <td>
+	            <input type="text" no-custom-Render data-name="Salary" value="" class="td-inner form-control" />
+	        </td>
+	        <td>
+	            <button dt-btn-update="info" dt-delay="250" class="btn btn-primary">Update</button>
+	            <button dt-btn-template="main" dt-delay="250" class="btn btn-default">Cancel</button>
+	        </td>
+	    </tr>
+	    <tr dt-template="main">
+	        <td>
+	            <div data-name="Id"></div>
+	        </td>
+	        <td>
+	            <div data-name="FirstName"></div>
+	        </td>
+	        <td>
+	            <div data-name="Salary"></div>
+	        </td>
+	        <td>
+	            <button dt-btn-template="edit" dt-delay="250" class="btn btn-warning">Edit</button>
+	            <button dt-btn-template="info" dt-delay="250" class="btn btn-info">Info</button>
+	        </td>
+	    </tr>
+	
+	    <tr dt-template="info">
+	        <td colspan="4">
+	            <div class="jumbotron">
+	                <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
+	                <p>Salary: <span data-name="Salary" /></p>
+	                <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
+	            </div>
+	        </td>
+	    </tr>
+	</tbody>
