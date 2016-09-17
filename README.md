@@ -2,11 +2,11 @@
 
 ----------
 ##Installation
-From the pacakege manager console in Visual Studio type `Install-Package DataTableServerSide`. On the client side reference the `dataTablesServerSide.js` from the 'assets/datatableServerside' folder. Also add the `bootstrap-tables.css` ([http://bootstrap-table.wenzhixin.net.cn/](http://bootstrap-table.wenzhixin.net.cn/ "link")) 
+From the package manager console in Visual Studio type `Install-Package DataTableServerSide`. On the client side reference the `dataTablesServerSide.js` from the `assets/datatableServerside` folder. Also add the `bootstrap-tables.css` ([http://bootstrap-table.wenzhixin.net.cn/](http://bootstrap-table.wenzhixin.net.cn/ "link")) 
 
 
 ##Description
-A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with serverside processing.
+A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with server side processing.
 **This project is still under development!**
 ##Quick Start
 ###Server:
@@ -42,7 +42,7 @@ A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting 
 	    }
 ###Client:
 #####HTML
-Set all column headers in the < thead >. Any column that expects result from the database should have data-name attribute value as the corresponding property name from the data class.
+Set all column headers in the `<thead>`. Any column that expects result from the database should have data-name attribute value as the corresponding property name from the data class.
 
 		<table id="table">
 		    <thead>
@@ -95,7 +95,7 @@ The selected rows identifiers can be got by:
 The result is an array of the identifiers of the selected rows.
 
 ###Sort
-Just put an attribute "sortable" in the column < th > element.
+Just put an attribute "sortable" in the column `<th>` element.
 ######example:
     <table id="table">
         <thead>
@@ -113,7 +113,7 @@ Just put an attribute "sortable" in the column < th > element.
     </table>
 
 ###Filters
-The filters can be created by placing input elements anywhere in the table. The inputs require an attribute filter="..." with any of the available options (see the list of available filter options) and attribute data-columnNames containing the names of the columns over which the filtering will be performed separated by a single space. All filters can be applied together in any combinations.
+The filters can be created by placing input elements anywhere in the table. The inputs require an attribute filter="..." with any of the available options (see the list of available filter options) and attribute `data-columnNames` containing the names of the columns over which the filtering will be performed separated by a single space. All filters can be applied together in any combinations.
 
 #####example
 
