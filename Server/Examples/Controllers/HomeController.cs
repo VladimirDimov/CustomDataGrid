@@ -37,6 +37,11 @@ namespace Examples.Controllers
             return View();
         }
 
+        public ActionResult PaginatorTemplateExample()
+        {
+            return View();
+        }
+
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
