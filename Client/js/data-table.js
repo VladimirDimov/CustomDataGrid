@@ -9,9 +9,10 @@ var settingsExternal = require('../js/dt-settings.js');
 var features = require('../js/features.js');
 var renderer = require('../js/renderer.js');
 var spinner = require('../js/spinners.js');
+var paginatorTemplate = require('../js/paginatorTemplate.js');
 
 window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
-    editable, validator, settingsExternal, features, renderer, spinner) {
+    editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate) {
     'use strict'
 
     var table = {
@@ -32,6 +33,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             selectable.init(this, settings);
             features.init(this);
             renderer.init(this);
+            paginatorTemplate.init(table);
 
             dataLoader.loadData(table, 1, true);
 
@@ -101,6 +103,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
 
 module.exports = window.dataTable;

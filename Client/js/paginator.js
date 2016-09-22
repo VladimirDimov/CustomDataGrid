@@ -7,8 +7,6 @@ var paginator = (function (dataLoader, validator) {
             table.events.onDataLoaded.push(paginator.updatePaginator);
             table.paginator = table.paginator || {};
             setCustomPaginator(table, settings)
-            // paginator.setPaginator(table, start, end, activePage);
-            // paginator.setPageClickEvents(table, dataLoader);
         },
         setPaginator: function (table, start, end, activePage) {
             if (!table.paginator) {

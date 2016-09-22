@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "SingleFilterExample";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .filterable {
+        margin-top: 15px;
+    }
+
+        .filterable .panel-heading .pull-right {
+            margin-top: -20px;
+        }
+
+        .filterable .filters input[disabled] {
+            background-color: transparent;
+            border: none;
+            cursor: auto;
+            box-shadow: none;
+            padding: 0;
+            height: auto;
+        }
+
+            .filterable .filters input[disabled]::-webkit-input-placeholder {
+                color: #333;
+            }
+
+            .filterable .filters input[disabled]::-moz-placeholder {
+                color: #333;
+            }
+
+            .filterable .filters input[disabled]:-ms-input-placeholder {
+                color: #333;
+            }
+</style>
+
+
+<div id="table" class="bootstrap-table">
+    <div class="fixed-table-toolbar">
+        <div class="columns columns-right btn-group pull-right">
+            <button class="btn btn-default" type="button" name="toggle" title="Toggle">
+                <i class="glyphicon glyphicon-list-alt icon-list-alt">
+                </i>
+            </button>
+            <div class="keep-open btn-group" title="Columns">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <i class="glyphicon glyphicon-th icon-th">
+                    </i> <span class="caret">
+                    </span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="id" value="0" checked="checked"> ID
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="name" value="1" checked="checked"> Item Name
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="price" value="2" checked="checked"> Item Price
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="pull-right search">
+            <input data-columnNames="Id FirstName Salary" filter="cs" class="form-control" type="text" placeholder="Search">
+        </div>
+    </div>
+    <div class="fixed-table-container" style="height: 367px; padding-bottom: 40px;">
+        <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
+            <table class="table table-hover JColResizer">
+                <thead>
+                    <tr>
+                        <th @*sortable*@ data-name="Id" @*style="width: 175px;"*@ data-field="id" tabindex="0">
+                            <div class="th-inner th-inner">ID</div>
+                            <div class="fht-cell" style="width: 175px;">
+                            </div>
+                        </th>
+                        <th sortable data-name="FirstName" @*style="width: 378px;"*@ data-field="name" tabindex="0">
+                            <div class="th-inner">Item Name</div>
+                            <div class="fht-cell" style="width: 377px;">
+                            </div>
+                        </th>
+                        <th sortable data-name="Salary" @*style="width: 368px;"*@ data-field="price" tabindex="0">
+                            <div class="th-inner">Item Price</div>
+                            <div class="fht-cell" style="width: 367px;">
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="fixed-table-pagination" style="display: block;">
+            <div class="pull-left pagination-detail">
+                <span class="pagination-info">Showing 20 of <span number-of-rows /> rows</span>
+            </div>
+            <div class="pull-right center pagination" dt-template="paginator">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" dt-paginator-prev>
+                            <a class="page-link" href="#" aria-label="Previous" dt-paginator-prev>
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                        <li class="page-item" dt-paginator-item><a class="page-link" href="#" dt-paginator-page>1</a></li>
+                        <li class="page-item" dt-paginator-item><a class="page-link" href="#" dt-paginator-page>2</a></li>
+                        <li class="page-item" dt-paginator-item><a class="page-link" href="#" dt-paginator-page>3</a></li>
+                        <li class="page-item" dt-paginator-item><a class="page-link" href="#" dt-paginator-page>4</a></li>
+                        <li class="page-item" dt-paginator-item><a class="page-link" href="#" dt-paginator-page>5</a></li>
+                        <li class="page-item" dt-paginator-next>
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetData'
+            },
+            paging: {
+                enable: true,
+                pageSize: 20
+            },
+            spinner: {
+                enable: true, // default value is "true"
+                style: 2,
+                opacity: 0.2,
+                width: '200px'
+            },
+            features: {
+                identifier: 'Id',
+                selectable: {
+                    enable: true,
+                    multi: true,
+                    cssClasses: 'active'
+                },
+            }
+        });
+
+        $(document).ready(function () {
+            $('.filterable .btn-filter').click(function () {
+                var $panel = $(this).parents('.filterable'),
+                $filters = $panel.find('.filters input'),
+                $tbody = $panel.find('.table tbody');
+                if ($filters.prop('disabled') == true) {
+                    $filters.prop('disabled', false);
+                    $filters.first().focus();
+                } else {
+                    $filters.val('').prop('disabled', true);
+                    $tbody.find('.no-result').remove();
+                    $tbody.find('tr').show();
+                }
+            });
+        });
+    </script>
+}
