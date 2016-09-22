@@ -780,6 +780,8 @@ var paginator = (function (dataLoader, validator) {
 
 module.exports = paginator;
 },{"../js/dataLoader.js":3,"../js/validator.js":15}],10:[function(require,module,exports){
+var dataLoader = require('../js/dataLoader.js');
+
 var paginatorTemplate = (function () {
     var paginatorTemplate = {
         init: function (table) {
@@ -788,6 +790,7 @@ var paginatorTemplate = (function () {
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
             table.events.onDataLoaded.push(updatePaginators);
+            setPageClickEvents(table);
         }
     };
 
@@ -813,20 +816,25 @@ var paginatorTemplate = (function () {
     }
 
     function renderPaginator(table, storeTemplate, currentPage, start, end) {
+        var $newPageItem;
         var $template = storeTemplate.$template;
         var newPageItems = [];
         for (var i = start; i <= end; i++) {
-            var $newPageItem = storeTemplate.$pageItem.clone();
-            var innerPageElement = $newPageItem.find('[dt-paginator-page]');
+            if (i != currentPage) {
+                $newPageItem = storeTemplate.$pageItem.clone();
+            } else {
+                $newPageItem = storeTemplate.$activePageTemplate.clone();
+            }
+            var innerPageElement = $newPageItem.find('[dt-paginator-inner]');
             innerPageElement.html(i);
             newPageItems.push($newPageItem);
         }
 
         var $newPageItems = $(newPageItems).map(function () { return this.toArray(); });
-        debugger;
-        var $pageItemToReplace = $template.find('[dt-paginator-item]');
-        $pageItemToReplace.replaceWith($newPageItems);
-        debugger;
+        var $existingPageItems = $template.find('[dt-paginator-page]');
+        var $pageItemsToRemove = $(Array.prototype.slice.call($existingPageItems, 1, $existingPageItems.length));
+        $pageItemsToRemove.remove();
+        $existingPageItems.replaceWith($newPageItems);
     }
 
     function setPaginatorTemplateElements(table, $paginatorTemplates) {
@@ -835,11 +843,18 @@ var paginatorTemplate = (function () {
             var $currentTemplate = $($paginatorTemplates[i]);
             table.store.paginatorTemplates[$currentTemplate] = {};
             var currentTemplateStore = {};
-            var $pageItems = $currentTemplate.find('[dt-paginator-item]');
-            currentTemplateStore.paginatorLength = $pageItems.length;
-            if ($pageItems.length > 0) {
-                currentTemplateStore.$pageItem = $pageItems.first();
-                var $pageItemsToRemove = $(Array.prototype.slice.call($pageItems, 1, $pageItems.length));
+            var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
+            var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
+            currentTemplateStore.paginatorLength = $allPageItems.length;
+
+            // Set active page template
+            var $activePageTemplate = $currentTemplate.find('[dt-active]').clone();
+            currentTemplateStore.$activePageTemplate = $activePageTemplate;
+
+            // Set not active page template
+            if ($pageItemsWithoutActive.length > 0) {
+                currentTemplateStore.$pageItem = $pageItemsWithoutActive.first();
+                var $pageItemsToRemove = $(Array.prototype.slice.call($pageItemsWithoutActive, 1, $pageItemsWithoutActive.length));
                 $pageItemsToRemove.remove();
             }
 
@@ -848,11 +863,20 @@ var paginatorTemplate = (function () {
         }
     }
 
+    function setPageClickEvents(table) {
+        table.$table.on('click', '[dt-template=paginator] [dt-paginator-inner]', function () {
+            var $this = $(this);
+            var page = $this.html();
+
+            dataLoader.loadData(table, page);
+        })
+    }
+
     return paginatorTemplate;
 })();
 
 module.exports = paginatorTemplate;
-},{}],11:[function(require,module,exports){
+},{"../js/dataLoader.js":3}],11:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = (function (selectable) {
