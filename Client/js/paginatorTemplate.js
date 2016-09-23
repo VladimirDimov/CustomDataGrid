@@ -61,7 +61,6 @@ var paginatorTemplate = (function () {
         table.store.paginatorTemplates = [];
         for (var i = 0, length = $paginatorTemplates.length; i < length; i += 1) {
             var $currentTemplate = $($paginatorTemplates[i]);
-            table.store.paginatorTemplates[$currentTemplate] = {};
             var currentTemplateStore = {};
             var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
             var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
