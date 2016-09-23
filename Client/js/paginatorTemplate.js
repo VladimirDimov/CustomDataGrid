@@ -105,8 +105,21 @@ var paginatorTemplate = (function () {
         table.$table.find('[dt-paginator-prev]').on('click', function () {
             var currentPage = parseInt(table.store.currentPage);
             if (currentPage == 1) return;
-            
+
             dataLoader.loadData(table, currentPage - 1);
+        });
+
+        table.$table.find('[dt-paginator-first]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+
+            dataLoader.loadData(table, 1);
+        });
+
+        table.$table.find('[dt-paginator-last]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+            if (table.store.numberOfPages == 0) return;
+
+            dataLoader.loadData(table, table.store.numberOfPages);
         });
     }
 
