@@ -43,6 +43,12 @@ var validator = (function () {
             if (typeof (val) !== 'function') {
                 throw message || 'The type of ' + name + ' must be a function.';
             }
+        },
+
+        ValidateMustBeAJqueryObject(val, name, message) {
+            if (!(val instanceof $)) {
+                throw message || name + " must be a valid jQuery object.";
+            }   
         }
     };
 

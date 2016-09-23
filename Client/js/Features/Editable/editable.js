@@ -1,5 +1,5 @@
-var renderer = require('../js/renderer.js');
-var validator = require('../js/validator.js');
+var renderer = require('../../../js/renderer.js');
+var validator = require('../../../js/validator.js');
 
 var editable = (function () {
 

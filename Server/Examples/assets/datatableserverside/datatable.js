@@ -120,18 +120,394 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
+var renderer = require('../../../js/renderer.js');
+var validator = require('../../../js/validator.js');
+
+var editable = (function () {
+
+    'use strict';
+    var editable = {
+        init: function (table, settings) {
+            setOnClickEvents(table);
+            configureSettings(table, settings);
+        },
+
+        // Replaces the content of a row with the edit template
+        renderEditRow: function (table, $row) {
+            $row.html(table.store.templates.editable.$template.html());
+            // Fill inputs with the current values
+            var $inputs = $row.find('.td-inner');
+            var identifier = $row.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            Array.prototype.forEach.call($inputs, function (el) {
+                var $el = $(el);
+                $el.attr('value', rowData[$el.attr('data-name')]);
+            }, this);
+
+            var $allRows = table.$table.find('tr');
+            Array.prototype.forEach.call($allRows, function (el) {
+                // var $el = $(el);
+                // if ($el.attr('data-identifier') != $row.attr('data-identifier')) {
+                //     $el.css('visibility', 'hidden');
+                // }
+            }, this);
+        },
+
+        updateRow: function (table, $row, template) {
+            var $inputs = $row.find('[data-name]');
+            var postData = {};
+            var identifier = $row.attr('data-identifier');
+            Array.prototype.forEach.call($inputs, function (el) {
+                var $el = $(el);
+                var curColName = $el.attr('data-name');
+                postData[curColName] = $el.prop('value') || $el.html();
+            });
+
+            var rowData = table.store.pageData[identifier];
+            table.settings.editable.update(
+                postData,
+                // SUCCESS
+                function () {
+                    for (var prop in postData) {
+                        rowData[prop] = postData[prop];
+                    }
+                },
+                // ERROR
+                function () {
+                    // Igonore error.
+                });
+            var $updatedRow = renderer.renderRow(table, rowData, template || 'main');
+            $row.html($updatedRow.html());
+
+            return postData;
+        }
+    };
+
+    function configureSettings(table, settings) {
+        if (!settings.editable) return;
+        validator.ValidateMustBeAFunction(settings.editable.update);
+        table.settings.editable = Object.create(Object.prototype);
+        table.settings.editable.update = settings.editable.update;
+    }
+
+    function setOnClickEvents(table) {
+        table.$table.on('click', '[dt-btn-edit]', function (e) {
+            var $row = $(this).parentsUntil('tr').parent();
+            editable.renderEditRow(table, $row);
+        });
+
+        table.$table.on('click', '[dt-btn-update]', function (e) {
+            var $row = $(this).parentsUntil('tr').parent();
+            editable.updateRow(table, $row, $(this).attr('dt-btn-update'));
+        });
+    }
+
+    return editable;
+} ());
+
+module.exports = editable;
+},{"../../../js/renderer.js":13,"../../../js/validator.js":17}],3:[function(require,module,exports){
+var validator = require('../../../js/validator.js');
+
+var paginatorTemplate = (function () {
+    // 'use strict'
+
+    var paginatorTemplate = {
+        init: function () {
+            return this;
+        },
+
+        get paginatorLength() {
+            return this._paginatorLength;
+        },
+        set paginatorLength(value) {
+            validator.ValidateMustBeAPositiveNumber(value);
+            this._paginatorLength = value;
+        },
+
+        get $template() {
+            return this._$template;
+        },
+        set $template($value) {
+            validator.ValidateMustBeAJqueryObject($value, "paginatorTemplate.$template");
+            this._$template = $value;
+        },
+
+        get $commonPageTemplate() {
+            return this._$commonPageTemplate;
+        },
+        set $commonPageTemplate($value) {
+            validator.ValidateMustBeAJqueryObject($value, "paginatorTemplate.$commonPageTemplate");
+            this._$commonPageTemplate = $value;
+        },
+
+        get $activePageTemplate() {
+            return this._$activePageTemplate;
+        },
+        set $activePageTemplate($value) {
+            validator.ValidateMustBeAJqueryObject($value, "paginatorTemplate.$activePageTemplate");
+            this._$activePageTemplate = $value;
+        }
+    };
+
+    return paginatorTemplate;
+})();
+
+module.exports = paginatorTemplate;
+},{"../../../js/validator.js":17}],4:[function(require,module,exports){
+var dataLoader = require('../../../js/dataLoader.js');
+var paginatorTemplate = require('./paginatorTemplate.js');
+
+var paginatorTemplatesInitialiser = (function () {
+    var paginatorTemplatesInitialiser = {
+        init: function (table) {
+            var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
+            if ($paginatorTemplates.length == 0) return;
+
+            setPaginatorTemplateElements(table, $paginatorTemplates);
+            table.events.onDataLoaded.push(updatePaginators);
+            setPageClickEvents(table);
+        }
+    };
+
+    function updatePaginators(table) {
+        var paginatorTemplates = table.store.paginatorTemplates;
+        for (i = 0, length = paginatorTemplates.length; i < length; i += 1) {
+            updatePaginator(table, paginatorTemplates[i]);
+        }
+    }
+
+    function updatePaginator(table, storeTemplate) {
+        var page = table.store.currentPage || 1;
+        var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
+        var start, end;
+        var length = table.settings.paginator.length;
+        var halfLength = Math.floor((length - 1) / 2);
+        var currentPaginatorLength = Math.min(storeTemplate.paginatorLength, numberOfPages);
+
+        start = Math.max(Math.floor(page - halfLength), 1);
+        end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
+
+        renderPaginator(table, storeTemplate, page, start, end);
+    }
+
+    function renderPaginator(table, storeTemplate, currentPage, start, end) {
+        var $newPageItem;
+        var $template = storeTemplate.$template;
+        var newPageItems = [];
+        for (var i = start; i <= end; i++) {
+            if (i != currentPage) {
+                $newPageItem = storeTemplate.$commonPageTemplate.clone();
+            } else {
+                $newPageItem = storeTemplate.$activePageTemplate ?
+                    storeTemplate.$activePageTemplate.clone() :
+                    storeTemplate.$commonPageTemplate.clone();
+            }
+            var innerPageElement = $newPageItem.find('[dt-paginator-inner]');
+            innerPageElement.html(i);
+            newPageItems.push($newPageItem);
+        }
+
+        var $newPageItems = $(newPageItems).map(function () { return this.toArray(); });
+        var $existingPageItems = $template.find('[dt-paginator-page]');
+        var $pageItemsToRemove = $(Array.prototype.slice.call($existingPageItems, 1, $existingPageItems.length));
+        $pageItemsToRemove.remove();
+        $existingPageItems.replaceWith($newPageItems);
+    }
+
+    function setPaginatorTemplateElements(table, $paginatorTemplates) {
+        table.store.paginatorTemplates = [];
+        for (var i = 0, length = $paginatorTemplates.length; i < length; i += 1) {
+            var $currentTemplate = $($paginatorTemplates[i]);
+            var currentTemplateStore = Object.create(paginatorTemplate).init();
+            var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
+            var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
+            currentTemplateStore.paginatorLength = $allPageItems.length;
+
+            // Set active page template
+            var $activePageTemplate = $currentTemplate.find('[dt-active]');
+            if ($activePageTemplate.length != 0) {
+                currentTemplateStore.$activePageTemplate = $activePageTemplate.first().clone();
+            } else {
+                currentTemplateStore.$activePageTemplate = $pageItemsWithoutActive.first();
+            }
+
+            // Set not active page template
+            if ($pageItemsWithoutActive.length > 0) {
+                currentTemplateStore.$commonPageTemplate = $pageItemsWithoutActive.first();
+                var $pageItemsToRemove = $(Array.prototype.slice.call($pageItemsWithoutActive, 1, $pageItemsWithoutActive.length));
+                $pageItemsToRemove.remove();
+            }
+
+            currentTemplateStore.$template = $currentTemplate;
+            table.store.paginatorTemplates.push(currentTemplateStore);
+        }
+    }
+
+    function setPageClickEvents(table) {
+        table.$table.on('click', '[dt-template=paginator] [dt-paginator-inner]', function () {
+            var $this = $(this);
+            var page = $this.html();
+
+            dataLoader.loadData(table, page);
+        });
+
+        table.$table.find('[dt-paginator-next]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+            if (currentPage == table.store.numberOfPages) return;
+
+            dataLoader.loadData(table, currentPage + 1);
+        });
+
+        table.$table.find('[dt-paginator-prev]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+            if (currentPage == 1) return;
+
+            dataLoader.loadData(table, currentPage - 1);
+        });
+
+        table.$table.find('[dt-paginator-first]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+
+            dataLoader.loadData(table, 1);
+        });
+
+        table.$table.find('[dt-paginator-last]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+            if (table.store.numberOfPages == 0) return;
+
+            dataLoader.loadData(table, table.store.numberOfPages);
+        });
+    }
+
+    return paginatorTemplatesInitialiser;
+})();
+
+module.exports = paginatorTemplatesInitialiser;
+},{"../../../js/dataLoader.js":7,"./paginatorTemplate.js":3}],5:[function(require,module,exports){
+var dataLoader = require('../../../js/dataLoader.js');
+var validator = require('../../../js/validator.js');
+
+var paginator = (function (dataLoader, validator) {
+    var paginator = {
+        init: function (table, settings) {
+            table.events.onDataLoaded.push(paginator.updatePaginator);
+            table.paginator = table.paginator || {};
+            setCustomPaginator(table, settings)
+        },
+        setPaginator: function (table, start, end, activePage) {
+            if (!table.paginator) {
+                table.paginator = Object.create(Object);
+            }
+
+            table.paginator.start = start;
+            table.paginator.end = end;
+
+            var $footer = table._$table.find('[pagination]');
+            $footer.children('.pagination').remove();
+            var $paginator = $('<ul></ul>')
+                .addClass('pagination');
+
+            if (table.paginator.start > 1) {
+                var $firstPageElement = $('<li><a href="#" page-first>' + 1 + '</a></li>');
+                var $previousPageElement = $('<li><a href="#" page-previous>' + '...' + '</a></li>');
+                $paginator.append($firstPageElement);
+                $paginator.append($previousPageElement);
+            }
+            for (var i = start; i <= end; i++) {
+                var $currentPageElement = $('<li><a href="#" page>' + i + '</a></li>');
+                $paginator.append($currentPageElement);
+                if (i == activePage) $currentPageElement.addClass('active');
+            }
+
+            if (table.paginator && table.store && table.paginator.end < table.store.numberOfPages) {
+                var $nextPageElement = $('<li><a href="#" page-next>' + '...' + '</a></li>');
+                var $lastPageElement = $('<li><a href="#" page-last>' + (table.store ? table.store.numberOfPages : "") + '</a></li>');
+                $paginator.append($nextPageElement);
+                $paginator.append($lastPageElement);
+            }
+
+            $footer.append($paginator);
+
+            return $paginator;
+        },
+
+        updatePaginator: function (table) {
+            var page = table.store.currentPage || 1;
+            var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
+            var start, end;
+            var length = table.settings.paginator.length;
+            var halfLength = Math.floor((length - 1) / 2);
+            var currentPaginatorLength = Math.min(length, numberOfPages);
+
+            table.paginator.currentPage = page;
+
+            table.store.numberOfPages = numberOfPages;
+            if (currentPaginatorLength > 0) {
+                start = Math.max(Math.floor(page - halfLength), 1);
+                end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
+                if (end - start + 1 < currentPaginatorLength) {
+                    end = page;
+                    start = Math.max(1, end - length + 1);
+                };
+            } else {
+                start = 0;
+                end = -1;
+            }
+
+            table.paginator.$paginator = paginator.setPaginator(table, start, end, page);
+        },
+
+        setPageClickEvents: function (table, dataLoader) {
+            table.$table.on('click', '.pagination li>a[page], li>a[page-first], li>a[page-last]', function (e) {
+                var page = $(e.target).html();
+
+                table.paginator.currentPage = page;
+                table.paginator.$paginator.children('li').removeClass('active');
+
+                dataLoader.loadData(table, page);
+            });
+
+            table.$table.on('click', 'li>a[page-next]', function (e) {
+                var page = parseInt(table.paginator.currentPage) + 1;
+
+                dataLoader.loadData(table, page, true);
+            });
+
+            table.$table.on('click', 'li>a[page-previous]', function (e) {
+                var page = parseInt(table.paginator.currentPage) - 1;
+                table.paginator.currentPage = page;
+
+                dataLoader.loadData(table, page, true);
+            });
+        }
+    };
+
+    function setCustomPaginator(table, settings) {
+        if (!settings.paginator) return;
+        if (settings.paginator.length) {
+            validator.ValidateShouldBeANumber(settings.paginator.length, "settings.paginator.length");
+            table.settings.paginator.length = settings.paginator.length;
+        }
+    }
+
+    return paginator;
+} (dataLoader, validator));
+
+module.exports = paginator;
+},{"../../../js/dataLoader.js":7,"../../../js/validator.js":17}],6:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
-var paginator = require('../js/paginator.js');
+var paginator = require('../js/Features/Paginator/paginator.js');
 var filter = require('../js/filter.js');
-var editable = require('../js/editable');
+var editable = require('../js/Features/Editable/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
 var features = require('../js/features.js');
 var renderer = require('../js/renderer.js');
 var spinner = require('../js/spinners.js');
-var paginatorTemplate = require('../js/paginatorTemplate.js');
+var paginatorTemplate = require('../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js');
 
 window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
     editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate) {
@@ -228,7 +604,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 })(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
 
 module.exports = window.dataTable;
-},{"../js/dataLoader.js":3,"../js/dt-settings.js":5,"../js/editable":6,"../js/features.js":7,"../js/filter.js":8,"../js/paginator.js":9,"../js/paginatorTemplate.js":10,"../js/renderer.js":11,"../js/selectable.js":12,"../js/sortable.js":13,"../js/spinners.js":14,"../js/validator.js":15}],3:[function(require,module,exports){
+},{"../js/Features/Editable/editable":2,"../js/Features/Paginator/paginator.js":5,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":4,"../js/dataLoader.js":7,"../js/dt-settings.js":9,"../js/features.js":10,"../js/filter.js":11,"../js/renderer.js":13,"../js/selectable.js":14,"../js/sortable.js":15,"../js/spinners.js":16,"../js/validator.js":17}],7:[function(require,module,exports){
 
 var paginator = require('../js/paginator.js');
 var selectable = require('../js/selectable.js');
@@ -340,7 +716,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":9,"../js/renderer.js":11,"../js/selectable.js":12,"../node_modules/q/q.js":16}],4:[function(require,module,exports){
+},{"../js/paginator.js":12,"../js/renderer.js":13,"../js/selectable.js":14,"../node_modules/q/q.js":18}],8:[function(require,module,exports){
 var defaultSettings = (function () {
     var defaultSettings = {
         pageSize: 10,
@@ -369,7 +745,7 @@ var defaultSettings = (function () {
 })();
 
 module.exports = defaultSettings;
-},{}],5:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var defaultSettings = require('../js/dt-default-settings.js');
 var validator = require('../js/validator.js');
 
@@ -491,94 +867,7 @@ var settings = (function (defaultSettings, validator) {
 })(defaultSettings, validator);
 
 module.exports = settings;
-},{"../js/dt-default-settings.js":4,"../js/validator.js":15}],6:[function(require,module,exports){
-var renderer = require('../js/renderer.js');
-var validator = require('../js/validator.js');
-
-var editable = (function () {
-
-    'use strict';
-    var editable = {
-        init: function (table, settings) {
-            setOnClickEvents(table);
-            configureSettings(table, settings);
-        },
-
-        // Replaces the content of a row with the edit template
-        renderEditRow: function (table, $row) {
-            $row.html(table.store.templates.editable.$template.html());
-            // Fill inputs with the current values
-            var $inputs = $row.find('.td-inner');
-            var identifier = $row.attr('data-identifier');
-            var rowData = table.store.pageData[identifier];
-            Array.prototype.forEach.call($inputs, function (el) {
-                var $el = $(el);
-                $el.attr('value', rowData[$el.attr('data-name')]);
-            }, this);
-
-            var $allRows = table.$table.find('tr');
-            Array.prototype.forEach.call($allRows, function (el) {
-                // var $el = $(el);
-                // if ($el.attr('data-identifier') != $row.attr('data-identifier')) {
-                //     $el.css('visibility', 'hidden');
-                // }
-            }, this);
-        },
-
-        updateRow: function (table, $row, template) {
-            var $inputs = $row.find('[data-name]');
-            var postData = {};
-            var identifier = $row.attr('data-identifier');
-            Array.prototype.forEach.call($inputs, function (el) {
-                var $el = $(el);
-                var curColName = $el.attr('data-name');
-                postData[curColName] = $el.prop('value') || $el.html();
-            });
-
-            var rowData = table.store.pageData[identifier];
-            table.settings.editable.update(
-                postData,
-                // SUCCESS
-                function () {
-                    for (var prop in postData) {
-                        rowData[prop] = postData[prop];
-                    }
-                },
-                // ERROR
-                function () {
-                    // Igonore error.
-                });
-            var $updatedRow = renderer.renderRow(table, rowData, template || 'main');
-            $row.html($updatedRow.html());
-
-            return postData;
-        }
-    };
-
-    function configureSettings(table, settings) {
-        if (!settings.editable) return;
-        validator.ValidateMustBeAFunction(settings.editable.update);
-        table.settings.editable = Object.create(Object.prototype);
-        table.settings.editable.update = settings.editable.update;
-    }
-
-    function setOnClickEvents(table) {
-        table.$table.on('click', '[dt-btn-edit]', function (e) {
-            var $row = $(this).parentsUntil('tr').parent();
-            editable.renderEditRow(table, $row);
-        });
-
-        table.$table.on('click', '[dt-btn-update]', function (e) {
-            var $row = $(this).parentsUntil('tr').parent();
-            editable.updateRow(table, $row, $(this).attr('dt-btn-update'));
-        });
-    }
-
-    return editable;
-} ());
-
-module.exports = editable;
-},{"../js/renderer.js":11,"../js/validator.js":15}],7:[function(require,module,exports){
+},{"../js/dt-default-settings.js":8,"../js/validator.js":17}],10:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 var renderer = require('../js/renderer.js');
 
@@ -617,7 +906,7 @@ var features = (function (dataLoader, renderer) {
 } (dataLoader, renderer));
 
 module.exports = features;
-},{"../js/dataLoader.js":3,"../js/renderer.js":11}],8:[function(require,module,exports){
+},{"../js/dataLoader.js":7,"../js/renderer.js":13}],11:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var filter = (function (dataLoader) {
@@ -668,7 +957,7 @@ var filter = (function (dataLoader) {
 } (dataLoader));
 
 module.exports = filter;
-},{"../js/dataLoader.js":3}],9:[function(require,module,exports){
+},{"../js/dataLoader.js":7}],12:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 var validator = require('../js/validator.js');
 
@@ -779,136 +1068,7 @@ var paginator = (function (dataLoader, validator) {
 } (dataLoader, validator));
 
 module.exports = paginator;
-},{"../js/dataLoader.js":3,"../js/validator.js":15}],10:[function(require,module,exports){
-var dataLoader = require('../js/dataLoader.js');
-
-var paginatorTemplate = (function () {
-    var paginatorTemplate = {
-        init: function (table) {
-            var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
-            if ($paginatorTemplates.length == 0) return;
-
-            setPaginatorTemplateElements(table, $paginatorTemplates);
-            table.events.onDataLoaded.push(updatePaginators);
-            setPageClickEvents(table);
-        }
-    };
-
-    function updatePaginators(table) {
-        var paginatorTemplates = table.store.paginatorTemplates;
-        for (i = 0, length = paginatorTemplates.length; i < length; i += 1) {
-            updatePaginator(table, paginatorTemplates[i]);
-        }
-    }
-
-    function updatePaginator(table, storeTemplate) {
-        var page = table.store.currentPage || 1;
-        var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
-        var start, end;
-        var length = table.settings.paginator.length;
-        var halfLength = Math.floor((length - 1) / 2);
-        var currentPaginatorLength = Math.min(storeTemplate.paginatorLength, numberOfPages);
-
-        start = Math.max(Math.floor(page - halfLength), 1);
-        end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
-
-        renderPaginator(table, storeTemplate, page, start, end);
-    }
-
-    function renderPaginator(table, storeTemplate, currentPage, start, end) {
-        var $newPageItem;
-        var $template = storeTemplate.$template;
-        var newPageItems = [];
-        for (var i = start; i <= end; i++) {
-            if (i != currentPage) {
-                $newPageItem = storeTemplate.$pageItem.clone();
-            } else {
-                $newPageItem = storeTemplate.$activePageTemplate ?
-                    storeTemplate.$activePageTemplate.clone() :
-                    storeTemplate.$pageItem.clone();
-            }
-            var innerPageElement = $newPageItem.find('[dt-paginator-inner]');
-            innerPageElement.html(i);
-            newPageItems.push($newPageItem);
-        }
-
-        var $newPageItems = $(newPageItems).map(function () { return this.toArray(); });
-        var $existingPageItems = $template.find('[dt-paginator-page]');
-        var $pageItemsToRemove = $(Array.prototype.slice.call($existingPageItems, 1, $existingPageItems.length));
-        $pageItemsToRemove.remove();
-        $existingPageItems.replaceWith($newPageItems);
-    }
-
-    function setPaginatorTemplateElements(table, $paginatorTemplates) {
-        table.store.paginatorTemplates = [];
-        for (var i = 0, length = $paginatorTemplates.length; i < length; i += 1) {
-            var $currentTemplate = $($paginatorTemplates[i]);
-            var currentTemplateStore = {};
-            var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
-            var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
-            currentTemplateStore.paginatorLength = $allPageItems.length;
-
-            // Set active page template
-            var $activePageTemplate = $currentTemplate.find('[dt-active]');
-            if ($activePageTemplate.length != 0) {
-                currentTemplateStore.$activePageTemplate = $activePageTemplate.first().clone();
-            } else {
-                currentTemplateStore.$activePageTemplate = $pageItemsWithoutActive.first();
-            }
-
-            // Set not active page template
-            if ($pageItemsWithoutActive.length > 0) {
-                currentTemplateStore.$pageItem = $pageItemsWithoutActive.first();
-                var $pageItemsToRemove = $(Array.prototype.slice.call($pageItemsWithoutActive, 1, $pageItemsWithoutActive.length));
-                $pageItemsToRemove.remove();
-            }
-
-            currentTemplateStore.$template = $currentTemplate;
-            table.store.paginatorTemplates.push(currentTemplateStore);
-        }
-    }
-
-    function setPageClickEvents(table) {
-        table.$table.on('click', '[dt-template=paginator] [dt-paginator-inner]', function () {
-            var $this = $(this);
-            var page = $this.html();
-
-            dataLoader.loadData(table, page);
-        });
-
-        table.$table.find('[dt-paginator-next]').on('click', function () {
-            var currentPage = parseInt(table.store.currentPage);
-            if (currentPage == table.store.numberOfPages) return;
-
-            dataLoader.loadData(table, currentPage + 1);
-        });
-
-        table.$table.find('[dt-paginator-prev]').on('click', function () {
-            var currentPage = parseInt(table.store.currentPage);
-            if (currentPage == 1) return;
-
-            dataLoader.loadData(table, currentPage - 1);
-        });
-
-        table.$table.find('[dt-paginator-first]').on('click', function () {
-            var currentPage = parseInt(table.store.currentPage);
-
-            dataLoader.loadData(table, 1);
-        });
-
-        table.$table.find('[dt-paginator-last]').on('click', function () {
-            var currentPage = parseInt(table.store.currentPage);
-            if (table.store.numberOfPages == 0) return;
-
-            dataLoader.loadData(table, table.store.numberOfPages);
-        });
-    }
-
-    return paginatorTemplate;
-})();
-
-module.exports = paginatorTemplate;
-},{"../js/dataLoader.js":3}],11:[function(require,module,exports){
+},{"../js/dataLoader.js":7,"../js/validator.js":17}],13:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = (function (selectable) {
@@ -1024,7 +1184,7 @@ var renderer = (function (selectable) {
 } (selectable));
 
 module.exports = renderer;
-},{"../js/selectable.js":12}],12:[function(require,module,exports){
+},{"../js/selectable.js":14}],14:[function(require,module,exports){
 var validator = require('../js/validator.js');
 var defaultSettings = require('../js/dt-default-settings.js');
 
@@ -1192,7 +1352,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{"../js/dt-default-settings.js":4,"../js/validator.js":15}],13:[function(require,module,exports){
+},{"../js/dt-default-settings.js":8,"../js/validator.js":17}],15:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
@@ -1230,7 +1390,7 @@ var sortable = (function (dataLoader) {
 })(dataLoader);
 
 module.exports = sortable;
-},{"../js/dataLoader.js":3}],14:[function(require,module,exports){
+},{"../js/dataLoader.js":7}],16:[function(require,module,exports){
 var defaultSettings = require('../js/dt-default-settings');
 
 // =====================================================================
@@ -1304,7 +1464,7 @@ var spinner = (function (defaultSettings) {
 } (defaultSettings));
 
 module.exports = spinner;
-},{"../js/dt-default-settings":4}],15:[function(require,module,exports){
+},{"../js/dt-default-settings":8}],17:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function (val, name, message) {
@@ -1350,6 +1510,12 @@ var validator = (function () {
             if (typeof (val) !== 'function') {
                 throw message || 'The type of ' + name + ' must be a function.';
             }
+        },
+
+        ValidateMustBeAJqueryObject(val, name, message) {
+            if (!(val instanceof $)) {
+                throw message || name + " must be a valid jQuery object.";
+            }   
         }
     };
 
@@ -1357,7 +1523,7 @@ var validator = (function () {
 })();
 
 module.exports = validator;
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -3409,4 +3575,4 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}]},{},[2]);
+},{"_process":1}]},{},[6]);

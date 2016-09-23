@@ -1,7 +1,8 @@
-var dataLoader = require('../js/dataLoader.js');
+var dataLoader = require('../../../js/dataLoader.js');
+var paginatorTemplate = require('./paginatorTemplate.js');
 
-var paginatorTemplate = (function () {
-    var paginatorTemplate = {
+var paginatorTemplatesInitialiser = (function () {
+    var paginatorTemplatesInitialiser = {
         init: function (table) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             if ($paginatorTemplates.length == 0) return;
@@ -39,11 +40,11 @@ var paginatorTemplate = (function () {
         var newPageItems = [];
         for (var i = start; i <= end; i++) {
             if (i != currentPage) {
-                $newPageItem = storeTemplate.$pageItem.clone();
+                $newPageItem = storeTemplate.$commonPageTemplate.clone();
             } else {
                 $newPageItem = storeTemplate.$activePageTemplate ?
                     storeTemplate.$activePageTemplate.clone() :
-                    storeTemplate.$pageItem.clone();
+                    storeTemplate.$commonPageTemplate.clone();
             }
             var innerPageElement = $newPageItem.find('[dt-paginator-inner]');
             innerPageElement.html(i);
@@ -61,7 +62,7 @@ var paginatorTemplate = (function () {
         table.store.paginatorTemplates = [];
         for (var i = 0, length = $paginatorTemplates.length; i < length; i += 1) {
             var $currentTemplate = $($paginatorTemplates[i]);
-            var currentTemplateStore = {};
+            var currentTemplateStore = Object.create(paginatorTemplate).init();
             var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
             var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
             currentTemplateStore.paginatorLength = $allPageItems.length;
@@ -76,7 +77,7 @@ var paginatorTemplate = (function () {
 
             // Set not active page template
             if ($pageItemsWithoutActive.length > 0) {
-                currentTemplateStore.$pageItem = $pageItemsWithoutActive.first();
+                currentTemplateStore.$commonPageTemplate = $pageItemsWithoutActive.first();
                 var $pageItemsToRemove = $(Array.prototype.slice.call($pageItemsWithoutActive, 1, $pageItemsWithoutActive.length));
                 $pageItemsToRemove.remove();
             }
@@ -122,7 +123,7 @@ var paginatorTemplate = (function () {
         });
     }
 
-    return paginatorTemplate;
+    return paginatorTemplatesInitialiser;
 })();
 
-module.exports = paginatorTemplate;
+module.exports = paginatorTemplatesInitialiser;

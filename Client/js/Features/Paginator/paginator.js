@@ -1,5 +1,5 @@
-var dataLoader = require('../js/dataLoader.js');
-var validator = require('../js/validator.js');
+var dataLoader = require('../../../js/dataLoader.js');
+var validator = require('../../../js/validator.js');
 
 var paginator = (function (dataLoader, validator) {
     var paginator = {

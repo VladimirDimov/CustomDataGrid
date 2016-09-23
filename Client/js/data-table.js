@@ -1,15 +1,15 @@
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
-var paginator = require('../js/paginator.js');
+var paginator = require('../js/Features/Paginator/paginator.js');
 var filter = require('../js/filter.js');
-var editable = require('../js/editable');
+var editable = require('../js/Features/Editable/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
 var features = require('../js/features.js');
 var renderer = require('../js/renderer.js');
 var spinner = require('../js/spinners.js');
-var paginatorTemplate = require('../js/paginatorTemplate.js');
+var paginatorTemplate = require('../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js');
 
 window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
     editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate) {
