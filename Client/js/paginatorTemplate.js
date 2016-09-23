@@ -93,7 +93,21 @@ var paginatorTemplate = (function () {
             var page = $this.html();
 
             dataLoader.loadData(table, page);
-        })
+        });
+
+        table.$table.find('[dt-paginator-next]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+            if (currentPage == table.store.numberOfPages) return;
+
+            dataLoader.loadData(table, currentPage + 1);
+        });
+
+        table.$table.find('[dt-paginator-prev]').on('click', function () {
+            var currentPage = parseInt(table.store.currentPage);
+            if (currentPage == 1) return;
+            
+            dataLoader.loadData(table, currentPage - 1);
+        });
     }
 
     return paginatorTemplate;
