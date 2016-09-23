@@ -823,7 +823,9 @@ var paginatorTemplate = (function () {
             if (i != currentPage) {
                 $newPageItem = storeTemplate.$pageItem.clone();
             } else {
-                $newPageItem = storeTemplate.$activePageTemplate.clone();
+                $newPageItem = storeTemplate.$activePageTemplate ?
+                    storeTemplate.$activePageTemplate.clone() :
+                    storeTemplate.$pageItem.clone();
             }
             var innerPageElement = $newPageItem.find('[dt-paginator-inner]');
             innerPageElement.html(i);
@@ -848,8 +850,12 @@ var paginatorTemplate = (function () {
             currentTemplateStore.paginatorLength = $allPageItems.length;
 
             // Set active page template
-            var $activePageTemplate = $currentTemplate.find('[dt-active]').clone();
-            currentTemplateStore.$activePageTemplate = $activePageTemplate;
+            var $activePageTemplate = $currentTemplate.find('[dt-active]');
+            if ($activePageTemplate.length != 0) {
+                currentTemplateStore.$activePageTemplate = $activePageTemplate.first().clone();
+            } else {
+                currentTemplateStore.$activePageTemplate = $pageItemsWithoutActive.first();
+            }
 
             // Set not active page template
             if ($pageItemsWithoutActive.length > 0) {
