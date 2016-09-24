@@ -207,6 +207,57 @@ var editable = (function () {
 
 module.exports = editable;
 },{"../../../js/renderer.js":13,"../../../js/validator.js":17}],3:[function(require,module,exports){
+var dataLoader = require('../../../js/dataLoader.js');
+
+var filterInitialiser = (function (dataLoader) {
+    'use strict';
+
+    return {
+        init: function (table) {
+            table.store.filter = [];
+            filterInitialiser.setFilterEvent(table);
+        },
+        setFilterEvent: function (table) {
+            var $filter = $(table.$table[0]).find('[filter]');
+            // var $filter = $(table.$table[0].querySelectorAll('[filter]'));
+            $filter.on('change', function () {
+                var $target = $(this);
+                var dictKey = this;
+                var filterOperator = $target.attr('filter');
+                var availableKeyElement;
+                var keyIndex = -1;
+
+                for (var index in table.store.filter) {
+                    keyIndex += 1;
+                    if (table.store.filter[index].key === dictKey) {
+                        availableKeyElement = true;
+                        break;
+                    }
+                }
+
+                var keyToAdd = {
+                    key: dictKey,
+                    value: {
+                        key: $target.attr('data-columnNames'),
+                        operator: filterOperator || 'ci',
+                        value: $target.val(),
+                    }
+                };
+
+                if (availableKeyElement) {
+                    table.store.filter[keyIndex] = keyToAdd;
+                } else {
+                    table.store.filter.push(keyToAdd);
+                }
+
+                dataLoader.loadData(table, 1);
+            });
+        }
+    };
+} (dataLoader));
+
+module.exports = filterInitialiser;
+},{"../../../js/dataLoader.js":8}],4:[function(require,module,exports){
 var validator = require('../../../js/validator.js');
 
 var paginatorTemplate = (function () {
@@ -254,7 +305,7 @@ var paginatorTemplate = (function () {
 })();
 
 module.exports = paginatorTemplate;
-},{"../../../js/validator.js":17}],4:[function(require,module,exports){
+},{"../../../js/validator.js":17}],5:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 var paginatorTemplate = require('./paginatorTemplate.js');
 
@@ -384,7 +435,7 @@ var paginatorTemplatesInitialiser = (function () {
 })();
 
 module.exports = paginatorTemplatesInitialiser;
-},{"../../../js/dataLoader.js":7,"./paginatorTemplate.js":3}],5:[function(require,module,exports){
+},{"../../../js/dataLoader.js":8,"./paginatorTemplate.js":4}],6:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 var validator = require('../../../js/validator.js');
 
@@ -495,12 +546,12 @@ var paginator = (function (dataLoader, validator) {
 } (dataLoader, validator));
 
 module.exports = paginator;
-},{"../../../js/dataLoader.js":7,"../../../js/validator.js":17}],6:[function(require,module,exports){
+},{"../../../js/dataLoader.js":8,"../../../js/validator.js":17}],7:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 var sortable = require('../js/sortable.js');
 var dataLoader = require('../js/dataLoader.js');
 var paginator = require('../js/Features/Paginator/paginator.js');
-var filter = require('../js/filter.js');
+var filter = require('../js/Features/Filter/filterInitialiser.js');
 var editable = require('../js/Features/Editable/editable');
 var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
@@ -604,7 +655,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 })(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
 
 module.exports = window.dataTable;
-},{"../js/Features/Editable/editable":2,"../js/Features/Paginator/paginator.js":5,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":4,"../js/dataLoader.js":7,"../js/dt-settings.js":9,"../js/features.js":10,"../js/filter.js":11,"../js/renderer.js":13,"../js/selectable.js":14,"../js/sortable.js":15,"../js/spinners.js":16,"../js/validator.js":17}],7:[function(require,module,exports){
+},{"../js/Features/Editable/editable":2,"../js/Features/Filter/filterInitialiser.js":3,"../js/Features/Paginator/paginator.js":6,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":5,"../js/dataLoader.js":8,"../js/dt-settings.js":10,"../js/features.js":11,"../js/renderer.js":13,"../js/selectable.js":14,"../js/sortable.js":15,"../js/spinners.js":16,"../js/validator.js":17}],8:[function(require,module,exports){
 
 var paginator = require('../js/paginator.js');
 var selectable = require('../js/selectable.js');
@@ -716,7 +767,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/paginator.js":12,"../js/renderer.js":13,"../js/selectable.js":14,"../node_modules/q/q.js":18}],8:[function(require,module,exports){
+},{"../js/paginator.js":12,"../js/renderer.js":13,"../js/selectable.js":14,"../node_modules/q/q.js":18}],9:[function(require,module,exports){
 var defaultSettings = (function () {
     var defaultSettings = {
         pageSize: 10,
@@ -745,7 +796,7 @@ var defaultSettings = (function () {
 })();
 
 module.exports = defaultSettings;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var defaultSettings = require('../js/dt-default-settings.js');
 var validator = require('../js/validator.js');
 
@@ -867,7 +918,7 @@ var settings = (function (defaultSettings, validator) {
 })(defaultSettings, validator);
 
 module.exports = settings;
-},{"../js/dt-default-settings.js":8,"../js/validator.js":17}],10:[function(require,module,exports){
+},{"../js/dt-default-settings.js":9,"../js/validator.js":17}],11:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 var renderer = require('../js/renderer.js');
 
@@ -906,58 +957,7 @@ var features = (function (dataLoader, renderer) {
 } (dataLoader, renderer));
 
 module.exports = features;
-},{"../js/dataLoader.js":7,"../js/renderer.js":13}],11:[function(require,module,exports){
-var dataLoader = require('../js/dataLoader.js');
-
-var filter = (function (dataLoader) {
-    'use strict';
-
-    return {
-        init: function (table) {
-            table.store.filter = [];
-            filter.setFilterEvent(table);
-        },
-        setFilterEvent: function (table) {
-            var $filter = $(table.$table[0]).find('[filter]');
-            // var $filter = $(table.$table[0].querySelectorAll('[filter]'));
-            $filter.on('change', function () {
-                var $target = $(this);
-                var dictKey = this;
-                var filterOperator = $target.attr('filter');
-                var availableKeyElement;
-                var keyIndex = -1;
-
-                for (var index in table.store.filter) {
-                    keyIndex += 1;
-                    if (table.store.filter[index].key === dictKey) {
-                        availableKeyElement = true;
-                        break;
-                    }
-                }
-
-                var keyToAdd = {
-                    key: dictKey,
-                    value: {
-                        key: $target.attr('data-columnNames'),
-                        operator: filterOperator || 'ci',
-                        value: $target.val(),
-                    }
-                };
-
-                if (availableKeyElement) {
-                    table.store.filter[keyIndex] = keyToAdd;
-                } else {
-                    table.store.filter.push(keyToAdd);
-                }
-
-                dataLoader.loadData(table, 1);
-            });
-        }
-    };
-} (dataLoader));
-
-module.exports = filter;
-},{"../js/dataLoader.js":7}],12:[function(require,module,exports){
+},{"../js/dataLoader.js":8,"../js/renderer.js":13}],12:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 var validator = require('../js/validator.js');
 
@@ -1068,7 +1068,7 @@ var paginator = (function (dataLoader, validator) {
 } (dataLoader, validator));
 
 module.exports = paginator;
-},{"../js/dataLoader.js":7,"../js/validator.js":17}],13:[function(require,module,exports){
+},{"../js/dataLoader.js":8,"../js/validator.js":17}],13:[function(require,module,exports){
 var selectable = require('../js/selectable.js');
 
 var renderer = (function (selectable) {
@@ -1352,7 +1352,7 @@ var selectable = (function () {
 })();
 
 module.exports = selectable;
-},{"../js/dt-default-settings.js":8,"../js/validator.js":17}],15:[function(require,module,exports){
+},{"../js/dt-default-settings.js":9,"../js/validator.js":17}],15:[function(require,module,exports){
 var dataLoader = require('../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
@@ -1390,7 +1390,7 @@ var sortable = (function (dataLoader) {
 })(dataLoader);
 
 module.exports = sortable;
-},{"../js/dataLoader.js":7}],16:[function(require,module,exports){
+},{"../js/dataLoader.js":8}],16:[function(require,module,exports){
 var defaultSettings = require('../js/dt-default-settings');
 
 // =====================================================================
@@ -1464,7 +1464,7 @@ var spinner = (function (defaultSettings) {
 } (defaultSettings));
 
 module.exports = spinner;
-},{"../js/dt-default-settings":8}],17:[function(require,module,exports){
+},{"../js/dt-default-settings":9}],17:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function (val, name, message) {
@@ -3575,4 +3575,4 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}]},{},[6]);
+},{"_process":1}]},{},[7]);

@@ -1,12 +1,12 @@
-var dataLoader = require('../js/dataLoader.js');
+var dataLoader = require('../../../js/dataLoader.js');
 
-var filter = (function (dataLoader) {
+var filterInitialiser = (function (dataLoader) {
     'use strict';
 
     return {
         init: function (table) {
             table.store.filter = [];
-            filter.setFilterEvent(table);
+            filterInitialiser.setFilterEvent(table);
         },
         setFilterEvent: function (table) {
             var $filter = $(table.$table[0]).find('[filter]');
@@ -47,4 +47,4 @@ var filter = (function (dataLoader) {
     };
 } (dataLoader));
 
-module.exports = filter;
+module.exports = filterInitialiser;
