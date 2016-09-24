@@ -1,4 +1,4 @@
-var dataLoader = require('../js/dataLoader.js');
+var dataLoader = require('../../../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
     'use strict';

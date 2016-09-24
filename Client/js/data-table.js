@@ -1,5 +1,5 @@
 var selectable = require('../js/selectable.js');
-var sortable = require('../js/sortable.js');
+var sortable = require('../js/Features/Sortable/sortableInitialiser.js');
 var dataLoader = require('../js/dataLoader.js');
 var paginator = require('../js/Features/Paginator/paginator.js');
 var filter = require('../js/Features/Filter/filterInitialiser.js');
