@@ -1,4 +1,4 @@
-var defaultSettings = require('../../../js/dt-default-settings');
+var defaultSettings = require('../../../js/defaultSettings');
 
 // =====================================================================
 // Example Configuration:

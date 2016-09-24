@@ -1,4 +1,4 @@
-var defaultSettings = require('../js/dt-default-settings.js');
+var defaultSettings = require('../js/defaultSettings.js');
 var validator = require('../js/validator.js');
 
 var settings = (function (defaultSettings, validator) {

@@ -1,5 +1,5 @@
 var validator = require('../../../js/validator.js');
-var defaultSettings = require('../../../js/dt-default-settings.js');
+var defaultSettings = require('../../../js/defaultSettings.js');
 
 var selectableInitialiser = (function () {
     var selectable = {

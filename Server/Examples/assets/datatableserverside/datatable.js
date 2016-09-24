@@ -158,7 +158,7 @@ var features = (function (dataLoader, renderer) {
 } (dataLoader, renderer));
 
 module.exports = features;
-},{"../../../js/dataLoader.js":12,"../../../js/renderer.js":15}],3:[function(require,module,exports){
+},{"../../../js/dataLoader.js":12,"../../../js/renderer.js":14}],3:[function(require,module,exports){
 var renderer = require('../../../js/renderer.js');
 var validator = require('../../../js/validator.js');
 
@@ -245,7 +245,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../../../js/renderer.js":15,"../../../js/validator.js":16}],4:[function(require,module,exports){
+},{"../../../js/renderer.js":14,"../../../js/validator.js":16}],4:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 
 var filterInitialiser = (function (dataLoader) {
@@ -587,7 +587,7 @@ var paginator = (function (dataLoader, validator) {
 module.exports = paginator;
 },{"../../../js/dataLoader.js":12,"../../../js/validator.js":16}],8:[function(require,module,exports){
 var validator = require('../../../js/validator.js');
-var defaultSettings = require('../../../js/dt-default-settings.js');
+var defaultSettings = require('../../../js/defaultSettings.js');
 
 var selectableInitialiser = (function () {
     var selectable = {
@@ -753,7 +753,7 @@ var selectableInitialiser = (function () {
 })();
 
 module.exports = selectableInitialiser;
-},{"../../../js/dt-default-settings.js":13,"../../../js/validator.js":16}],9:[function(require,module,exports){
+},{"../../../js/defaultSettings.js":13,"../../../js/validator.js":16}],9:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
@@ -792,7 +792,7 @@ var sortable = (function (dataLoader) {
 
 module.exports = sortable;
 },{"../../../js/dataLoader.js":12}],10:[function(require,module,exports){
-var defaultSettings = require('../../../js/dt-default-settings');
+var defaultSettings = require('../../../js/defaultSettings');
 
 // =====================================================================
 // Example Configuration:
@@ -865,7 +865,7 @@ var spinnerInitialiser = (function (defaultSettings) {
 } (defaultSettings));
 
 module.exports = spinnerInitialiser;
-},{"../../../js/dt-default-settings":13}],11:[function(require,module,exports){
+},{"../../../js/defaultSettings":13}],11:[function(require,module,exports){
 var selectable = require('../js/Features/Selectable/selectable.js');
 var sortable = require('../js/Features/Sortable/sortableInitialiser.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -873,7 +873,7 @@ var paginator = require('../js/Features/Paginator/paginator.js');
 var filter = require('../js/Features/Filter/filterInitialiser.js');
 var editable = require('../js/Features/Editable/editable');
 var validator = require('../js/validator.js');
-var settingsExternal = require('../js/dt-settings.js');
+var settings = require('../js/settings.js');
 var features = require('../js/Features/AdditionalFeatures/additionalFeatures.js');
 var renderer = require('../js/renderer.js');
 var spinner = require('../js/Features/Spinners/spinnerInitialiser.js');
@@ -971,10 +971,10 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settings, features, renderer, spinner, paginatorTemplate);
 
 module.exports = window.dataTable;
-},{"../js/Features/AdditionalFeatures/additionalFeatures.js":2,"../js/Features/Editable/editable":3,"../js/Features/Filter/filterInitialiser.js":4,"../js/Features/Paginator/paginator.js":7,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":6,"../js/Features/Selectable/selectable.js":8,"../js/Features/Sortable/sortableInitialiser.js":9,"../js/Features/Spinners/spinnerInitialiser.js":10,"../js/dataLoader.js":12,"../js/dt-settings.js":14,"../js/renderer.js":15,"../js/validator.js":16}],12:[function(require,module,exports){
+},{"../js/Features/AdditionalFeatures/additionalFeatures.js":2,"../js/Features/Editable/editable":3,"../js/Features/Filter/filterInitialiser.js":4,"../js/Features/Paginator/paginator.js":7,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":6,"../js/Features/Selectable/selectable.js":8,"../js/Features/Sortable/sortableInitialiser.js":9,"../js/Features/Spinners/spinnerInitialiser.js":10,"../js/dataLoader.js":12,"../js/renderer.js":14,"../js/settings.js":15,"../js/validator.js":16}],12:[function(require,module,exports){
 
 var paginator = require('../js/Features/Paginator/paginator.js');
 // var selectable = require('../js/Features/Selectable/selectable.js');
@@ -1086,7 +1086,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/Features/Paginator/paginator.js":7,"../js/renderer.js":15,"../node_modules/q/q.js":17}],13:[function(require,module,exports){
+},{"../js/Features/Paginator/paginator.js":7,"../js/renderer.js":14,"../node_modules/q/q.js":17}],13:[function(require,module,exports){
 var defaultSettings = (function () {
     var defaultSettings = {
         pageSize: 10,
@@ -1116,7 +1116,123 @@ var defaultSettings = (function () {
 
 module.exports = defaultSettings;
 },{}],14:[function(require,module,exports){
-var defaultSettings = require('../js/dt-default-settings.js');
+var selectable = require('../js/Features/Selectable/selectable.js');
+
+var renderer = (function (selectable) {
+    'use strict';
+
+    var renderer = {
+
+        init: function (table) {
+            setButtonEvents(table);
+            setTemplates(table);
+        },
+
+        // Renders table cell. If there is a custom defined render function calls it first.
+        renderCell: function (table, colName, content, rowData) {
+            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
+                return table.settings.columns[colName].render(content, rowData);
+            };
+
+            return content;
+        },
+
+        renderRow: function (table, rowData, templateName) {
+            var identifier = rowData[table.settings.features.identifier];
+            var $row;
+            var propValue, $template;
+
+            if (templateName != undefined && table.store.templates.main) {
+                var $containers = table.store.templates[templateName].$containers;
+                for (var i = 0, l = $containers.length; i < l; i += 1) {
+                    var $container = $($containers[i]);
+                    var propName = $container.attr('data-name');
+                    var propValue = rowData[propName];
+                    var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
+                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
+                    var attributeValue = $container.attr('value');
+                    if (typeof attributeValue === typeof undefined || attributeValue === false) {
+                        $container.html(cellData);
+                    } else {
+                        $container.attr('value', cellData);
+                    }
+                }
+
+                $row = table.store.templates[templateName].$template.clone();
+            } else {
+                // If there is no main template provided the renderer will render the cells directly into the td elements
+                $row = $('<tr>');
+                for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
+                    var propName = table.store.columnPropertyNames[col];
+
+                    if (!propName) {
+                        throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+                    }
+
+                    propValue = rowData[propName];
+
+                    var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
+                    $row.append($col);
+                }
+            }
+
+            $row.attr('data-identifier', identifier);
+
+            return $row;
+        },
+
+        RenderTableBody: function (table, data) {
+            var $tbody = table.$table.find('tbody').empty();
+            var buffer = [];
+            for (var row = 0; row < data.length; row++) {
+                var rowData = data[row];
+                var $row = renderer.renderRow(table, rowData, 'main');
+                buffer.push($row);
+            }
+
+            $tbody.append(buffer);
+        }
+    };
+
+    function setTemplates(table) {
+        table.store.templates = {};
+        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+        $templatesOrigin.remove();
+        var $templates = $templatesOrigin.clone();
+        if ($templates.length != 0) {
+            Array.prototype.forEach.call($templates, function (el) {
+                var $el = $(el);
+                var template = {};
+                template.$template = $el;
+                template.$containers = $el.find('[data-name]');
+                table.store.templates[$el.attr('dt-template')] = template;
+                $el.removeAttr('dt-template');
+            });
+        }
+    }
+
+    function setButtonEvents(table) {
+        table.$table.on('click', '[dt-btn-template]', function () {
+            var $this = $(this);
+            var $curRow = $this.parentsUntil('tr').parent();
+            var identifier = $curRow.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
+
+            // fade in the new template
+            var delay = $this.attr('dt-delay') || 0;
+            $($curRow).fadeOut(0,0);
+            $curRow.html($rowFromTemplate.html());
+            $($curRow).fadeIn(parseInt(delay));
+        })
+    }
+
+    return renderer;
+} (selectable));
+
+module.exports = renderer;
+},{"../js/Features/Selectable/selectable.js":8}],15:[function(require,module,exports){
+var defaultSettings = require('../js/defaultSettings.js');
 var validator = require('../js/validator.js');
 
 var settings = (function (defaultSettings, validator) {
@@ -1237,123 +1353,7 @@ var settings = (function (defaultSettings, validator) {
 })(defaultSettings, validator);
 
 module.exports = settings;
-},{"../js/dt-default-settings.js":13,"../js/validator.js":16}],15:[function(require,module,exports){
-var selectable = require('../js/Features/Selectable/selectable.js');
-
-var renderer = (function (selectable) {
-    'use strict';
-
-    var renderer = {
-
-        init: function (table) {
-            setButtonEvents(table);
-            setTemplates(table);
-        },
-
-        // Renders table cell. If there is a custom defined render function calls it first.
-        renderCell: function (table, colName, content, rowData) {
-            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-                return table.settings.columns[colName].render(content, rowData);
-            };
-
-            return content;
-        },
-
-        renderRow: function (table, rowData, templateName) {
-            var identifier = rowData[table.settings.features.identifier];
-            var $row;
-            var propValue, $template;
-
-            if (templateName != undefined && table.store.templates.main) {
-                var $containers = table.store.templates[templateName].$containers;
-                for (var i = 0, l = $containers.length; i < l; i += 1) {
-                    var $container = $($containers[i]);
-                    var propName = $container.attr('data-name');
-                    var propValue = rowData[propName];
-                    var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
-                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
-                    var attributeValue = $container.attr('value');
-                    if (typeof attributeValue === typeof undefined || attributeValue === false) {
-                        $container.html(cellData);
-                    } else {
-                        $container.attr('value', cellData);
-                    }
-                }
-
-                $row = table.store.templates[templateName].$template.clone();
-            } else {
-                // If there is no main template provided the renderer will render the cells directly into the td elements
-                $row = $('<tr>');
-                for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
-                    var propName = table.store.columnPropertyNames[col];
-
-                    if (!propName) {
-                        throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
-                    }
-
-                    propValue = rowData[propName];
-
-                    var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
-                    $row.append($col);
-                }
-            }
-
-            $row.attr('data-identifier', identifier);
-
-            return $row;
-        },
-
-        RenderTableBody: function (table, data) {
-            var $tbody = table.$table.find('tbody').empty();
-            var buffer = [];
-            for (var row = 0; row < data.length; row++) {
-                var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData, 'main');
-                buffer.push($row);
-            }
-
-            $tbody.append(buffer);
-        }
-    };
-
-    function setTemplates(table) {
-        table.store.templates = {};
-        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
-        $templatesOrigin.remove();
-        var $templates = $templatesOrigin.clone();
-        if ($templates.length != 0) {
-            Array.prototype.forEach.call($templates, function (el) {
-                var $el = $(el);
-                var template = {};
-                template.$template = $el;
-                template.$containers = $el.find('[data-name]');
-                table.store.templates[$el.attr('dt-template')] = template;
-                $el.removeAttr('dt-template');
-            });
-        }
-    }
-
-    function setButtonEvents(table) {
-        table.$table.on('click', '[dt-btn-template]', function () {
-            var $this = $(this);
-            var $curRow = $this.parentsUntil('tr').parent();
-            var identifier = $curRow.attr('data-identifier');
-            var rowData = table.store.pageData[identifier];
-            var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
-
-            // fade in the new template
-            var delay = $this.attr('dt-delay') || 0;
-            $($curRow).fadeOut(0,0);
-            $curRow.html($rowFromTemplate.html());
-            $($curRow).fadeIn(parseInt(delay));
-        })
-    }
-
-    return renderer;
-} (selectable));
-
-module.exports = renderer;
-},{"../js/Features/Selectable/selectable.js":8}],16:[function(require,module,exports){
+},{"../js/defaultSettings.js":13,"../js/validator.js":16}],16:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function (val, name, message) {

@@ -5,7 +5,7 @@ var paginator = require('../js/Features/Paginator/paginator.js');
 var filter = require('../js/Features/Filter/filterInitialiser.js');
 var editable = require('../js/Features/Editable/editable');
 var validator = require('../js/validator.js');
-var settingsExternal = require('../js/dt-settings.js');
+var settings = require('../js/settings.js');
 var features = require('../js/Features/AdditionalFeatures/additionalFeatures.js');
 var renderer = require('../js/renderer.js');
 var spinner = require('../js/Features/Spinners/spinnerInitialiser.js');
@@ -103,6 +103,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
     };
 
     return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settings, features, renderer, spinner, paginatorTemplate);
 
 module.exports = window.dataTable;
