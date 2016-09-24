@@ -1,7 +1,7 @@
-var validator = require('../js/validator.js');
-var defaultSettings = require('../js/dt-default-settings.js');
+var validator = require('../../../js/validator.js');
+var defaultSettings = require('../../../js/dt-default-settings.js');
 
-var selectable = (function () {
+var selectableInitialiser = (function () {
     var selectable = {
         init: function (table, settings) {
             if (!isSelectable(settings)) {
@@ -164,4 +164,4 @@ var selectable = (function () {
     return selectable;
 })();
 
-module.exports = selectable;
+module.exports = selectableInitialiser;

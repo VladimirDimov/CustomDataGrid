@@ -206,7 +206,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../../../js/renderer.js":13,"../../../js/validator.js":16}],3:[function(require,module,exports){
+},{"../../../js/renderer.js":14,"../../../js/validator.js":16}],3:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 
 var filterInitialiser = (function (dataLoader) {
@@ -257,7 +257,7 @@ var filterInitialiser = (function (dataLoader) {
 } (dataLoader));
 
 module.exports = filterInitialiser;
-},{"../../../js/dataLoader.js":9}],4:[function(require,module,exports){
+},{"../../../js/dataLoader.js":10}],4:[function(require,module,exports){
 var validator = require('../../../js/validator.js');
 
 var paginatorTemplate = (function () {
@@ -435,7 +435,7 @@ var paginatorTemplatesInitialiser = (function () {
 })();
 
 module.exports = paginatorTemplatesInitialiser;
-},{"../../../js/dataLoader.js":9,"./paginatorTemplate.js":4}],6:[function(require,module,exports){
+},{"../../../js/dataLoader.js":10,"./paginatorTemplate.js":4}],6:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 var validator = require('../../../js/validator.js');
 
@@ -546,576 +546,11 @@ var paginator = (function (dataLoader, validator) {
 } (dataLoader, validator));
 
 module.exports = paginator;
-},{"../../../js/dataLoader.js":9,"../../../js/validator.js":16}],7:[function(require,module,exports){
-var dataLoader = require('../../../js/dataLoader.js');
-
-var sortable = (function (dataLoader) {
-    'use strict';
-    return {
-        init: function (table) {
-            var $sortables = table.$table.find('th[sortable]');
-            $sortables.find('.th-inner').addClass('sortable both');
-            table.store.$sortables = $sortables;
-            $sortables.on('click', function (e) {
-                var $target = $(this);
-                var name = $target.attr('data-name');
-                var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
-                table.orderBy = {
-                    Name: name,
-                    Asc: isAsc
-                };
-
-                dataLoader.loadData(table, 1)
-                    .then(function () {
-                        // table.store.$sortables.removeAttr('asc desc');
-                        table.store.$sortables.find('.th-inner').removeClass('asc desc');
-
-                        if (isAsc) {
-                            $target.find('.th-inner').addClass('sortable both asc');
-                            $target.find('.th-inner').removeClass('desc');
-                        } else {
-                            $target.find('.th-inner').addClass('sortable both desc');
-                            $target.find('.th-inner').removeClass('asc');
-                        }
-                    });
-            });
-        },
-    }
-})(dataLoader);
-
-module.exports = sortable;
-},{"../../../js/dataLoader.js":9}],8:[function(require,module,exports){
-var selectable = require('../js/selectable.js');
-var sortable = require('../js/Features/Sortable/sortableInitialiser.js');
-var dataLoader = require('../js/dataLoader.js');
-var paginator = require('../js/Features/Paginator/paginator.js');
-var filter = require('../js/Features/Filter/filterInitialiser.js');
-var editable = require('../js/Features/Editable/editable');
-var validator = require('../js/validator.js');
-var settingsExternal = require('../js/dt-settings.js');
-var features = require('../js/features.js');
-var renderer = require('../js/renderer.js');
-var spinner = require('../js/spinners.js');
-var paginatorTemplate = require('../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js');
-
-window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
-    editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate) {
-    'use strict'
-
-    var table = {
-        init: function (selector, settings) {
-            this._$table = $(selector).first();
-
-            // Settings
-            this._settings = settingsExternal.init(settings);
-            // Init objects
-            configureEvents(this);
-            configureStore(this);
-
-            configurePaginator(this, settings, dataLoader);
-            spinner.init(this, settings);
-            filter.init(table);
-            sortable.init(table);
-            editable.init(this, settings);
-            selectable.init(this, settings);
-            features.init(this);
-            renderer.init(this);
-            paginatorTemplate.init(table);
-
-            dataLoader.loadData(table, 1, true);
-
-            return this;
-        },
-
-        get settings() {
-            return this._settings;
-        },
-
-        get paginator() {
-            return this._paginator;
-        },
-        set paginator(val) {
-            this._paginator = val;
-        },
-
-        get $table() {
-            return this._$table;
-        },
-
-        get filter() {
-            return table.store.filter;
-        },
-
-        getSelected: function () {
-            return selectable.getSelected(this);
-        },
-
-        get columnPropertyNames() {
-            return this._columnPropertyNames;
-        }
-    };
-
-    function configureEvents(table) {
-        table.events = Object.create(Object);
-        table.events.onDataLoaded = [];
-        table.events.onDataLoading = [];
-        table.events.onTableRendered = [];
-    }
-
-    function configureStore(table) {
-        table.store = {
-            columnPropertyNames: getColumnPropertyNames(),
-            pageData: null,
-            data: {},
-            requestIdentifiersOnDataLoad: false,
-        };
-    }
-
-    function configurePaginator(table, settings, dataLoader) {
-        paginator.init(table, settings);
-        paginator.setPageClickEvents(table, dataLoader);
-    }
-
-    function getColumnPropertyNames() {
-        var colPropNames = [];
-        var $columns = table.$table.find('thead th');
-        for (var i = 0; i < $columns.length; i++) {
-            var colName = $($columns[i]).attr('data-name');
-            if (colName) {
-                colPropNames.push(colName);
-            }
-        }
-
-        return colPropNames;
-    };
-
-    return table;
-})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
-
-module.exports = window.dataTable;
-},{"../js/Features/Editable/editable":2,"../js/Features/Filter/filterInitialiser.js":3,"../js/Features/Paginator/paginator.js":6,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":5,"../js/Features/Sortable/sortableInitialiser.js":7,"../js/dataLoader.js":9,"../js/dt-settings.js":11,"../js/features.js":12,"../js/renderer.js":13,"../js/selectable.js":14,"../js/spinners.js":15,"../js/validator.js":16}],9:[function(require,module,exports){
-
-var paginator = require('../js/Features/Paginator/paginator.js');
-var selectable = require('../js/selectable.js');
-var tableRenderer = require('../js/renderer.js');
-var q = require('../node_modules/q/q.js')
-
-var dataLoader = (function () {
-    var dataLoader = {
-        loadData: function (table, page, isUpdatePaginator) {
-            var deferred = q.defer();
-
-            // Execute onDataLoading events
-            for (var index in table.events.onDataLoading) {
-                table.events.onDataLoading[index](table);
-            }
-
-            var filter = formatFilterRequestValues(table.store.filter);
-
-            $.ajax({
-                url: table.settings.ajax.url,
-                dataType: 'json',
-                contentType: 'application/json; charset=utf-8',
-                data: {
-                    identifierPropName: table.settings.features.identifier,
-                    getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
-                    page: page,
-                    pageSize: table.settings.paging.pageSize,
-                    filter: JSON.stringify(filter),
-                    orderBy: table.orderBy ? table.orderBy.Name : null,
-                    asc: table.orderBy ? table.orderBy.Asc : true
-                },
-                success: function (data) {
-                    // Add result to the dataTable object
-                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber, page);
-
-                    // Invoke events on dataLoaded
-                    for (var index in table.events.onDataLoaded) {
-                        table.events.onDataLoaded[index](table);
-                    }
-
-                    tableRenderer.RenderTableBody(table, data.data);
-
-                    // Invoke events on tableRendered
-                    for (var index in table.events.onTableRendered) {
-                        table.events.onTableRendered[index](table);
-                    }
-
-                    deferred.resolve();
-                },
-                error: function (err) {
-                    table.$table.html(err.responseText);
-                }
-            });
-
-            return deferred.promise;
-        }
-    };
-
-    function formatFilterRequestValues(filterObj) {
-        var filters = [];
-        for (var filter in filterObj) {
-            filters.push({
-                key: filterObj[filter].value.key,
-                value: {
-                    operator: filterObj[filter].value.operator,
-                    value: filterObj[filter].value.value
-                }
-            });
-        }
-
-        return filters;
-    }
-
-    function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
-        var dataObj = {};
-        var identifierName = table.settings.features.identifier;
-
-        table.store.currentPage = currentPage;
-
-        for (var i = 0, l = data.length; i < l; i += 1) {
-            var curDataRow = data[i];
-            dataObj[curDataRow[identifierName]] = curDataRow;
-        }
-        table.store.pageData = dataObj;
-
-        table.store.numberOfRows = rowsNumber;
-        if (table.settings.paging.enable) {
-            table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
-        }
-
-        initIdentifiers(table, identifiers);
-    }
-
-    function initIdentifiers(table, identifiers) {
-        if (!identifiers) {
-            return;
-        }
-
-        table.store.identifiers = {};
-
-        for (var i = 0, l = identifiers.length; i < l; i += 1) {
-            table.store.identifiers[identifiers[i]] = {
-                selected: false,
-            };
-        }
-    }
-
-    return dataLoader;
-} ());
-
-module.exports = dataLoader;
-},{"../js/Features/Paginator/paginator.js":6,"../js/renderer.js":13,"../js/selectable.js":14,"../node_modules/q/q.js":17}],10:[function(require,module,exports){
-var defaultSettings = (function () {
-    var defaultSettings = {
-        pageSize: 10,
-
-        paginator: {
-            length: 5
-        },
-
-        features: {
-            selectable: {
-                enable: false,
-                multi: false,
-                cssClasses: 'active',
-            }
-        },
-
-        spinner: {
-            enable: true,
-            style: 0,
-            width: '100px',
-            opacity: 1,
-        }
-    };
-
-    return defaultSettings;
-})();
-
-module.exports = defaultSettings;
-},{}],11:[function(require,module,exports){
-var defaultSettings = require('../js/dt-default-settings.js');
-var validator = require('../js/validator.js');
-
-var settings = (function (defaultSettings, validator) {
-    var settings = {
-        init: function (settings) {
-            validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
-
-            // Init default values
-            this.paging = {
-                enable: true,
-                pageSize: defaultSettings.pageSize
-            };
-            this.paginator = defaultSettings.paginator;
-            this.features = defaultSettings.features;
-
-            // Set custom values
-            setCustomPaging.call(this, settings.paging);
-            // setCustomPaginator.call(this, settings.paginator);
-            setCustomFeatures.call(this, settings.features);
-            setCustomColumns.call(this, settings.columns);
-            setCustomEditable.call(this, settings.editable);
-
-            this.ajax = settings.ajax;
-
-            return this;
-        },
-
-        get paginator() {
-            return this._paginator;
-        },
-        set paginator(val) {
-            this._paginator = val;
-        },
-
-        get features() {
-            return this._features;
-        },
-        set features(val) {
-            this._features = val;
-        },
-
-        get ajax() {
-            return this._ajax;
-        },
-        set ajax(val) {
-            validator.ValidateValueCannotBeNullOrUndefined(val, "ajax", "The ajax propery of the settings object is required");
-            validator.ValidateValueCannotBeNullOrUndefined(val.url, "ajax.url");
-
-            this._ajax = val;
-        },
-
-        get columns() {
-            return this._columns;
-        },
-        set columns(val) {
-            if (!val) return;
-            for (var prop in val) {
-                if (val[prop].render) {
-                    validator.ValidateMustBeAFunction(val[prop].render, "columns." + prop + ".render()");
-                }
-            }
-
-            this._columns = val;
-        }
-    };
-
-    function setCustomPaging(paging) {
-        if (!paging) return;
-        if (paging.pageSize) {
-            this.paging.pageSize = paging.pageSize;
-        }
-
-        if (paging.enable != undefined && paging.enable === false) {
-            this.paging.enable = false;
-        } else {
-            paging.enable = true;
-        }
-    }
-
-    function setCustomFeatures(features) {
-        if (!features) return;
-        if (features.selectable) {
-            if (features.selectable.enable != undefined) {
-                validator.ValidateMustBeValidBoolean(features.selectable.enable, "features.selectable.enable");
-                this.features.selectable.enable = features.selectable.enable;
-            }
-
-            if (features.selectable.cssClasses) {
-                validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
-                this.features.selectable.cssClasses = features.selectable.cssClasses;
-            }
-
-            if (features.selectable.multi != undefined) {
-                validator.ValidateMustBeValidBoolean(features.selectable.multi);
-                this.features.selectable.multi = features.selectable.multi;
-            }
-
-            if (features.identifier) {
-                validator.ValidateMustBeValidString(features.identifier, 'features.identifier');
-                this.features.identifier = features.identifier;
-            }
-        }
-    }
-
-    function setCustomColumns(columns) {
-        if (!columns) return;
-        this.columns = columns;
-    }
-
-    function setCustomEditable(editable) {
-        if (!editable) return;
-        validator.ValidateMustBeAFunction(editable.update);
-        this.editable = Object.create(Object.prototype);
-        this.editable.update = editable.update;
-    }
-
-    return settings;
-})(defaultSettings, validator);
-
-module.exports = settings;
-},{"../js/dt-default-settings.js":10,"../js/validator.js":16}],12:[function(require,module,exports){
-var dataLoader = require('../js/dataLoader.js');
-var renderer = require('../js/renderer.js');
-
-var features = (function (dataLoader, renderer) {
-    'use strict';
-
-    var features = {
-        init: function (table) {
-            table.events.onDataLoaded.push(renderNumberOfRows);
-            table.events.onDataLoaded.push(renderNumberOfPages);
-        }
-    };
-
-
-    function renderNumberOfRows(table) {
-        var numberOfRows = table.store.numberOfRows;
-
-        var containers = table.$table.find('[number-of-rows]');
-
-        for (var i = 0, l = containers.length; i < l; i += 1) {
-            $(containers[i]).html(numberOfRows);
-        }
-    }
-
-    function renderNumberOfPages(table) {
-        var numberOfPages = table.store.numberOfPages;
-
-        var containers = table.$table.find('[number-of-pages]');
-
-        for (var i = 0, l = containers.length; i < l; i += 1) {
-            $(containers[i]).html(numberOfPages);
-        }
-    }
-
-    return features;
-} (dataLoader, renderer));
-
-module.exports = features;
-},{"../js/dataLoader.js":9,"../js/renderer.js":13}],13:[function(require,module,exports){
-var selectable = require('../js/selectable.js');
-
-var renderer = (function (selectable) {
-    'use strict';
-
-    var renderer = {
-
-        init: function (table) {
-            setButtonEvents(table);
-            setTemplates(table);
-        },
-
-        // Renders table cell. If there is a custom defined render function calls it first.
-        renderCell: function (table, colName, content, rowData) {
-            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-                return table.settings.columns[colName].render(content, rowData);
-            };
-
-            return content;
-        },
-
-        renderRow: function (table, rowData, templateName) {
-            var identifier = rowData[table.settings.features.identifier];
-            var $row;
-            var propValue, $template;
-
-            if (templateName != undefined && table.store.templates.main) {
-                var $containers = table.store.templates[templateName].$containers;
-                for (var i = 0, l = $containers.length; i < l; i += 1) {
-                    var $container = $($containers[i]);
-                    var propName = $container.attr('data-name');
-                    var propValue = rowData[propName];
-                    var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
-                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
-                    var attributeValue = $container.attr('value');
-                    if (typeof attributeValue === typeof undefined || attributeValue === false) {
-                        $container.html(cellData);
-                    } else {
-                        $container.attr('value', cellData);
-                    }
-                }
-
-                $row = table.store.templates[templateName].$template.clone();
-            } else {
-                // If there is no main template provided the renderer will render the cells directly into the td elements
-                $row = $('<tr>');
-                for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
-                    var propName = table.store.columnPropertyNames[col];
-
-                    if (!propName) {
-                        throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
-                    }
-
-                    propValue = rowData[propName];
-
-                    var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
-                    $row.append($col);
-                }
-            }
-
-            $row.attr('data-identifier', identifier);
-
-            return $row;
-        },
-
-        RenderTableBody: function (table, data) {
-            var $tbody = table.$table.find('tbody').empty();
-            var buffer = [];
-            for (var row = 0; row < data.length; row++) {
-                var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData, 'main');
-                buffer.push($row);
-            }
-
-            $tbody.append(buffer);
-        }
-    };
-
-    function setTemplates(table) {
-        table.store.templates = {};
-        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
-        $templatesOrigin.remove();
-        var $templates = $templatesOrigin.clone();
-        if ($templates.length != 0) {
-            Array.prototype.forEach.call($templates, function (el) {
-                var $el = $(el);
-                var template = {};
-                template.$template = $el;
-                template.$containers = $el.find('[data-name]');
-                table.store.templates[$el.attr('dt-template')] = template;
-                $el.removeAttr('dt-template');
-            });
-        }
-    }
-
-    function setButtonEvents(table) {
-        table.$table.on('click', '[dt-btn-template]', function () {
-            var $this = $(this);
-            var $curRow = $this.parentsUntil('tr').parent();
-            var identifier = $curRow.attr('data-identifier');
-            var rowData = table.store.pageData[identifier];
-            var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
-
-            // fade in the new template
-            var delay = $this.attr('dt-delay') || 0;
-            $($curRow).fadeOut(0,0);
-            $curRow.html($rowFromTemplate.html());
-            $($curRow).fadeIn(parseInt(delay));
-        })
-    }
-
-    return renderer;
-} (selectable));
-
-module.exports = renderer;
-},{"../js/selectable.js":14}],14:[function(require,module,exports){
-var validator = require('../js/validator.js');
-var defaultSettings = require('../js/dt-default-settings.js');
-
-var selectable = (function () {
+},{"../../../js/dataLoader.js":10,"../../../js/validator.js":16}],7:[function(require,module,exports){
+var validator = require('../../../js/validator.js');
+var defaultSettings = require('../../../js/dt-default-settings.js');
+
+var selectableInitialiser = (function () {
     var selectable = {
         init: function (table, settings) {
             if (!isSelectable(settings)) {
@@ -1278,8 +713,573 @@ var selectable = (function () {
     return selectable;
 })();
 
-module.exports = selectable;
-},{"../js/dt-default-settings.js":10,"../js/validator.js":16}],15:[function(require,module,exports){
+module.exports = selectableInitialiser;
+},{"../../../js/dt-default-settings.js":11,"../../../js/validator.js":16}],8:[function(require,module,exports){
+var dataLoader = require('../../../js/dataLoader.js');
+
+var sortable = (function (dataLoader) {
+    'use strict';
+    return {
+        init: function (table) {
+            var $sortables = table.$table.find('th[sortable]');
+            $sortables.find('.th-inner').addClass('sortable both');
+            table.store.$sortables = $sortables;
+            $sortables.on('click', function (e) {
+                var $target = $(this);
+                var name = $target.attr('data-name');
+                var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
+                table.orderBy = {
+                    Name: name,
+                    Asc: isAsc
+                };
+
+                dataLoader.loadData(table, 1)
+                    .then(function () {
+                        // table.store.$sortables.removeAttr('asc desc');
+                        table.store.$sortables.find('.th-inner').removeClass('asc desc');
+
+                        if (isAsc) {
+                            $target.find('.th-inner').addClass('sortable both asc');
+                            $target.find('.th-inner').removeClass('desc');
+                        } else {
+                            $target.find('.th-inner').addClass('sortable both desc');
+                            $target.find('.th-inner').removeClass('asc');
+                        }
+                    });
+            });
+        },
+    }
+})(dataLoader);
+
+module.exports = sortable;
+},{"../../../js/dataLoader.js":10}],9:[function(require,module,exports){
+var selectable = require('../js/Features/Selectable/selectable.js');
+var sortable = require('../js/Features/Sortable/sortableInitialiser.js');
+var dataLoader = require('../js/dataLoader.js');
+var paginator = require('../js/Features/Paginator/paginator.js');
+var filter = require('../js/Features/Filter/filterInitialiser.js');
+var editable = require('../js/Features/Editable/editable');
+var validator = require('../js/validator.js');
+var settingsExternal = require('../js/dt-settings.js');
+var features = require('../js/features.js');
+var renderer = require('../js/renderer.js');
+var spinner = require('../js/spinners.js');
+var paginatorTemplate = require('../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js');
+
+window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
+    editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate) {
+    'use strict'
+
+    var table = {
+        init: function (selector, settings) {
+            this._$table = $(selector).first();
+
+            // Settings
+            this._settings = settingsExternal.init(settings);
+            // Init objects
+            configureEvents(this);
+            configureStore(this);
+
+            configurePaginator(this, settings, dataLoader);
+            spinner.init(this, settings);
+            filter.init(table);
+            sortable.init(table);
+            editable.init(this, settings);
+            selectable.init(this, settings);
+            features.init(this);
+            renderer.init(this);
+            paginatorTemplate.init(table);
+
+            dataLoader.loadData(table, 1, true);
+
+            return this;
+        },
+
+        get settings() {
+            return this._settings;
+        },
+
+        get paginator() {
+            return this._paginator;
+        },
+        set paginator(val) {
+            this._paginator = val;
+        },
+
+        get $table() {
+            return this._$table;
+        },
+
+        get filter() {
+            return table.store.filter;
+        },
+
+        getSelected: function () {
+            return selectable.getSelected(this);
+        },
+
+        get columnPropertyNames() {
+            return this._columnPropertyNames;
+        }
+    };
+
+    function configureEvents(table) {
+        table.events = Object.create(Object);
+        table.events.onDataLoaded = [];
+        table.events.onDataLoading = [];
+        table.events.onTableRendered = [];
+    }
+
+    function configureStore(table) {
+        table.store = {
+            columnPropertyNames: getColumnPropertyNames(),
+            pageData: null,
+            data: {},
+            requestIdentifiersOnDataLoad: false,
+        };
+    }
+
+    function configurePaginator(table, settings, dataLoader) {
+        paginator.init(table, settings);
+        paginator.setPageClickEvents(table, dataLoader);
+    }
+
+    function getColumnPropertyNames() {
+        var colPropNames = [];
+        var $columns = table.$table.find('thead th');
+        for (var i = 0; i < $columns.length; i++) {
+            var colName = $($columns[i]).attr('data-name');
+            if (colName) {
+                colPropNames.push(colName);
+            }
+        }
+
+        return colPropNames;
+    };
+
+    return table;
+})(selectable, sortable, dataLoader, paginator, filter, editable, validator, settingsExternal, features, renderer, spinner, paginatorTemplate);
+
+module.exports = window.dataTable;
+},{"../js/Features/Editable/editable":2,"../js/Features/Filter/filterInitialiser.js":3,"../js/Features/Paginator/paginator.js":6,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":5,"../js/Features/Selectable/selectable.js":7,"../js/Features/Sortable/sortableInitialiser.js":8,"../js/dataLoader.js":10,"../js/dt-settings.js":12,"../js/features.js":13,"../js/renderer.js":14,"../js/spinners.js":15,"../js/validator.js":16}],10:[function(require,module,exports){
+
+var paginator = require('../js/Features/Paginator/paginator.js');
+// var selectable = require('../js/Features/Selectable/selectable.js');
+var tableRenderer = require('../js/renderer.js');
+var q = require('../node_modules/q/q.js')
+
+var dataLoader = (function () {
+    var dataLoader = {
+        loadData: function (table, page, isUpdatePaginator) {
+            var deferred = q.defer();
+
+            // Execute onDataLoading events
+            for (var index in table.events.onDataLoading) {
+                table.events.onDataLoading[index](table);
+            }
+
+            var filter = formatFilterRequestValues(table.store.filter);
+
+            $.ajax({
+                url: table.settings.ajax.url,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: {
+                    identifierPropName: table.settings.features.identifier,
+                    getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
+                    page: page,
+                    pageSize: table.settings.paging.pageSize,
+                    filter: JSON.stringify(filter),
+                    orderBy: table.orderBy ? table.orderBy.Name : null,
+                    asc: table.orderBy ? table.orderBy.Asc : true
+                },
+                success: function (data) {
+                    // Add result to the dataTable object
+                    refreshPageData(table, data.data, data.identifiers, data.rowsNumber, page);
+
+                    // Invoke events on dataLoaded
+                    for (var index in table.events.onDataLoaded) {
+                        table.events.onDataLoaded[index](table);
+                    }
+
+                    tableRenderer.RenderTableBody(table, data.data);
+
+                    // Invoke events on tableRendered
+                    for (var index in table.events.onTableRendered) {
+                        table.events.onTableRendered[index](table);
+                    }
+
+                    deferred.resolve();
+                },
+                error: function (err) {
+                    table.$table.html(err.responseText);
+                }
+            });
+
+            return deferred.promise;
+        }
+    };
+
+    function formatFilterRequestValues(filterObj) {
+        var filters = [];
+        for (var filter in filterObj) {
+            filters.push({
+                key: filterObj[filter].value.key,
+                value: {
+                    operator: filterObj[filter].value.operator,
+                    value: filterObj[filter].value.value
+                }
+            });
+        }
+
+        return filters;
+    }
+
+    function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        var dataObj = {};
+        var identifierName = table.settings.features.identifier;
+
+        table.store.currentPage = currentPage;
+
+        for (var i = 0, l = data.length; i < l; i += 1) {
+            var curDataRow = data[i];
+            dataObj[curDataRow[identifierName]] = curDataRow;
+        }
+        table.store.pageData = dataObj;
+
+        table.store.numberOfRows = rowsNumber;
+        if (table.settings.paging.enable) {
+            table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+        }
+
+        initIdentifiers(table, identifiers);
+    }
+
+    function initIdentifiers(table, identifiers) {
+        if (!identifiers) {
+            return;
+        }
+
+        table.store.identifiers = {};
+
+        for (var i = 0, l = identifiers.length; i < l; i += 1) {
+            table.store.identifiers[identifiers[i]] = {
+                selected: false,
+            };
+        }
+    }
+
+    return dataLoader;
+} ());
+
+module.exports = dataLoader;
+},{"../js/Features/Paginator/paginator.js":6,"../js/renderer.js":14,"../node_modules/q/q.js":17}],11:[function(require,module,exports){
+var defaultSettings = (function () {
+    var defaultSettings = {
+        pageSize: 10,
+
+        paginator: {
+            length: 5
+        },
+
+        features: {
+            selectable: {
+                enable: false,
+                multi: false,
+                cssClasses: 'active',
+            }
+        },
+
+        spinner: {
+            enable: true,
+            style: 0,
+            width: '100px',
+            opacity: 1,
+        }
+    };
+
+    return defaultSettings;
+})();
+
+module.exports = defaultSettings;
+},{}],12:[function(require,module,exports){
+var defaultSettings = require('../js/dt-default-settings.js');
+var validator = require('../js/validator.js');
+
+var settings = (function (defaultSettings, validator) {
+    var settings = {
+        init: function (settings) {
+            validator.ValidateValueCannotBeNullOrUndefined(settings, 'settings', 'The configuration object argument is missing from the datatable init() function constructor.');
+
+            // Init default values
+            this.paging = {
+                enable: true,
+                pageSize: defaultSettings.pageSize
+            };
+            this.paginator = defaultSettings.paginator;
+            this.features = defaultSettings.features;
+
+            // Set custom values
+            setCustomPaging.call(this, settings.paging);
+            // setCustomPaginator.call(this, settings.paginator);
+            setCustomFeatures.call(this, settings.features);
+            setCustomColumns.call(this, settings.columns);
+            setCustomEditable.call(this, settings.editable);
+
+            this.ajax = settings.ajax;
+
+            return this;
+        },
+
+        get paginator() {
+            return this._paginator;
+        },
+        set paginator(val) {
+            this._paginator = val;
+        },
+
+        get features() {
+            return this._features;
+        },
+        set features(val) {
+            this._features = val;
+        },
+
+        get ajax() {
+            return this._ajax;
+        },
+        set ajax(val) {
+            validator.ValidateValueCannotBeNullOrUndefined(val, "ajax", "The ajax propery of the settings object is required");
+            validator.ValidateValueCannotBeNullOrUndefined(val.url, "ajax.url");
+
+            this._ajax = val;
+        },
+
+        get columns() {
+            return this._columns;
+        },
+        set columns(val) {
+            if (!val) return;
+            for (var prop in val) {
+                if (val[prop].render) {
+                    validator.ValidateMustBeAFunction(val[prop].render, "columns." + prop + ".render()");
+                }
+            }
+
+            this._columns = val;
+        }
+    };
+
+    function setCustomPaging(paging) {
+        if (!paging) return;
+        if (paging.pageSize) {
+            this.paging.pageSize = paging.pageSize;
+        }
+
+        if (paging.enable != undefined && paging.enable === false) {
+            this.paging.enable = false;
+        } else {
+            paging.enable = true;
+        }
+    }
+
+    function setCustomFeatures(features) {
+        if (!features) return;
+        if (features.selectable) {
+            if (features.selectable.enable != undefined) {
+                validator.ValidateMustBeValidBoolean(features.selectable.enable, "features.selectable.enable");
+                this.features.selectable.enable = features.selectable.enable;
+            }
+
+            if (features.selectable.cssClasses) {
+                validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
+                this.features.selectable.cssClasses = features.selectable.cssClasses;
+            }
+
+            if (features.selectable.multi != undefined) {
+                validator.ValidateMustBeValidBoolean(features.selectable.multi);
+                this.features.selectable.multi = features.selectable.multi;
+            }
+
+            if (features.identifier) {
+                validator.ValidateMustBeValidString(features.identifier, 'features.identifier');
+                this.features.identifier = features.identifier;
+            }
+        }
+    }
+
+    function setCustomColumns(columns) {
+        if (!columns) return;
+        this.columns = columns;
+    }
+
+    function setCustomEditable(editable) {
+        if (!editable) return;
+        validator.ValidateMustBeAFunction(editable.update);
+        this.editable = Object.create(Object.prototype);
+        this.editable.update = editable.update;
+    }
+
+    return settings;
+})(defaultSettings, validator);
+
+module.exports = settings;
+},{"../js/dt-default-settings.js":11,"../js/validator.js":16}],13:[function(require,module,exports){
+var dataLoader = require('../js/dataLoader.js');
+var renderer = require('../js/renderer.js');
+
+var features = (function (dataLoader, renderer) {
+    'use strict';
+
+    var features = {
+        init: function (table) {
+            table.events.onDataLoaded.push(renderNumberOfRows);
+            table.events.onDataLoaded.push(renderNumberOfPages);
+        }
+    };
+
+
+    function renderNumberOfRows(table) {
+        var numberOfRows = table.store.numberOfRows;
+
+        var containers = table.$table.find('[number-of-rows]');
+
+        for (var i = 0, l = containers.length; i < l; i += 1) {
+            $(containers[i]).html(numberOfRows);
+        }
+    }
+
+    function renderNumberOfPages(table) {
+        var numberOfPages = table.store.numberOfPages;
+
+        var containers = table.$table.find('[number-of-pages]');
+
+        for (var i = 0, l = containers.length; i < l; i += 1) {
+            $(containers[i]).html(numberOfPages);
+        }
+    }
+
+    return features;
+} (dataLoader, renderer));
+
+module.exports = features;
+},{"../js/dataLoader.js":10,"../js/renderer.js":14}],14:[function(require,module,exports){
+var selectable = require('../js/Features/Selectable/selectable.js');
+
+var renderer = (function (selectable) {
+    'use strict';
+
+    var renderer = {
+
+        init: function (table) {
+            setButtonEvents(table);
+            setTemplates(table);
+        },
+
+        // Renders table cell. If there is a custom defined render function calls it first.
+        renderCell: function (table, colName, content, rowData) {
+            if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
+                return table.settings.columns[colName].render(content, rowData);
+            };
+
+            return content;
+        },
+
+        renderRow: function (table, rowData, templateName) {
+            var identifier = rowData[table.settings.features.identifier];
+            var $row;
+            var propValue, $template;
+
+            if (templateName != undefined && table.store.templates.main) {
+                var $containers = table.store.templates[templateName].$containers;
+                for (var i = 0, l = $containers.length; i < l; i += 1) {
+                    var $container = $($containers[i]);
+                    var propName = $container.attr('data-name');
+                    var propValue = rowData[propName];
+                    var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
+                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
+                    var attributeValue = $container.attr('value');
+                    if (typeof attributeValue === typeof undefined || attributeValue === false) {
+                        $container.html(cellData);
+                    } else {
+                        $container.attr('value', cellData);
+                    }
+                }
+
+                $row = table.store.templates[templateName].$template.clone();
+            } else {
+                // If there is no main template provided the renderer will render the cells directly into the td elements
+                $row = $('<tr>');
+                for (var col = 0, l = table.store.columnPropertyNames.length; col < l; col++) {
+                    var propName = table.store.columnPropertyNames[col];
+
+                    if (!propName) {
+                        throw 'Missing column name. Each <th> in the data table htm element must have an attribute "data-name"'
+                    }
+
+                    propValue = rowData[propName];
+
+                    var $col = $('<td>').html(renderer.renderCell(table, propName, propValue, rowData));
+                    $row.append($col);
+                }
+            }
+
+            $row.attr('data-identifier', identifier);
+
+            return $row;
+        },
+
+        RenderTableBody: function (table, data) {
+            var $tbody = table.$table.find('tbody').empty();
+            var buffer = [];
+            for (var row = 0; row < data.length; row++) {
+                var rowData = data[row];
+                var $row = renderer.renderRow(table, rowData, 'main');
+                buffer.push($row);
+            }
+
+            $tbody.append(buffer);
+        }
+    };
+
+    function setTemplates(table) {
+        table.store.templates = {};
+        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+        $templatesOrigin.remove();
+        var $templates = $templatesOrigin.clone();
+        if ($templates.length != 0) {
+            Array.prototype.forEach.call($templates, function (el) {
+                var $el = $(el);
+                var template = {};
+                template.$template = $el;
+                template.$containers = $el.find('[data-name]');
+                table.store.templates[$el.attr('dt-template')] = template;
+                $el.removeAttr('dt-template');
+            });
+        }
+    }
+
+    function setButtonEvents(table) {
+        table.$table.on('click', '[dt-btn-template]', function () {
+            var $this = $(this);
+            var $curRow = $this.parentsUntil('tr').parent();
+            var identifier = $curRow.attr('data-identifier');
+            var rowData = table.store.pageData[identifier];
+            var $rowFromTemplate = renderer.renderRow(table, rowData, $(this).attr('dt-btn-template'));
+
+            // fade in the new template
+            var delay = $this.attr('dt-delay') || 0;
+            $($curRow).fadeOut(0,0);
+            $curRow.html($rowFromTemplate.html());
+            $($curRow).fadeIn(parseInt(delay));
+        })
+    }
+
+    return renderer;
+} (selectable));
+
+module.exports = renderer;
+},{"../js/Features/Selectable/selectable.js":7}],15:[function(require,module,exports){
 var defaultSettings = require('../js/dt-default-settings');
 
 // =====================================================================
@@ -1353,7 +1353,7 @@ var spinner = (function (defaultSettings) {
 } (defaultSettings));
 
 module.exports = spinner;
-},{"../js/dt-default-settings":10}],16:[function(require,module,exports){
+},{"../js/dt-default-settings":11}],16:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function (val, name, message) {
@@ -3464,4 +3464,4 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}]},{},[8]);
+},{"_process":1}]},{},[9]);

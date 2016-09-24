@@ -1,4 +1,4 @@
-var selectable = require('../js/selectable.js');
+var selectable = require('../js/Features/Selectable/selectable.js');
 var sortable = require('../js/Features/Sortable/sortableInitialiser.js');
 var dataLoader = require('../js/dataLoader.js');
 var paginator = require('../js/Features/Paginator/paginator.js');

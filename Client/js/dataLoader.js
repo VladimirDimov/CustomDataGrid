@@ -1,6 +1,6 @@
 
 var paginator = require('../js/Features/Paginator/paginator.js');
-var selectable = require('../js/selectable.js');
+// var selectable = require('../js/Features/Selectable/selectable.js');
 var tableRenderer = require('../js/renderer.js');
 var q = require('../node_modules/q/q.js')
 

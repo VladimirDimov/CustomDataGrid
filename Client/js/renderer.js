@@ -1,4 +1,4 @@
-var selectable = require('../js/selectable.js');
+var selectable = require('../js/Features/Selectable/selectable.js');
 
 var renderer = (function (selectable) {
     'use strict';
