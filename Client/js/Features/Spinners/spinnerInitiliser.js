@@ -1,4 +1,4 @@
-var defaultSettings = require('../js/dt-default-settings');
+var defaultSettings = require('../../../js/dt-default-settings');
 
 // =====================================================================
 // Example Configuration:
@@ -10,10 +10,10 @@ var defaultSettings = require('../js/dt-default-settings');
 //          width: '200px'
 //       }
 // =====================================================================
-var spinner = (function (defaultSettings) {
+var spinnerInitialiser = (function (defaultSettings) {
     'use strict';
 
-    var spinner = {
+    var spinnerInitialiser = {
         init: function (table, settings) {
             if (settings.spinner && settings.spinner.enable === false) {
                 return;
@@ -67,7 +67,7 @@ var spinner = (function (defaultSettings) {
         table.settings.spinner.opacity = settings.spinner.opacity || defaultSettings.spinner.opacity;
     }
 
-    return spinner;
+    return spinnerInitialiser;
 } (defaultSettings));
 
-module.exports = spinner;
+module.exports = spinnerInitialiser;

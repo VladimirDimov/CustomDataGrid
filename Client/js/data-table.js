@@ -8,7 +8,7 @@ var validator = require('../js/validator.js');
 var settingsExternal = require('../js/dt-settings.js');
 var features = require('../js/features.js');
 var renderer = require('../js/renderer.js');
-var spinner = require('../js/spinners.js');
+var spinner = require('../js/Features/Spinners/spinnerInitialiser.js');
 var paginatorTemplate = require('../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js');
 
 window.dataTable = (function (selectable, sortable, dataLoader, paginator, filter,
