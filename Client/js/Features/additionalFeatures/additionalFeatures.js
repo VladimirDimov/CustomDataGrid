@@ -1,5 +1,5 @@
-var dataLoader = require('../js/dataLoader.js');
-var renderer = require('../js/renderer.js');
+var dataLoader = require('../../../js/dataLoader.js');
+var renderer = require('../../../js/renderer.js');
 
 var features = (function (dataLoader, renderer) {
     'use strict';
