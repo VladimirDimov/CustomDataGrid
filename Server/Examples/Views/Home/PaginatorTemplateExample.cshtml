@@ -36,6 +36,46 @@
 
 
 <div id="table" class="bootstrap-table">
+    <div class="pull-left center pagination" dt-template="paginator">
+        <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+                <li class="page-item" dt-paginator-prev>
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item" dt-paginator-first>
+                    <a class="page-link" href="#">first</a>
+                </li>
+                <li class="page-item" dt-paginator-page>
+                    <a dt-paginator-inner class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item" dt-paginator-page>
+                    <a dt-paginator-inner class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item" dt-paginator-page>
+                    <a dt-paginator-inner class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item" dt-paginator-page>
+                    <a dt-paginator-inner class="page-link" href="#">4</a>
+                </li>
+                <li class="page-item" dt-paginator-page>
+                    <a dt-paginator-inner class="page-link" href="#">5</a>
+                </li>
+                <li class="page-item" dt-paginator-last>
+                    <a class="page-link" href="#">last</a>
+                </li>
+                <li class="page-item" dt-paginator-next>
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
     <div class="fixed-table-toolbar">
         <div class="columns columns-right btn-group pull-right">
             <button class="btn btn-default" type="button" name="toggle" title="Toggle">
@@ -114,45 +154,6 @@
                         <li class="page-item" dt-paginator-page><a class="page-link" href="#" dt-paginator-inner>3</a></li>
                         <li class="page-item" dt-paginator-page><a class="page-link" href="#" dt-paginator-inner>4</a></li>
                         <li class="page-item" dt-paginator-page><a class="page-link" href="#" dt-paginator-inner>5</a></li>
-                        <li class="page-item" dt-paginator-next>
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="pull-left center pagination" dt-template="paginator">
-                <nav aria-label="...">
-                    <ul class="pagination pagination-lg">
-                        <li class="page-item" dt-paginator-prev>
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </li>
-                        <li class="page-item" dt-paginator-first>
-                            <a class="page-link" href="#">first</a>
-                        </li>
-                        <li class="page-item" dt-paginator-page>
-                            <a dt-paginator-inner class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item" dt-paginator-page>
-                            <a dt-paginator-inner class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item" dt-paginator-page>
-                            <a dt-paginator-inner class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item" dt-paginator-page>
-                            <a dt-paginator-inner class="page-link" href="#">4</a>
-                        </li>
-                        <li class="page-item" dt-paginator-page>
-                            <a dt-paginator-inner class="page-link" href="#">5</a>
-                        </li>
-                        <li class="page-item" dt-paginator-last>
-                            <a class="page-link" href="#">last</a>
-                        </li>
                         <li class="page-item" dt-paginator-next>
                             <a class="page-link" href="#" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
