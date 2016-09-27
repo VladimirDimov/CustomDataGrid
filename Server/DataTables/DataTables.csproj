@@ -97,9 +97,10 @@
     <Compile Include="Models\Request\RequestModel.cs" />
     <Compile Include="ProcessDataProviders\FilterProvider.cs" />
     <Compile Include="ProcessDataProviders\GetIdentifiersProvider.cs" />
+    <Compile Include="ProcessDataProviders\Contracts\IRequestParamsManager.cs" />
     <Compile Include="ProcessDataProviders\SortProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestParamsManager.cs" />
+    <Compile Include="ProcessDataProviders\RequestParamsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

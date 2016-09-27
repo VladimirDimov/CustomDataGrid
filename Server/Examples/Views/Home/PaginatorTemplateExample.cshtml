@@ -36,7 +36,8 @@
 
 
 <div id="table" class="bootstrap-table">
-    <div class="pull-left center pagination" dt-template="paginator">
+    Big paginator without active page template
+    <div class="" dt-template="paginator">
         <nav aria-label="...">
             <ul class="pagination pagination-lg">
                 <li class="page-item" dt-paginator-prev>
@@ -74,6 +75,17 @@
                 </li>
             </ul>
         </nav>
+    </div>
+
+    Small paginator with active page template
+    <div dt-template="paginator">
+        <ul class="pagination pagination-sm">
+            <li dt-paginator-page><a href="#" dt-paginator-inner>1</a></li>
+            <li dt-paginator-page dt-active class="active"><a href="#" dt-paginator-inner>2</a></li>
+            <li dt-paginator-page><a href="#" dt-paginator-inner>3</a></li>
+            <li dt-paginator-page><a href="#" dt-paginator-inner>4</a></li>
+            <li dt-paginator-page><a href="#" dt-paginator-inner>5</a></li>
+        </ul>
     </div>
 
     <div class="fixed-table-toolbar">
