@@ -19,16 +19,16 @@
 
         public IQueryable<object> Execute(IQueryable<object> data, RequestModel requestModel, Type dataCollectionGenericType)
         {
-            var filterDict = requestModel.Filter;
-            if (filterDict == null)
-            {
-                return data;
-            }
-
             // STARRT validation
             this.validationProvider.ValidateMustNotBeNull(dataCollectionGenericType, "data collection generic type");
             this.validationProvider.ValidateMustNotBeNull(data, "filtered data");
             // END validation
+
+            var filterDict = requestModel.Filter;
+            if (filterDict == null || filterDict.Count() == 0)
+            {
+                return data;
+            }
 
             foreach (var filter in filterDict)
             {

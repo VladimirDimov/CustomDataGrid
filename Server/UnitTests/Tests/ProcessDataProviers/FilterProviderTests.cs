@@ -1,18 +1,19 @@
 ﻿namespace UnitTests.ProcessDataProviers
 {
-    using DataTables.Models.Filter;
-    using DataTables.ProcessDataProviders;
-    using Helpers;
-    using Mocks.DataObjects;
-    using Moq;
-    using NUnit.Framework;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using DataTables.Models.Filter;
+    using DataTables.Models.Request;
+    using DataTables.ProcessDataProviders;
+    using Helpers;
+    using Mocks.DataObjects;
+    using NUnit.Framework;
 
-    class FilterProviderTests
+    internal class FilterProviderTests
     {
         #region ValidationTests
+
         [Test]
         public void ShouldThrowOfTypeIfNoDataCollectionGenericTypeIsProvided()
         {
@@ -20,32 +21,34 @@
 
             Assert.Throws(typeof(ArgumentNullException), () =>
             {
-                provider.FilterData(null, new List<object>().AsQueryable(), new Dictionary<string, FilterRequestModel>());
+                provider.Execute(new List<object>().AsQueryable(), new RequestModel(), null);
             });
         }
 
         [Test]
         public void ShouldThrowOfTypeIfNoDataIsProvided()
         {
-            var provider = new FilterProvider();
+            var filterProvider = new FilterProvider();
 
             Assert.Throws(typeof(ArgumentNullException), () =>
             {
-                provider.FilterData(typeof(object), null, new Dictionary<string, FilterRequestModel>());
+                filterProvider.Execute(null, new RequestModel(), typeof(object));
             });
         }
 
         [Test]
-        public void ShouldThrowOfTypeIfNoFiltersDictionaryIsProvided()
+        public void ShouldNotThrowIfNoFiltersDictionaryIsProvided()
         {
-            var provider = new FilterProvider();
+            var filterProvider = new FilterProvider();
+            var requestModel = new RequestModel() { Filter = null };
 
-            Assert.Throws(typeof(ArgumentNullException), () =>
+            Assert.DoesNotThrow(() =>
             {
-                provider.FilterData(typeof(object), new List<object>().AsQueryable(), null);
+                filterProvider.Execute(new List<object>().AsQueryable(), requestModel, typeof(object));
             });
         }
-        #endregion
+
+        #endregion ValidationTests
 
         [Test]
         public void ShouldReturnAllItemsIfFilterWIthEmptyValueIsProvided()
@@ -61,7 +64,9 @@
                 { "PropInt", new FilterRequestModel {Operator = "<" , Value = ""} },
             };
 
-            var orderedData = filterProvider.FilterData(typeof(DataObject), data, filters);
+            var requestModel = new RequestModel { Filter = filters };
+
+            var orderedData = filterProvider.Execute(data, requestModel, typeof(DataObject));
 
             Assert.AreEqual(numberOfItems, orderedData.Count());
         }
@@ -88,8 +93,9 @@
             {
                 { "PropString", new FilterRequestModel {Operator = "ci" , Value = "searchkey"} },
             };
+            var requestModel = new RequestModel { Filter = filters };
 
-            var filteredCollection = filterProvider.FilterData(typeof(DataObject), collection.AsQueryable(), filters);
+            var filteredCollection = filterProvider.Execute(collection.AsQueryable(), requestModel, typeof(DataObject));
 
             Assert.AreEqual(5000, filteredCollection.Count());
         }
@@ -116,8 +122,9 @@
             {
                 { "PropInt", new FilterRequestModel {Operator = "ci" , Value = "777"} },
             };
+            var requestModel = new RequestModel { Filter = filters };
 
-            var filteredCollection = filterProvider.FilterData(typeof(DataObject), data.AsQueryable(), filters);
+            var filteredCollection = filterProvider.Execute(data.AsQueryable(), requestModel, (typeof(DataObject)));
 
             Assert.AreEqual(5000, filteredCollection.Count());
         }
@@ -131,10 +138,11 @@
             {
                 { "PropString", new FilterRequestModel {Operator = ">" , Value = "1"} },
             };
+            var requestModel = new RequestModel { Filter = filters };
 
             Assert.Throws(typeof(InvalidOperationException), () =>
             {
-                var filteredData = filterProvider.FilterData(typeof(DataObject), data.AsQueryable(), filters);
+                var filteredData = filterProvider.Execute(data.AsQueryable(), requestModel, typeof(DataObject));
             });
         }
 
@@ -233,8 +241,9 @@
                 new KeyValuePair<string, FilterRequestModel>( "PropInt", new FilterRequestModel {Operator = ">" , Value = "300" }),
                 new KeyValuePair<string, FilterRequestModel>( "PropInt", new FilterRequestModel {Operator = "<" , Value = "700" }),
             };
+            var requestModel = new RequestModel { Filter = filters };
 
-            var filteredCollection = filterProvider.FilterData(typeof(DataObject), data.AsQueryable(), filters);
+            var filteredCollection = filterProvider.Execute(data.AsQueryable(), requestModel, typeof(DataObject));
 
             foreach (DataObject item in filteredCollection)
             {
@@ -294,8 +303,9 @@
             {
                 { propName, new FilterRequestModel {Operator = oper , Value = fitlerVal} },
             };
+            var requestModel = new RequestModel { Filter = filters };
 
-            var filteredCollection = filterProvider.FilterData(typeof(DataObject), data.AsQueryable(), filters);
+            var filteredCollection = filterProvider.Execute(data.AsQueryable(), requestModel, typeof(DataObject));
 
             Assert.AreEqual(expectNum, filteredCollection.Count());
         }

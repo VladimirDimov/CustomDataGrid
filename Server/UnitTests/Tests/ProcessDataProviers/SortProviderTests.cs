@@ -9,7 +9,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-
+    using DataTables.Models.Request;
     class SortProviderTests
     {
         #region ValidationTests
@@ -17,9 +17,11 @@
         public void ShouldThrowOfTypeWhenNoDataIsProvided()
         {
             var sortProvider = new SortProvider();
+            var requestModel = new RequestModel { OrderByPropName = "propName", IsAscending = true };
+
             Assert.Throws(typeof(ArgumentNullException), () =>
             {
-                sortProvider.SortData(null, "propName", true, typeof(object));
+                sortProvider.Execute(null, requestModel, typeof(object));
             });
         }
 
@@ -27,9 +29,11 @@
         public void ShouldThrowOfTypeWhenNoDataCollectionGenericTypeIsProvided()
         {
             var sortProvider = new SortProvider();
+            var requestModel = new RequestModel { OrderByPropName = "propName", IsAscending = true };
+
             Assert.Throws(typeof(ArgumentNullException), () =>
             {
-                sortProvider.SortData(new List<object>().AsQueryable(), "propName", true, null);
+                sortProvider.Execute(new List<object>().AsQueryable(), requestModel, null);
             });
         }
 
@@ -40,11 +44,11 @@
         {
             var sortProvider = new SortProvider();
             var collection = new List<DataObject>().AsQueryable();
+            var requestModel = new RequestModel { OrderByPropName = "PropString", IsAscending = true };
 
-            var sortedCollection = sortProvider.SortData(
+            var sortedCollection = sortProvider.Execute(
                 collection,
-                typeof(DataObject).GetProperties().First().Name,
-                true,
+                requestModel,
                 typeof(DataObject));
 
             Assert.AreEqual(sortedCollection.Count(), 0);
@@ -111,8 +115,10 @@
                 new DataObject {PropString = "D" },
             }.AsQueryable();
 
+            var requestModel = new RequestModel { OrderByPropName = "PropString", IsAscending = true };
+
             var orderedCollection = sortProvider
-                .SortData(collection, "PropString", true, typeof(DataObject))
+                .Execute(collection, requestModel, typeof(DataObject))
                 .ToList();
             for (int i = 0; i < collection.Count() - 2; i++)
             {
@@ -130,10 +136,11 @@
 
             var collection = dataCollectionsGenerator.GetCollection(numberOfItems);
 
-            var sortedCollection = sortProvider.SortData(
+            var requestModel = new RequestModel { OrderByPropName = propName, IsAscending = isAsc };
+
+            var sortedCollection = sortProvider.Execute(
                 collection,
-                propName,
-                isAsc,
+                requestModel,
                 typeof(DataObject)).ToList();
 
             var propInfo = typeof(DataObject).GetProperty(propName);
