@@ -51,5 +51,15 @@
                 httpContextHelpers.GetRequestParameter(CompareStringConst, filterContext);
             });
         }
+
+        [Test]
+        public void GetRequestParameterOrDefaultShouldReturnNullIfParamIsNotFound()
+        {
+            var filterContext = ActionExecutedContextMocks.GetActionExecutedContextMockNullResult();
+            var httpContextHelpers = new HttpContextHelpers();
+            var result = httpContextHelpers.GetRequestParameterOrDefault("SomeInvalidParameter", filterContext);
+
+            Assert.IsNull(result);
+        }
     }
 }

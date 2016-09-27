@@ -22,5 +22,26 @@ namespace UnitTests.Mocks.ActionExecutedContext
 
             return filterContext;
         }
+
+        /// <summary>
+        /// Returns null for any provided parameter name
+        /// </summary>
+        /// <returns></returns>
+        public static System.Web.Mvc.ActionExecutedContext GetActionExecutedContextMockNullResult()
+        {
+            var valueProvider = new Mock<IValueProvider>();
+            valueProvider
+                .Setup<ValueProviderResult>(x => x.GetValue(It.IsAny<string>()))
+                .Returns<ValueProviderResult>(null);
+
+            var controller = new HomeController();
+            controller.ValueProvider = valueProvider.Object;
+
+            var filterContext = new System.Web.Mvc.ActionExecutedContext();
+            filterContext.Controller = controller;
+
+            return filterContext;
+        }
+
     }
 }
