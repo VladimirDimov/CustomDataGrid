@@ -19,7 +19,7 @@
             var sortProvider = new SortProvider();
             Assert.Throws(typeof(ArgumentNullException), () =>
             {
-                sortProvider.SortCollection(null, "propName", true, typeof(object));
+                sortProvider.SortData(null, "propName", true, typeof(object));
             });
         }
 
@@ -29,7 +29,7 @@
             var sortProvider = new SortProvider();
             Assert.Throws(typeof(ArgumentNullException), () =>
             {
-                sortProvider.SortCollection(new List<object>().AsQueryable(), "propName", true, null);
+                sortProvider.SortData(new List<object>().AsQueryable(), "propName", true, null);
             });
         }
 
@@ -41,7 +41,7 @@
             var sortProvider = new SortProvider();
             var collection = new List<DataObject>().AsQueryable();
 
-            var sortedCollection = sortProvider.SortCollection(
+            var sortedCollection = sortProvider.SortData(
                 collection,
                 typeof(DataObject).GetProperties().First().Name,
                 true,
@@ -112,7 +112,7 @@
             }.AsQueryable();
 
             var orderedCollection = sortProvider
-                .SortCollection(collection, "PropString", true, typeof(DataObject))
+                .SortData(collection, "PropString", true, typeof(DataObject))
                 .ToList();
             for (int i = 0; i < collection.Count() - 2; i++)
             {
@@ -130,7 +130,7 @@
 
             var collection = dataCollectionsGenerator.GetCollection(numberOfItems);
 
-            var sortedCollection = sortProvider.SortCollection(
+            var sortedCollection = sortProvider.SortData(
                 collection,
                 propName,
                 isAsc,

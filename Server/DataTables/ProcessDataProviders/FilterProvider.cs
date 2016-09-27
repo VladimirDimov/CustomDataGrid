@@ -1,14 +1,14 @@
 ﻿namespace DataTables.ProcessDataProviders
 {
-    using CommonProviders;
-    using Expressions;
-    using Models.Filter;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using CommonProviders;
+    using Contracts;
+    using Expressions;
+    using Models.Request;
 
-    public class FilterProvider
+    public class FilterProvider : IProcessData
     {
         private ValidationProvider validationProvider;
 
@@ -17,15 +17,17 @@
             this.validationProvider = new ValidationProvider();
         }
 
-        public IQueryable<object> FilterData(
-                                            Type dataCollectionGenericType,
-                                            IQueryable<object> data,
-                                            IEnumerable<KeyValuePair<string, FilterRequestModel>> filterDict)
+        public IQueryable<object> Execute(IQueryable<object> data, RequestModel requestModel, Type dataCollectionGenericType)
         {
+            var filterDict = requestModel.Filter;
+            if (filterDict == null)
+            {
+                return data;
+            }
+
             // STARRT validation
             this.validationProvider.ValidateMustNotBeNull(dataCollectionGenericType, "data collection generic type");
             this.validationProvider.ValidateMustNotBeNull(data, "filtered data");
-            this.validationProvider.ValidateMustNotBeNull(filterDict, "filters dictionary");
             // END validation
 
             foreach (var filter in filterDict)

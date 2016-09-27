@@ -1,17 +1,25 @@
 ﻿namespace DataTables.ProcessDataProviders
 {
-    using DataTables.Expressions;
     using System;
     using System.Linq;
+    using DataTables.Expressions;
+    using Models.Request;
 
-    class GetIdentifiersProvider
+    internal class GetIdentifiersProvider : IGetIdentifiersProvider
     {
         public GetIdentifiersProvider()
         {
         }
 
-        public IQueryable GetIdentifierCollection(Type dataGenericType, string propName, IQueryable<object> data)
+        public IQueryable Execute(IQueryable<object> data, RequestModel requestModel, Type dataGenericType)
         {
+            if (requestModel.GetIdentifiers == false)
+            {
+                return null;
+            }
+
+            var propName = requestModel.IdentifierPropName;
+
             if (string.IsNullOrEmpty(propName))
             {
                 throw new ArgumentNullException("Identifiers property name must be provided");

@@ -1,29 +1,30 @@
 ﻿namespace DataTables
 {
-    using CommonProviders;
-    using ProcessDataProviders;
     using System;
     using System.Linq;
     using System.Web.Mvc;
-
+    using CommonProviders;
+    using Models.Request;
+    using ProcessDataProviders;
+    using ProcessDataProviders.Contracts;
     /// <summary>
     /// Application Engine
     /// </summary>
-    class Engine
+    internal class Engine
     {
-        private FilterProvider filterProvider;
+        private RequestParamsManager requestParamsManager;
+        private IProcessData filterProvider;
+        private IProcessData sortProvider;
         private GetIdentifiersProvider getIdentifiersProvider;
         private JsonProvider jsonProvider;
-        private RequestParamsManager requestParamsManager;
-        private SortProvider sortProvider;
 
         public Engine()
         {
+            this.requestParamsManager = new RequestParamsManager();
             this.filterProvider = new FilterProvider();
             this.sortProvider = new SortProvider();
-            this.jsonProvider = new JsonProvider();
-            this.requestParamsManager = new RequestParamsManager();
             this.getIdentifiersProvider = new GetIdentifiersProvider();
+            this.jsonProvider = new JsonProvider();
         }
 
         /// <summary>
@@ -33,32 +34,23 @@
         public void Run(ActionExecutedContext filterContext)
         {
             // Get request model
-            var requestModel = this.requestParamsManager.GetRequestModel(filterContext);
+            RequestModel requestModel = this.requestParamsManager.GetRequestModel(filterContext);
 
-            var collectionDataType = requestModel.Data
-                                        .GetType()
-                                        .GetGenericArguments()
-                                        .FirstOrDefault();
+            // Get data generic type
+            Type dataGenericType = requestModel.Data.GetType().GetGenericArguments().FirstOrDefault();
+
             // Filtered Data
-            IQueryable<object> filteredData =
-                                                requestModel.Filter == null ?
-                                                requestModel.Data :
-                                                this.filterProvider.FilterData(collectionDataType, requestModel.Data, requestModel.Filter);
-
+            IQueryable<object> filteredData = this.filterProvider.Execute(requestModel.Data, requestModel, dataGenericType);
             // Ordered Data
-            IQueryable<object> orderedData = this.sortProvider.SortCollection(filteredData, requestModel.OrderByPropName, requestModel.IsAscending, collectionDataType);
-
-            // Paged Data
-            var pageData = orderedData
-                .Skip((requestModel.Page - 1) * requestModel.PageSize)
-                .Take(requestModel.PageSize);
+            IQueryable<object> sortedData = this.sortProvider.Execute(filteredData, requestModel, dataGenericType);
 
             // Identifiers collection
-            IQueryable identifiers = null;
-            if (requestModel.GetIdentifiers)
-            {
-                identifiers = this.getIdentifiersProvider.GetIdentifierCollection(collectionDataType, requestModel.IdentifierPropName, orderedData);
-            }
+            IQueryable identifiers = this.getIdentifiersProvider.Execute(sortedData, requestModel, dataGenericType);
+
+            // Paged Data
+            var pageData = sortedData
+                .Skip((requestModel.Page - 1) * requestModel.PageSize)
+                .Take(requestModel.PageSize);
 
             // Set JSON Result
             var resultObj = new
@@ -67,8 +59,10 @@
                 data = pageData,
                 rowsNumber = filteredData.Count()
             };
+
             var jsonResult = jsonProvider.GetJsonResult(resultObj);
 
+            // Set result
             filterContext.Result = jsonResult;
         }
     }

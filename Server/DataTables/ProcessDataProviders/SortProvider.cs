@@ -1,12 +1,13 @@
 ﻿namespace DataTables.ProcessDataProviders
 {
-    using CommonProviders;
-    using Expressions;
     using System;
     using System.Linq;
-    using System.Linq.Expressions;
+    using CommonProviders;
+    using Contracts;
+    using Expressions;
+    using Models.Request;
 
-    public class SortProvider
+    public class SortProvider : IProcessData
     {
         private ValidationProvider validationProvider;
 
@@ -15,21 +16,23 @@
             this.validationProvider = new ValidationProvider();
         }
 
-        public IQueryable<object> SortCollection(IQueryable<object> filteredData, string orderBy, bool asc, Type collectionDataType)
+        public IQueryable<object> Execute(IQueryable<object> data, RequestModel requestModel, Type collectionDataType)
         {
+            var orderBy = requestModel.OrderByPropName;
+            var asc = requestModel.IsAscending;
+
             if (!string.IsNullOrEmpty(orderBy))
             {
                 this.validationProvider.ValidateMustNotBeNull(orderBy, "OrderBy property name");
-                this.validationProvider.ValidateMustNotBeNull(filteredData, "data collection");
+                this.validationProvider.ValidateMustNotBeNull(data, "data collection");
                 this.validationProvider.ValidateMustNotBeNull(collectionDataType, "data collection generic type");
 
-
                 var expr = OrderByLambda.LambdaExpression(collectionDataType, orderBy, asc);
-                IQueryable<object> sorted = (IQueryable<object>)expr.Compile().DynamicInvoke(filteredData);
+                IQueryable<object> sorted = (IQueryable<object>)expr.Compile().DynamicInvoke(data);
                 return sorted;
             }
 
-            return filteredData;
+            return data;
         }
     }
 }
