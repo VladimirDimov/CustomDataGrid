@@ -196,7 +196,6 @@ var features = (function (dataLoader, renderer) {
         }
     };
 
-
     function renderNumberOfRows(table) {
         var numberOfRows = table.store.numberOfRows;
 
