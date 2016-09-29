@@ -146,10 +146,6 @@
       <Project>{62a8a8da-094b-4b41-b552-465964663860}</Project>
       <Name>Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WebApi\WebApi.csproj">
-      <Project>{6AAA4544-82A1-425B-89BE-DB9772F8200B}</Project>
-      <Name>WebApi</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Choose>
