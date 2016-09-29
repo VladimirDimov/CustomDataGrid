@@ -3,6 +3,8 @@ var renderer = require('../../../js/renderer.js');
 
 var features = (function (dataLoader, renderer) {
     'use strict';
+    var _numberOfRows = 'number-of-rows';
+    var_numberOfPages = 'number-of-pages';
 
     var features = {
         init: function (table) {
@@ -15,7 +17,7 @@ var features = (function (dataLoader, renderer) {
     function renderNumberOfRows(table) {
         var numberOfRows = table.store.numberOfRows;
 
-        var containers = table.$table.find('[number-of-rows]');
+        var containers = table.$table.find('[' + _numberOfRows+']');
 
         for (var i = 0, l = containers.length; i < l; i += 1) {
             $(containers[i]).html(numberOfRows);
@@ -25,7 +27,7 @@ var features = (function (dataLoader, renderer) {
     function renderNumberOfPages(table) {
         var numberOfPages = table.store.numberOfPages;
 
-        var containers = table.$table.find('[number-of-pages]');
+        var containers = table.$table.find('[' + var_numberOfPages+']');
 
         for (var i = 0, l = containers.length; i < l; i += 1) {
             $(containers[i]).html(numberOfPages);
