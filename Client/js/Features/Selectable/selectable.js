@@ -10,12 +10,7 @@ var selectableInitialiser = (function () {
 
             table.events.onTableRendered.push(selectable.refreshPageSelection);
 
-            table.store.selectable = {};
-            table.store.selectable.identifier = settings.selectable.identifier;
-            table.store.selectable.identifiers = null;
-            table.store.selectable.requestIdentifiersOnDataLoad = true;
-            table.store.selectable.multi = settings.selectable.multi;
-            table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
+            configure(table, settings);
 
             setEvents(table);
             setFunctions(table);
@@ -77,6 +72,15 @@ var selectableInitialiser = (function () {
             }
         }
     };
+
+    function configure(table, settings) {
+        table.store.selectable = {};
+        table.store.selectable.identifier = settings.selectable.identifier;
+        table.store.selectable.identifiers = null;
+        table.store.selectable.requestIdentifiersOnDataLoad = true;
+        table.store.selectable.multi = settings.selectable.multi;
+        table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
+    }
 
     function setFunctions(table) {
         table.selectAll = function () {

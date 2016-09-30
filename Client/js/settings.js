@@ -16,8 +16,6 @@ var settings = (function (defaultSettings, validator) {
 
             // Set custom values
             setCustomPaging.call(this, settings.paging);
-            // setCustomPaginator.call(this, settings.paginator);
-            setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomEditable.call(this, settings.editable);
             setCustomSelectable.call(this, settings.selectable);
@@ -88,18 +86,6 @@ var settings = (function (defaultSettings, validator) {
         } else {
             paging.enable = true;
         }
-    }
-
-    function setCustomFeatures(features) {
-        // // if (!features) return;
-        // if (features.selectable) {
-
-        //     if (features.selectable.cssClasses) {
-        //         validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
-        //         this.features.selectable.cssClasses = features.selectable.cssClasses;
-        //     }
-
-        // }
     }
 
     function setCustomColumns(columns) {

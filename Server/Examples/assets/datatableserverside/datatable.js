@@ -660,12 +660,7 @@ var selectableInitialiser = (function () {
 
             table.events.onTableRendered.push(selectable.refreshPageSelection);
 
-            table.store.selectable = {};
-            table.store.selectable.identifier = settings.selectable.identifier;
-            table.store.selectable.identifiers = null;
-            table.store.selectable.requestIdentifiersOnDataLoad = true;
-            table.store.selectable.multi = settings.selectable.multi;
-            table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
+            configure(table, settings);
 
             setEvents(table);
             setFunctions(table);
@@ -727,6 +722,15 @@ var selectableInitialiser = (function () {
             }
         }
     };
+
+    function configure(table, settings) {
+        table.store.selectable = {};
+        table.store.selectable.identifier = settings.selectable.identifier;
+        table.store.selectable.identifiers = null;
+        table.store.selectable.requestIdentifiersOnDataLoad = true;
+        table.store.selectable.multi = settings.selectable.multi;
+        table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
+    }
 
     function setFunctions(table) {
         table.selectAll = function () {
@@ -1321,8 +1325,6 @@ var settings = (function (defaultSettings, validator) {
 
             // Set custom values
             setCustomPaging.call(this, settings.paging);
-            // setCustomPaginator.call(this, settings.paginator);
-            setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomEditable.call(this, settings.editable);
             setCustomSelectable.call(this, settings.selectable);
@@ -1393,18 +1395,6 @@ var settings = (function (defaultSettings, validator) {
         } else {
             paging.enable = true;
         }
-    }
-
-    function setCustomFeatures(features) {
-        // // if (!features) return;
-        // if (features.selectable) {
-
-        //     if (features.selectable.cssClasses) {
-        //         validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
-        //         this.features.selectable.cssClasses = features.selectable.cssClasses;
-        //     }
-
-        // }
     }
 
     function setCustomColumns(columns) {
