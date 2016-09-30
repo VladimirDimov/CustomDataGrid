@@ -435,14 +435,14 @@ var paginator = (function (dataLoader, validator) {
             table.$table.on('click', 'li>a[page-next]', function (e) {
                 var page = parseInt(table.paginator.currentPage) + 1;
 
-                dataLoader.loadData(table, page, true);
+                dataLoader.loadData(table, page);
             });
 
             table.$table.on('click', 'li>a[page-previous]', function (e) {
                 var page = parseInt(table.paginator.currentPage) - 1;
                 table.paginator.currentPage = page;
 
-                dataLoader.loadData(table, page, true);
+                dataLoader.loadData(table, page);
             });
         }
     };
