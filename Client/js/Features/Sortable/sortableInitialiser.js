@@ -16,19 +16,20 @@ var sortable = (function (dataLoader) {
                     Asc: isAsc
                 };
 
-                dataLoader.loadData(table, 1)
-                    .then(function () {
-                        // table.store.$sortables.removeAttr('asc desc');
-                        table.store.$sortables.find('.th-inner').removeClass('asc desc');
+                dataLoader.loadData(table, 1, function () {
+                    // table.store.$sortables.removeAttr('asc desc');
+                    table.store.$sortables.find('.th-inner').removeClass('asc desc');
 
-                        if (isAsc) {
-                            $target.find('.th-inner').addClass('sortable both asc');
-                            $target.find('.th-inner').removeClass('desc');
-                        } else {
-                            $target.find('.th-inner').addClass('sortable both desc');
-                            $target.find('.th-inner').removeClass('asc');
-                        }
-                    });
+                    if (isAsc) {
+                        $target.find('.th-inner').addClass('sortable both asc');
+                        $target.find('.th-inner').removeClass('desc');
+                    } else {
+                        $target.find('.th-inner').addClass('sortable both desc');
+                        $target.find('.th-inner').removeClass('asc');
+                    }
+                }, function (err) {
+                    // Igonre error
+                })
             });
         },
     }

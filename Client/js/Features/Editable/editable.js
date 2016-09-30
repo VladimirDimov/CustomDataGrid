@@ -23,12 +23,6 @@ var editable = (function () {
             }, this);
 
             var $allRows = table.$table.find('tr');
-            Array.prototype.forEach.call($allRows, function (el) {
-                // var $el = $(el);
-                // if ($el.attr('data-identifier') != $row.attr('data-identifier')) {
-                //     $el.css('visibility', 'hidden');
-                // }
-            }, this);
         },
 
         updateRow: function (table, $row, template) {

@@ -2,13 +2,13 @@
 var paginator = require('../js/Features/Paginator/paginator.js');
 // var selectable = require('../js/Features/Selectable/selectable.js');
 var tableRenderer = require('../js/renderer.js');
-var q = require('../node_modules/q/q.js')
+// var q = require('../node_modules/q/q.js')
 
 var dataLoader = (function () {
     var dataLoader = {
-        loadData: function (table, page, isUpdatePaginator) {
+        loadData: function (table, page, successCallback, errorCallback) {
             var getIdentifiers;
-            var deferred = q.defer();
+            // var deferred = q.defer();
 
             // Execute onDataLoading events
             for (var index in table.events.onDataLoading) {
@@ -52,14 +52,16 @@ var dataLoader = (function () {
                         table.events.onTableRendered[index](table);
                     }
 
-                    deferred.resolve();
+                    // deferred.resolve();
+                    if (successCallback) successCallback(data);
                 },
                 error: function (err) {
                     table.$table.html(err.responseText);
+                    if (errorCallback) errorCallback(err);
                 }
             });
 
-            return deferred.promise;
+            // return deferred.promise;
         }
     };
 

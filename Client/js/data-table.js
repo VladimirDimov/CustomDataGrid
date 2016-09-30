@@ -35,7 +35,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             renderer.init(this);
             paginatorTemplate.init(table);
 
-            dataLoader.loadData(table, 1, true);
+            dataLoader.loadData(table, 1);
 
             return this;
         },
