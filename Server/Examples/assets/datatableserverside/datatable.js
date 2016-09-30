@@ -286,7 +286,7 @@ var paginatorTemplatesInitialiser = (function () {
             var currentTemplateStore = Object.create(paginatorTemplate).init();
             var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
             var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
-            currentTemplateStore.paginatorLength = $allPageItems.length;
+            currentTemplateStore.paginatorLength = $currentTemplate.attr('data-paginator-length') || $allPageItems.length;
 
             // Set active page template
             var $activePageTemplate = $currentTemplate.find('[dt-active]');
