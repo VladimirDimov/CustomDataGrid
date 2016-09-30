@@ -7,6 +7,7 @@ var q = require('../node_modules/q/q.js')
 var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
+            var getIdentifiers;
             var deferred = q.defer();
 
             // Execute onDataLoading events
@@ -16,13 +17,19 @@ var dataLoader = (function () {
 
             var filter = formatFilterRequestValues(table.store.filter);
 
+            if (table.store.selectable) {
+                getIdentifiers = table.store.selectable.requestIdentifiersOnDataLoad && table.store.selectable.identifiers === null;
+            } else {
+                getIdentifiers = false;
+            }
+
             $.ajax({
                 url: table.settings.ajax.url,
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 data: {
-                    identifierPropName: table.settings.features.identifier,
-                    getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
+                    identifierPropName: table.store.selectable ? table.store.selectable.identifier : null,
+                    getIdentifiers: getIdentifiers,
                     page: page,
                     pageSize: table.settings.paging.pageSize,
                     filter: JSON.stringify(filter),
@@ -72,14 +79,16 @@ var dataLoader = (function () {
     }
 
     function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        var identifierPropName;
         var dataObj = {};
-        var identifierName = table.settings.features.identifier;
+
+        identifierName = table.store.selectable ? table.store.selectable.identifier : null;
 
         table.store.currentPage = currentPage;
 
         for (var i = 0, l = data.length; i < l; i += 1) {
             var curDataRow = data[i];
-            dataObj[curDataRow[identifierName]] = curDataRow;
+            dataObj[curDataRow[identifierName] || i] = curDataRow;
         }
         table.store.pageData = dataObj;
 
@@ -96,10 +105,10 @@ var dataLoader = (function () {
             return;
         }
 
-        table.store.identifiers = {};
+        table.store.selectable.identifiers = {};
 
         for (var i = 0, l = identifiers.length; i < l; i += 1) {
-            table.store.identifiers[identifiers[i]] = {
+            table.store.selectable.identifiers[identifiers[i]] = {
                 selected: false,
             };
         }

@@ -19,8 +19,9 @@ var renderer = (function (selectable) {
             return content;
         },
 
-        renderRow: function (table, rowData, templateName) {
-            var identifier = rowData[table.settings.features.identifier];
+        renderRow: function (table, rowData, templateName, index) {
+            var identifierPropName = table.store.selectable ? table.store.selectable.identifier : null;
+            var identifier = rowData[identifierPropName] || index;
             var $row;
             var propValue, $template;
 
@@ -68,7 +69,7 @@ var renderer = (function (selectable) {
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData, 'main');
+                var $row = renderer.renderRow(table, rowData, 'main', row);
                 buffer.push($row);
             }
 
@@ -106,7 +107,7 @@ var renderer = (function (selectable) {
             $($curRow).fadeOut(0,0);
             $curRow.html($rowFromTemplate.html());
             $($curRow).fadeIn(parseInt(delay));
-        })
+        });
     }
 
     return renderer;

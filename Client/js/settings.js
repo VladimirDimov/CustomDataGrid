@@ -20,6 +20,7 @@ var settings = (function (defaultSettings, validator) {
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomEditable.call(this, settings.editable);
+            setCustomSelectable.call(this, settings.selectable);
 
             this.ajax = settings.ajax;
 
@@ -38,6 +39,13 @@ var settings = (function (defaultSettings, validator) {
         },
         set features(val) {
             this._features = val;
+        },
+
+        get selectable() {
+            return this._selectable;
+        },
+        set selectable(value) {
+            this._selectable = value;
         },
 
         get ajax() {
@@ -65,6 +73,10 @@ var settings = (function (defaultSettings, validator) {
         }
     };
 
+    function setCustomSelectable(selectable) {
+        this.selectable  = selectable;
+    }
+
     function setCustomPaging(paging) {
         if (!paging) return;
         if (paging.pageSize) {
@@ -79,28 +91,15 @@ var settings = (function (defaultSettings, validator) {
     }
 
     function setCustomFeatures(features) {
-        if (!features) return;
-        if (features.selectable) {
-            if (features.selectable.enable != undefined) {
-                validator.ValidateMustBeValidBoolean(features.selectable.enable, "features.selectable.enable");
-                this.features.selectable.enable = features.selectable.enable;
-            }
+        // // if (!features) return;
+        // if (features.selectable) {
 
-            if (features.selectable.cssClasses) {
-                validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
-                this.features.selectable.cssClasses = features.selectable.cssClasses;
-            }
+        //     if (features.selectable.cssClasses) {
+        //         validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
+        //         this.features.selectable.cssClasses = features.selectable.cssClasses;
+        //     }
 
-            if (features.selectable.multi != undefined) {
-                validator.ValidateMustBeValidBoolean(features.selectable.multi);
-                this.features.selectable.multi = features.selectable.multi;
-            }
-
-            if (features.identifier) {
-                validator.ValidateMustBeValidString(features.identifier, 'features.identifier');
-                this.features.identifier = features.identifier;
-            }
-        }
+        // }
     }
 
     function setCustomColumns(columns) {

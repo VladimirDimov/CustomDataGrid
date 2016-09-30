@@ -658,9 +658,14 @@ var selectableInitialiser = (function () {
                 return;
             }
 
-            table.store.identifiers = null;
             table.events.onTableRendered.push(selectable.refreshPageSelection);
-            table.store.requestIdentifiersOnDataLoad = true;
+
+            table.store.selectable = {};
+            table.store.selectable.identifier = settings.selectable.identifier;
+            table.store.selectable.identifiers = null;
+            table.store.selectable.requestIdentifiersOnDataLoad = true;
+            table.store.selectable.multi = settings.selectable.multi;
+            table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
 
             setEvents(table);
             setFunctions(table);
@@ -668,8 +673,8 @@ var selectableInitialiser = (function () {
 
         getSelected: function (table) {
             var seletedIdentifiers = [];
-            var identifiers = table.store.identifiers;
-            if (table.settings.features.selectable.enable === false) {
+            var identifiers = table.store.selectable.identifiers;
+            if (table.store.selectable.enable === false) {
                 throw "The selectable option is disabled. You can enable it by setting the property settings.features.selectable.enable = true";
             }
 
@@ -685,7 +690,7 @@ var selectableInitialiser = (function () {
 
         unselectAll: function (table) {
             var numberOfModifiedRows = 0;
-            var identifiers = table.store.identifiers;
+            var identifiers = table.store.selectable.identifiers;
             if (identifiers) {
                 for (var prop in identifiers) {
                     if (identifiers[prop].selected == true) {
@@ -702,9 +707,9 @@ var selectableInitialiser = (function () {
         },
 
         selectAll: function (table) {
-            if (table.store.identifiers) {
-                for (var prop in table.store.identifiers) {
-                    table.store.identifiers[prop].selected = true;
+            if (table.store.selectable.identifiers) {
+                for (var prop in table.store.selectable.identifiers) {
+                    table.store.selectable.identifiers[prop].selected = true;
                 }
             }
         },
@@ -744,7 +749,7 @@ var selectableInitialiser = (function () {
             var numberOfSelectedRows;
 
             // No Ctrl && is not multiselect
-            if (!e.ctrlKey || !table.settings.features.selectable.multi) {
+            if (!e.ctrlKey || !table.store.selectable.multi) {
                 numberOfSelectedRows = selectable.unselectAll(table);
             }
 
@@ -763,16 +768,16 @@ var selectableInitialiser = (function () {
     }
 
     function isSelectable(settings) {
-        if (settings.features && settings.features.selectable && settings.features.selectable.enable !== undefined) {
-            validator.ValidateMustBeValidBoolean(settings.features.selectable.enable, 'settings.features.selectable.enable');
-            return settings.features.selectable.enable;
+        if (settings.selectable && settings.selectable.enable !== undefined) {
+            validator.ValidateMustBeValidBoolean(settings.selectable.enable, 'settings.features.selectable.enable');
+            return settings.selectable.enable;
         }
 
         return defaultSettings.features.selectable.enable;
     }
 
     function setRowSelectCssClasses(table, $row, isSelected) {
-        var cssClasses = table.settings.features.selectable.cssClasses;
+        var cssClasses = table.store.selectable.cssClasses;
         if (isSelected) {
             $row.addClass(cssClasses);
         } else {
@@ -787,26 +792,20 @@ var selectableInitialiser = (function () {
     }
 
     function GetIdentifierObj(table, identifier) {
-        if (!table.store.identifiers) {
+        if (!table.store.selectable.identifiers) {
             throw "There are no identifiers loaded to the data table";
         }
 
-        var identifierObj = table.store.identifiers[identifier];
+        var identifierObj = table.store.selectable.identifiers[identifier];
 
         if (!identifierObj) {
-            throw new "Invalid identifier value: " + identifier;
+            throw "Invalid identifier value: " + identifier;
         }
 
         return identifierObj;
     }
 
-    function RemoveFromArray(element, arr) {
-        var index = arr.indexOf(element);
-        arr.splice(index, 1);
-    }
-
     function setIdentifierSelectStatus(table, identifier, selected) {
-        var identifiers = table.store.identifiers;
         var identifierObj = GetIdentifierObj(table, identifier);
         identifierObj.selected = selected;
     }
@@ -1046,6 +1045,7 @@ var q = require('../node_modules/q/q.js')
 var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, isUpdatePaginator) {
+            var getIdentifiers;
             var deferred = q.defer();
 
             // Execute onDataLoading events
@@ -1055,13 +1055,19 @@ var dataLoader = (function () {
 
             var filter = formatFilterRequestValues(table.store.filter);
 
+            if (table.store.selectable) {
+                getIdentifiers = table.store.selectable.requestIdentifiersOnDataLoad && table.store.selectable.identifiers === null;
+            } else {
+                getIdentifiers = false;
+            }
+
             $.ajax({
                 url: table.settings.ajax.url,
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 data: {
-                    identifierPropName: table.settings.features.identifier,
-                    getIdentifiers: table.store.requestIdentifiersOnDataLoad && table.store.identifiers === null,
+                    identifierPropName: table.store.selectable ? table.store.selectable.identifier : null,
+                    getIdentifiers: getIdentifiers,
                     page: page,
                     pageSize: table.settings.paging.pageSize,
                     filter: JSON.stringify(filter),
@@ -1111,14 +1117,16 @@ var dataLoader = (function () {
     }
 
     function refreshPageData(table, data, identifiers, rowsNumber, currentPage) {
+        var identifierPropName;
         var dataObj = {};
-        var identifierName = table.settings.features.identifier;
+
+        identifierName = table.store.selectable ? table.store.selectable.identifier : null;
 
         table.store.currentPage = currentPage;
 
         for (var i = 0, l = data.length; i < l; i += 1) {
             var curDataRow = data[i];
-            dataObj[curDataRow[identifierName]] = curDataRow;
+            dataObj[curDataRow[identifierName] || i] = curDataRow;
         }
         table.store.pageData = dataObj;
 
@@ -1135,10 +1143,10 @@ var dataLoader = (function () {
             return;
         }
 
-        table.store.identifiers = {};
+        table.store.selectable.identifiers = {};
 
         for (var i = 0, l = identifiers.length; i < l; i += 1) {
-            table.store.identifiers[identifiers[i]] = {
+            table.store.selectable.identifiers[identifiers[i]] = {
                 selected: false,
             };
         }
@@ -1199,8 +1207,9 @@ var renderer = (function (selectable) {
             return content;
         },
 
-        renderRow: function (table, rowData, templateName) {
-            var identifier = rowData[table.settings.features.identifier];
+        renderRow: function (table, rowData, templateName, index) {
+            var identifierPropName = table.store.selectable ? table.store.selectable.identifier : null;
+            var identifier = rowData[identifierPropName] || index;
             var $row;
             var propValue, $template;
 
@@ -1248,7 +1257,7 @@ var renderer = (function (selectable) {
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];
-                var $row = renderer.renderRow(table, rowData, 'main');
+                var $row = renderer.renderRow(table, rowData, 'main', row);
                 buffer.push($row);
             }
 
@@ -1286,7 +1295,7 @@ var renderer = (function (selectable) {
             $($curRow).fadeOut(0,0);
             $curRow.html($rowFromTemplate.html());
             $($curRow).fadeIn(parseInt(delay));
-        })
+        });
     }
 
     return renderer;
@@ -1316,6 +1325,7 @@ var settings = (function (defaultSettings, validator) {
             setCustomFeatures.call(this, settings.features);
             setCustomColumns.call(this, settings.columns);
             setCustomEditable.call(this, settings.editable);
+            setCustomSelectable.call(this, settings.selectable);
 
             this.ajax = settings.ajax;
 
@@ -1334,6 +1344,13 @@ var settings = (function (defaultSettings, validator) {
         },
         set features(val) {
             this._features = val;
+        },
+
+        get selectable() {
+            return this._selectable;
+        },
+        set selectable(value) {
+            this._selectable = value;
         },
 
         get ajax() {
@@ -1361,6 +1378,10 @@ var settings = (function (defaultSettings, validator) {
         }
     };
 
+    function setCustomSelectable(selectable) {
+        this.selectable  = selectable;
+    }
+
     function setCustomPaging(paging) {
         if (!paging) return;
         if (paging.pageSize) {
@@ -1375,28 +1396,15 @@ var settings = (function (defaultSettings, validator) {
     }
 
     function setCustomFeatures(features) {
-        if (!features) return;
-        if (features.selectable) {
-            if (features.selectable.enable != undefined) {
-                validator.ValidateMustBeValidBoolean(features.selectable.enable, "features.selectable.enable");
-                this.features.selectable.enable = features.selectable.enable;
-            }
+        // // if (!features) return;
+        // if (features.selectable) {
 
-            if (features.selectable.cssClasses) {
-                validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
-                this.features.selectable.cssClasses = features.selectable.cssClasses;
-            }
+        //     if (features.selectable.cssClasses) {
+        //         validator.ValidateMustBeValidStringOrNull(features.selectable.cssClasses, "features.selectable.cssClasses");
+        //         this.features.selectable.cssClasses = features.selectable.cssClasses;
+        //     }
 
-            if (features.selectable.multi != undefined) {
-                validator.ValidateMustBeValidBoolean(features.selectable.multi);
-                this.features.selectable.multi = features.selectable.multi;
-            }
-
-            if (features.identifier) {
-                validator.ValidateMustBeValidString(features.identifier, 'features.identifier');
-                this.features.identifier = features.identifier;
-            }
-        }
+        // }
     }
 
     function setCustomColumns(columns) {
