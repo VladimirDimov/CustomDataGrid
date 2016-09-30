@@ -660,8 +660,6 @@ var sortable = (function (dataLoader) {
                         $target.find('.th-inner').addClass('sortable both desc');
                         $target.find('.th-inner').removeClass('asc');
                     }
-                }, function (err) {
-                    // Igonre error
                 })
             });
         },

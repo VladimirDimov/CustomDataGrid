@@ -187,7 +187,7 @@
             },
             paging: {
                 enable: true,
-                pageSize: 20
+                pageSize: 8
             },
             spinner: {
                 enable: true, // default value is "true"
@@ -195,14 +195,12 @@
                 opacity: 0.2,
                 width: '200px'
             },
-            features: {
+            selectable: {
                 identifier: 'Id',
-                selectable: {
-                    enable: true,
-                    multi: true,
-                    cssClasses: 'active'
-                },
-            }
+                enable: true,
+                multi: true,
+                cssClasses: 'active'
+            },
         });
 
         $(document).ready(function () {
