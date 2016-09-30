@@ -50,6 +50,9 @@
             <table dt-table class="table table-hover JColResizer">
                 <thead>
                     <tr>
+                        <th>
+                            <input type="checkbox" name="name" value="" />
+                        </th>
                         <th @*sortable*@ data-name="Id" @*style="width: 175px;"*@ data-field="id" tabindex="0">
                             <div class="th-inner th-inner">ID</div>
                             <div class="fht-cell" style="width: 175px;">
@@ -89,6 +92,9 @@
                         </td>
                     </tr>
                     <tr dt-template="main">
+                        <td>
+                            <input class="selected" type="checkbox" name="name" value="" />
+                        </td>
                         <td>
                             <div data-name="Id"></div>
                         </td>
@@ -146,10 +152,10 @@
                 multi: true,
                 cssClasses: 'warning',
                 onSelectedRowRendered: function ($row) {
-                    $row.find('td').first().css('background-color', 'red');
+                    $row.find('input.selected').prop('checked', true);
                 },
                 onNotSelectedRowRendered: function ($row) {
-                    $row.find('td').first().css('background-color', '');
+                    $row.find('input.selected').prop('checked', false);
                 }
             },
             columns: {
