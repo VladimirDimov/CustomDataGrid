@@ -73,6 +73,8 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
         table.events.onDataLoaded = [];
         table.events.onDataLoading = [];
         table.events.onTableRendered = [];
+        table.events.onSelectedRowRendered = []; // someFunction($row);
+        table.events.onNotSelectedRowRendered = []; // someFunction($row);
     }
 
     function configureStore(table) {

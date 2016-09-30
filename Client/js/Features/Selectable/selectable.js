@@ -10,6 +10,14 @@ var selectableInitialiser = (function () {
 
             table.events.onTableRendered.push(selectable.refreshPageSelection);
 
+            if (settings.selectable.onSelectedRowRendered) {
+                table.events.onSelectedRowRendered.push(settings.selectable.onSelectedRowRendered);
+            }
+
+            if (settings.selectable.onNotSelectedRowRendered) {
+                table.events.onNotSelectedRowRendered.push(settings.selectable.onNotSelectedRowRendered);
+            }
+
             configure(table, settings);
 
             setEvents(table);
@@ -66,8 +74,20 @@ var selectableInitialiser = (function () {
                 var rowIdentifier = $row.attr('data-identifier');
                 if (isSelected(table, rowIdentifier)) {
                     setRowSelectCssClasses(table, $row, true);
+
+                    // Run events for selected
+                    table.events.onSelectedRowRendered.forEach(function (event) {
+                        event($row);
+                    }, this);
+
                 } else {
                     setRowSelectCssClasses(table, $row, false);
+
+                    // Run events for not selected
+                    table.events.onNotSelectedRowRendered.forEach(function (event) {
+                        event($row);
+                    }, this);
+
                 }
             }
         }

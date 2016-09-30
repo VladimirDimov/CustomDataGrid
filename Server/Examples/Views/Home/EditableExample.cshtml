@@ -144,7 +144,13 @@
                 identifier: 'Id',
                 enable: true,
                 multi: true,
-                cssClasses: 'warning'
+                cssClasses: 'warning',
+                onSelectedRowRendered: function ($row) {
+                    $row.find('td').first().css('background-color', 'red');
+                },
+                onNotSelectedRowRendered: function ($row) {
+                    $row.find('td').first().css('background-color', '');
+                }
             },
             columns: {
                 Actions: {
