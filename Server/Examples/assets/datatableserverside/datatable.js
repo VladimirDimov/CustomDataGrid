@@ -38,7 +38,7 @@ var features = (function (dataLoader, renderer) {
 } (dataLoader, renderer));
 
 module.exports = features;
-},{"../../../js/dataLoader.js":11,"../../../js/renderer.js":13}],2:[function(require,module,exports){
+},{"../../../js/dataLoader.js":12,"../../../js/renderer.js":14}],2:[function(require,module,exports){
 var renderer = require('../../../js/renderer.js');
 var validator = require('../../../js/validator.js');
 
@@ -119,7 +119,7 @@ var editable = (function () {
 } ());
 
 module.exports = editable;
-},{"../../../js/renderer.js":13,"../../../js/validator.js":15}],3:[function(require,module,exports){
+},{"../../../js/renderer.js":14,"../../../js/validator.js":16}],3:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 
 var filterInitialiser = (function (dataLoader) {
@@ -170,7 +170,38 @@ var filterInitialiser = (function (dataLoader) {
 } (dataLoader));
 
 module.exports = filterInitialiser;
-},{"../../../js/dataLoader.js":11}],4:[function(require,module,exports){
+},{"../../../js/dataLoader.js":12}],4:[function(require,module,exports){
+var paginatorPredefinedTemplatesFactory = (function () {
+    'use strict'
+
+    return {
+        getTemplate: function (templateNumber, configurations) {
+            switch (templateNumber) {
+                case "1":
+                    return getTemplateA(configurations);
+
+                default:
+                    break;
+            }
+        }
+    };
+
+    function getTemplateA(configurations) {
+        var html = '<ul class="pagination pagination-sm">' +
+            '<li dt-paginator-page><a href="#" dt-paginator-inner>1</a></li>' +
+            '<li dt-paginator-page dt-active class="active"><a href="#" dt-paginator-inner>2</a></li>' +
+            '<li dt-paginator-page><a href="#" dt-paginator-inner>3</a></li>' +
+            '<li dt-paginator-page><a href="#" dt-paginator-inner>4</a></li>' +
+            '<li dt-paginator-page><a href="#" dt-paginator-inner>5</a></li>' +
+            '</ul>';
+
+        return $.parseHTML(html);
+    }
+
+})();
+
+module.exports = paginatorPredefinedTemplatesFactory;
+},{}],5:[function(require,module,exports){
 var validator = require('../../../js/validator.js');
 
 var paginatorTemplate = (function () {
@@ -218,21 +249,48 @@ var paginatorTemplate = (function () {
 })();
 
 module.exports = paginatorTemplate;
-},{"../../../js/validator.js":15}],5:[function(require,module,exports){
+},{"../../../js/validator.js":16}],6:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 var paginatorTemplate = require('./paginatorTemplate.js');
+var paginatorPredefinedTemplatesFactory = require('./paginatorPredefinedTemplatesFactory.js');
 
 var paginatorTemplatesInitialiser = (function () {
+    var _dtPaginator = 'dt-paginator';
+    var _dtPaginatorLength = 'dt-paginator-length';
+
     var paginatorTemplatesInitialiser = {
         init: function (table) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
+            var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
             if ($paginatorTemplates.length == 0) return;
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
+
+            var predefinedTemplates = getPredefinedTemplates($paginatorPredefinedTemplateContainers);
+            setPaginatorTemplateElements(table, predefinedTemplates);
+
             table.events.onDataLoaded.push(updatePaginators);
             setPageClickEvents(table);
         }
     };
+
+    function getPredefinedTemplates($paginatorPredefinedTemplateContainers) {
+        var predefinedTemplates = [];
+
+        $paginatorPredefinedTemplateContainers.each(function (i) {
+            var $curTempalteContainer = $($paginatorPredefinedTemplateContainers[i]);
+            var tempalteNumber = $curTempalteContainer.attr(_dtPaginator);
+            var config = {
+                length: $curTempalteContainer.attr('dt-paginator-length')
+            };
+
+            var $curTemplate = paginatorPredefinedTemplatesFactory.getTemplate(tempalteNumber, config);
+            $curTempalteContainer.append($curTemplate);
+            predefinedTemplates.push($curTempalteContainer);
+        });
+
+        return predefinedTemplates;
+    }
 
     function updatePaginators(table) {
         var paginatorTemplates = table.store.paginatorTemplates;
@@ -280,7 +338,7 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function setPaginatorTemplateElements(table, $paginatorTemplates) {
-        table.store.paginatorTemplates = [];
+        table.store.paginatorTemplates = table.store.paginatorTemplates || [];
         for (var i = 0, length = $paginatorTemplates.length; i < length; i += 1) {
             var $currentTemplate = $($paginatorTemplates[i]);
             var currentTemplateStore = Object.create(paginatorTemplate).init();
@@ -309,7 +367,7 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function setPageClickEvents(table) {
-        table.$table.on('click', '[dt-template=paginator] [dt-paginator-inner]', function () {
+        table.$table.on('click', '[dt-paginator-inner]', function () {
             var $this = $(this);
             var page = $this.html();
 
@@ -348,7 +406,7 @@ var paginatorTemplatesInitialiser = (function () {
 })();
 
 module.exports = paginatorTemplatesInitialiser;
-},{"../../../js/dataLoader.js":11,"./paginatorTemplate.js":4}],6:[function(require,module,exports){
+},{"../../../js/dataLoader.js":12,"./paginatorPredefinedTemplatesFactory.js":4,"./paginatorTemplate.js":5}],7:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 var validator = require('../../../js/validator.js');
 
@@ -459,7 +517,7 @@ var paginator = (function (dataLoader, validator) {
 } (dataLoader, validator));
 
 module.exports = paginator;
-},{"../../../js/dataLoader.js":11,"../../../js/validator.js":15}],7:[function(require,module,exports){
+},{"../../../js/dataLoader.js":12,"../../../js/validator.js":16}],8:[function(require,module,exports){
 var validator = require('../../../js/validator.js');
 var defaultSettings = require('../../../js/defaultSettings.js');
 
@@ -650,7 +708,7 @@ var selectableInitialiser = (function () {
 })();
 
 module.exports = selectableInitialiser;
-},{"../../../js/defaultSettings.js":12,"../../../js/validator.js":15}],8:[function(require,module,exports){
+},{"../../../js/defaultSettings.js":13,"../../../js/validator.js":16}],9:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
@@ -687,7 +745,7 @@ var sortable = (function (dataLoader) {
 })(dataLoader);
 
 module.exports = sortable;
-},{"../../../js/dataLoader.js":11}],9:[function(require,module,exports){
+},{"../../../js/dataLoader.js":12}],10:[function(require,module,exports){
 var defaultSettings = require('../../../js/defaultSettings');
 
 // =====================================================================
@@ -761,7 +819,7 @@ var spinnerInitialiser = (function (defaultSettings) {
 } (defaultSettings));
 
 module.exports = spinnerInitialiser;
-},{"../../../js/defaultSettings":12}],10:[function(require,module,exports){
+},{"../../../js/defaultSettings":13}],11:[function(require,module,exports){
 var selectable = require('../js/Features/Selectable/selectable.js');
 var sortable = require('../js/Features/Sortable/sortableInitialiser.js');
 var dataLoader = require('../js/dataLoader.js');
@@ -872,7 +930,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 })(selectable, sortable, dataLoader, paginator, filter, editable, validator, settings, features, renderer, spinner, paginatorTemplate);
 
 module.exports = window.dataTable;
-},{"../js/Features/AdditionalFeatures/additionalFeatures.js":1,"../js/Features/Editable/editable":2,"../js/Features/Filter/filterInitialiser.js":3,"../js/Features/Paginator/paginator.js":6,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":5,"../js/Features/Selectable/selectable.js":7,"../js/Features/Sortable/sortableInitialiser.js":8,"../js/Features/Spinners/spinnerInitialiser.js":9,"../js/dataLoader.js":11,"../js/renderer.js":13,"../js/settings.js":14,"../js/validator.js":15}],11:[function(require,module,exports){
+},{"../js/Features/AdditionalFeatures/additionalFeatures.js":1,"../js/Features/Editable/editable":2,"../js/Features/Filter/filterInitialiser.js":3,"../js/Features/Paginator/paginator.js":7,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":6,"../js/Features/Selectable/selectable.js":8,"../js/Features/Sortable/sortableInitialiser.js":9,"../js/Features/Spinners/spinnerInitialiser.js":10,"../js/dataLoader.js":12,"../js/renderer.js":14,"../js/settings.js":15,"../js/validator.js":16}],12:[function(require,module,exports){
 
 var paginator = require('../js/Features/Paginator/paginator.js');
 // var selectable = require('../js/Features/Selectable/selectable.js');
@@ -995,7 +1053,7 @@ var dataLoader = (function () {
 } ());
 
 module.exports = dataLoader;
-},{"../js/Features/Paginator/paginator.js":6,"../js/renderer.js":13}],12:[function(require,module,exports){
+},{"../js/Features/Paginator/paginator.js":7,"../js/renderer.js":14}],13:[function(require,module,exports){
 var defaultSettings = (function () {
     var defaultSettings = {
         pageSize: 10,
@@ -1024,7 +1082,7 @@ var defaultSettings = (function () {
 })();
 
 module.exports = defaultSettings;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var selectable = require('../js/Features/Selectable/selectable.js');
 
 var renderer = (function (selectable) {
@@ -1141,7 +1199,7 @@ var renderer = (function (selectable) {
 } (selectable));
 
 module.exports = renderer;
-},{"../js/Features/Selectable/selectable.js":7}],14:[function(require,module,exports){
+},{"../js/Features/Selectable/selectable.js":8}],15:[function(require,module,exports){
 var defaultSettings = require('../js/defaultSettings.js');
 var validator = require('../js/validator.js');
 
@@ -1248,7 +1306,7 @@ var settings = (function (defaultSettings, validator) {
 })(defaultSettings, validator);
 
 module.exports = settings;
-},{"../js/defaultSettings.js":12,"../js/validator.js":15}],15:[function(require,module,exports){
+},{"../js/defaultSettings.js":13,"../js/validator.js":16}],16:[function(require,module,exports){
 var validator = (function () {
     var validator = {
         ValidateValueCannotBeNullOrUndefined: function (val, name, message) {
@@ -1307,4 +1365,4 @@ var validator = (function () {
 })();
 
 module.exports = validator;
-},{}]},{},[10]);
+},{}]},{},[11]);

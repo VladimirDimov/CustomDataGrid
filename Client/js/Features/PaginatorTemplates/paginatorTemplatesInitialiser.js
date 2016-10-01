@@ -1,17 +1,44 @@
 var dataLoader = require('../../../js/dataLoader.js');
 var paginatorTemplate = require('./paginatorTemplate.js');
+var paginatorPredefinedTemplatesFactory = require('./paginatorPredefinedTemplatesFactory.js');
 
 var paginatorTemplatesInitialiser = (function () {
+    var _dtPaginator = 'dt-paginator';
+    var _dtPaginatorLength = 'dt-paginator-length';
+
     var paginatorTemplatesInitialiser = {
         init: function (table) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
+            var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
             if ($paginatorTemplates.length == 0) return;
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
+
+            var predefinedTemplates = getPredefinedTemplates($paginatorPredefinedTemplateContainers);
+            setPaginatorTemplateElements(table, predefinedTemplates);
+
             table.events.onDataLoaded.push(updatePaginators);
             setPageClickEvents(table);
         }
     };
+
+    function getPredefinedTemplates($paginatorPredefinedTemplateContainers) {
+        var predefinedTemplates = [];
+
+        $paginatorPredefinedTemplateContainers.each(function (i) {
+            var $curTempalteContainer = $($paginatorPredefinedTemplateContainers[i]);
+            var tempalteNumber = $curTempalteContainer.attr(_dtPaginator);
+            var config = {
+                length: $curTempalteContainer.attr('dt-paginator-length')
+            };
+
+            var $curTemplate = paginatorPredefinedTemplatesFactory.getTemplate(tempalteNumber, config);
+            $curTempalteContainer.append($curTemplate);
+            predefinedTemplates.push($curTempalteContainer);
+        });
+
+        return predefinedTemplates;
+    }
 
     function updatePaginators(table) {
         var paginatorTemplates = table.store.paginatorTemplates;
@@ -59,7 +86,7 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function setPaginatorTemplateElements(table, $paginatorTemplates) {
-        table.store.paginatorTemplates = [];
+        table.store.paginatorTemplates = table.store.paginatorTemplates || [];
         for (var i = 0, length = $paginatorTemplates.length; i < length; i += 1) {
             var $currentTemplate = $($paginatorTemplates[i]);
             var currentTemplateStore = Object.create(paginatorTemplate).init();
@@ -88,7 +115,7 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function setPageClickEvents(table) {
-        table.$table.on('click', '[dt-template=paginator] [dt-paginator-inner]', function () {
+        table.$table.on('click', '[dt-paginator-inner]', function () {
             var $this = $(this);
             var page = $this.html();
 
