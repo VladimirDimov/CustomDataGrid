@@ -180,8 +180,11 @@ var paginatorPredefinedTemplatesFactory = (function () {
                 case "1":
                     return getTemplateA(configurations);
 
+                case "2":
+                    return getTemplateB(configurations);
+
                 default:
-                    break;
+                    throw "Invalid paginator template number: " + templateNumber;
             }
         }
     };
@@ -193,6 +196,38 @@ var paginatorPredefinedTemplatesFactory = (function () {
             '<li dt-paginator-page><a href="#" dt-paginator-inner>3</a></li>' +
             '<li dt-paginator-page><a href="#" dt-paginator-inner>4</a></li>' +
             '<li dt-paginator-page><a href="#" dt-paginator-inner>5</a></li>' +
+            '</ul>';
+
+        return $.parseHTML(html);
+    }
+
+    function getTemplateB(configurations) {
+        var html =
+            '<ul class="pagination pagination-lg">' +
+            '<li class="page-item" dt-paginator-prev>' +
+            '<a class="page-link" href="#" aria-label="Previous">' +
+            '<span aria-hidden="true">&laquo;</span>' +
+            '<span class="sr-only">Previous</span>' +
+            '</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-first>' +
+            '<a class="page-link" href="#">first</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-page>' +
+            '<a dt-paginator-inner class="page-link" href="#">1</a>' +
+            '</li>' +
+            '<li class="page-item active" dt-paginator-page dt-active>' +
+            '<a dt-paginator-inner class="page-link" href="#">2</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-last>' +
+            '<a class="page-link" href="#">last</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-next>' +
+            '<a class="page-link" href="#" aria-label="Next">' +
+            '<span aria-hidden="true">&raquo;</span>' +
+            '<span class="sr-only">Next</span>' +
+            '</a>' +
+            '</li>' +
             '</ul>';
 
         return $.parseHTML(html);
@@ -262,7 +297,7 @@ var paginatorTemplatesInitialiser = (function () {
         init: function (table) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
-            if ($paginatorTemplates.length == 0) return;
+            if ($paginatorTemplates.length === 0 && $paginatorPredefinedTemplateContainers.length === 0) return;
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
 
@@ -344,7 +379,7 @@ var paginatorTemplatesInitialiser = (function () {
             var currentTemplateStore = Object.create(paginatorTemplate).init();
             var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
             var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
-            currentTemplateStore.paginatorLength = $currentTemplate.attr('data-paginator-length') || $allPageItems.length;
+            currentTemplateStore.paginatorLength = $currentTemplate.attr('dt-paginator-length') || $allPageItems.length;
 
             // Set active page template
             var $activePageTemplate = $currentTemplate.find('[dt-active]');

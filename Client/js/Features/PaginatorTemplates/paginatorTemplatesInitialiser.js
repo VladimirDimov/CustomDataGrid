@@ -10,7 +10,7 @@ var paginatorTemplatesInitialiser = (function () {
         init: function (table) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
-            if ($paginatorTemplates.length == 0) return;
+            if ($paginatorTemplates.length === 0 && $paginatorPredefinedTemplateContainers.length === 0) return;
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
 
@@ -92,7 +92,7 @@ var paginatorTemplatesInitialiser = (function () {
             var currentTemplateStore = Object.create(paginatorTemplate).init();
             var $pageItemsWithoutActive = $currentTemplate.find('[dt-paginator-page]:not([dt-active])');
             var $allPageItems = $currentTemplate.find('[dt-paginator-page]');
-            currentTemplateStore.paginatorLength = $currentTemplate.attr('data-paginator-length') || $allPageItems.length;
+            currentTemplateStore.paginatorLength = $currentTemplate.attr('dt-paginator-length') || $allPageItems.length;
 
             // Set active page template
             var $activePageTemplate = $currentTemplate.find('[dt-active]');
