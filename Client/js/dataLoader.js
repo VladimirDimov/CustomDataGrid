@@ -96,7 +96,7 @@ var dataLoader = (function () {
 
         table.store.numberOfRows = rowsNumber;
         if (table.settings.paging.enable) {
-            table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+            table.store.numberOfPages = Math.ceil(rowsNumber / table.settings.paging.pageSize);
         }
 
         initIdentifiers(table, identifiers);

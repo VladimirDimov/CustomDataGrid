@@ -7,7 +7,7 @@ var paginatorTemplatesInitialiser = (function () {
     var _dtPaginatorLength = 'dt-paginator-length';
 
     var paginatorTemplatesInitialiser = {
-        init: function (table) {
+        init: function (table, settings) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
             if ($paginatorTemplates.length === 0 && $paginatorPredefinedTemplateContainers.length === 0) return;

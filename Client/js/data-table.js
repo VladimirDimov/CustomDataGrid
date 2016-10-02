@@ -25,7 +25,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             configureEvents(this);
             configureStore(this);
 
-            configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
             filter.init(table);
             sortable.init(table);
@@ -33,7 +32,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             selectable.init(this, settings);
             features.init(this);
             renderer.init(this);
-            paginatorTemplate.init(table);
+            paginatorTemplate.init(table, settings);
 
             dataLoader.loadData(table, 1);
 
@@ -84,11 +83,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             data: {},
             requestIdentifiersOnDataLoad: false,
         };
-    }
-
-    function configurePaginator(table, settings, dataLoader) {
-        paginator.init(table, settings);
-        paginator.setPageClickEvents(table, dataLoader);
     }
 
     function getColumnPropertyNames() {

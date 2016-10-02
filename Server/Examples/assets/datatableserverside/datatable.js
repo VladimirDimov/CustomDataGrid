@@ -294,7 +294,7 @@ var paginatorTemplatesInitialiser = (function () {
     var _dtPaginatorLength = 'dt-paginator-length';
 
     var paginatorTemplatesInitialiser = {
-        init: function (table) {
+        init: function (table, settings) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
             if ($paginatorTemplates.length === 0 && $paginatorPredefinedTemplateContainers.length === 0) return;
@@ -882,7 +882,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             configureEvents(this);
             configureStore(this);
 
-            configurePaginator(this, settings, dataLoader);
             spinner.init(this, settings);
             filter.init(table);
             sortable.init(table);
@@ -890,7 +889,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             selectable.init(this, settings);
             features.init(this);
             renderer.init(this);
-            paginatorTemplate.init(table);
+            paginatorTemplate.init(table, settings);
 
             dataLoader.loadData(table, 1);
 
@@ -941,11 +940,6 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             data: {},
             requestIdentifiersOnDataLoad: false,
         };
-    }
-
-    function configurePaginator(table, settings, dataLoader) {
-        paginator.init(table, settings);
-        paginator.setPageClickEvents(table, dataLoader);
     }
 
     function getColumnPropertyNames() {
@@ -1064,7 +1058,7 @@ var dataLoader = (function () {
 
         table.store.numberOfRows = rowsNumber;
         if (table.settings.paging.enable) {
-            table.store.numberOfPages = Math.ceil(rowsNumber / table._paginator.length);
+            table.store.numberOfPages = Math.ceil(rowsNumber / table.settings.paging.pageSize);
         }
 
         initIdentifiers(table, identifiers);
