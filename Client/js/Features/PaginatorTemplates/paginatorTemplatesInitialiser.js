@@ -57,7 +57,7 @@ var paginatorTemplatesInitialiser = (function () {
 
         start = Math.max(Math.floor(page - halfLength), 1);
         end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
-
+        debugger;
         renderPaginator(table, storeTemplate, page, start, end);
     }
 
