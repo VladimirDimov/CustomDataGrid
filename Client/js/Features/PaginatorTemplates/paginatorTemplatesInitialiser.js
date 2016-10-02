@@ -48,15 +48,25 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function updatePaginator(table, storeTemplate) {
+        debugger;
         var page = table.store.currentPage || 1;
         var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
         var start, end;
-        var length = table.settings.paginator.length;
+        var length = storeTemplate.paginatorLength;
         var halfLength = Math.floor((length - 1) / 2);
         var currentPaginatorLength = Math.min(storeTemplate.paginatorLength, numberOfPages);
 
-        start = Math.max(Math.floor(page - halfLength), 1);
-        end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
+        if (page <= (1 + halfLength)) {
+            start = 1;
+            end = length;
+        } else if (1 + halfLength < page && page < numberOfPages - halfLength) {
+            start = Math.max(Math.floor(page - halfLength), 1);
+            end = Math.min(start + currentPaginatorLength - 1, numberOfPages);
+        } else {
+            start = numberOfPages - length + 1;
+            end = numberOfPages;
+        }
+
         debugger;
         renderPaginator(table, storeTemplate, page, start, end);
     }
