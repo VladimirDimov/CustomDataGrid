@@ -10,7 +10,18 @@ var paginatorTemplatesInitialiser = (function () {
         init: function (table, settings) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
+
             if ($paginatorTemplates.length === 0 && $paginatorPredefinedTemplateContainers.length === 0) return;
+
+            table.events.onTableInitializing.push(function () {
+                $paginatorTemplates.toggle();
+                $paginatorPredefinedTemplateContainers.toggle();
+            });
+
+            table.events.onTableInitialized.push(function () {
+                $paginatorTemplates.toggle();
+                $paginatorPredefinedTemplateContainers.toggle();
+            });
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
 
@@ -48,7 +59,6 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function updatePaginator(table, storeTemplate) {
-        debugger;
         var page = table.store.currentPage || 1;
         var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
         var start, end;
@@ -67,7 +77,6 @@ var paginatorTemplatesInitialiser = (function () {
             end = numberOfPages;
         }
 
-        debugger;
         renderPaginator(table, storeTemplate, page, start, end);
     }
 

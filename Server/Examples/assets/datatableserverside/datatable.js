@@ -297,7 +297,18 @@ var paginatorTemplatesInitialiser = (function () {
         init: function (table, settings) {
             var $paginatorTemplates = table.$table.find('[dt-template=paginator]');
             var $paginatorPredefinedTemplateContainers = table.$table.find('[' + _dtPaginator + ']');
+
             if ($paginatorTemplates.length === 0 && $paginatorPredefinedTemplateContainers.length === 0) return;
+
+            table.events.onTableInitializing.push(function () {
+                $paginatorTemplates.toggle();
+                $paginatorPredefinedTemplateContainers.toggle();
+            });
+
+            table.events.onTableInitialized.push(function () {
+                $paginatorTemplates.toggle();
+                $paginatorPredefinedTemplateContainers.toggle();
+            });
 
             setPaginatorTemplateElements(table, $paginatorTemplates);
 
@@ -335,7 +346,6 @@ var paginatorTemplatesInitialiser = (function () {
     }
 
     function updatePaginator(table, storeTemplate) {
-        debugger;
         var page = table.store.currentPage || 1;
         var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
         var start, end;
@@ -354,7 +364,6 @@ var paginatorTemplatesInitialiser = (function () {
             end = numberOfPages;
         }
 
-        debugger;
         renderPaginator(table, storeTemplate, page, start, end);
     }
 
@@ -901,7 +910,11 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
             renderer.init(this);
             paginatorTemplate.init(table, settings);
 
-            dataLoader.loadData(table, 1);
+            executeOnTableInitializingEvents(this);
+
+            dataLoader.loadData(table, 1, function () {
+                executeOnTableInitializedEvents(table);
+            });
 
             return this;
         },
@@ -941,6 +954,8 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
         table.events.onTableRendered = [];
         table.events.onSelectedRowRendered = []; // someFunction($row);
         table.events.onNotSelectedRowRendered = []; // someFunction($row);
+        table.events.onTableInitializing = [];
+        table.events.onTableInitialized = [];
     }
 
     function configureStore(table) {
@@ -964,6 +979,18 @@ window.dataTable = (function (selectable, sortable, dataLoader, paginator, filte
 
         return colPropNames;
     };
+
+    function executeOnTableInitializingEvents(table) {
+        table.events.onTableInitializing.forEach(function (event) {
+            event(table);
+        }, this);
+    }
+
+    function executeOnTableInitializedEvents(table) {
+        table.events.onTableInitialized.forEach(function (event) {
+            event(table);
+        }, this);
+    }
 
     return table;
 })(selectable, sortable, dataLoader, paginator, filter, editable, validator, settings, features, renderer, spinner, paginatorTemplate);
