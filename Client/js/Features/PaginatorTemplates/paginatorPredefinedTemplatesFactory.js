@@ -10,6 +10,9 @@ var paginatorPredefinedTemplatesFactory = (function () {
                 case "2":
                     return getTemplateB(configurations);
 
+                case "3":
+                    return getTemplateC(configurations);
+
                 default:
                     throw "Invalid paginator template number: " + templateNumber;
             }
@@ -28,9 +31,43 @@ var paginatorPredefinedTemplatesFactory = (function () {
         return $.parseHTML(html);
     }
 
+    // Large with first-last and previous-next buttons
     function getTemplateB(configurations) {
         var html =
             '<ul class="pagination pagination-lg">' +
+            '<li class="page-item" dt-paginator-prev>' +
+            '<a class="page-link" href="#" aria-label="Previous">' +
+            '<span aria-hidden="true">&laquo;</span>' +
+            '<span class="sr-only">Previous</span>' +
+            '</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-first>' +
+            '<a class="page-link" href="#">first</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-page>' +
+            '<a dt-paginator-inner class="page-link" href="#">1</a>' +
+            '</li>' +
+            '<li class="page-item active" dt-paginator-page dt-active>' +
+            '<a dt-paginator-inner class="page-link" href="#">2</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-last>' +
+            '<a class="page-link" href="#">last</a>' +
+            '</li>' +
+            '<li class="page-item" dt-paginator-next>' +
+            '<a class="page-link" href="#" aria-label="Next">' +
+            '<span aria-hidden="true">&raquo;</span>' +
+            '<span class="sr-only">Next</span>' +
+            '</a>' +
+            '</li>' +
+            '</ul>';
+
+        return $.parseHTML(html);
+    }
+
+    // Large with first-last and previous-next buttons
+    function getTemplateC(configurations) {
+        var html =
+            '<ul class="pagination pagination-sm">' +
             '<li class="page-item" dt-paginator-prev>' +
             '<a class="page-link" href="#" aria-label="Previous">' +
             '<span aria-hidden="true">&laquo;</span>' +
