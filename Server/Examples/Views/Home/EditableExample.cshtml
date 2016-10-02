@@ -111,7 +111,7 @@
                     </tr>
 
                     <tr dt-template="info">
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="jumbotron">
                                 <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
                                 <p>Salary: <span data-name="Salary" /></p>
@@ -150,7 +150,7 @@
                 identifier: 'Id',
                 enable: true,
                 multi: true,
-                cssClasses: 'warning',
+                cssClasses: 'selected',
                 onSelectedRowRendered: function ($row) {
                     $row.find('input.selected').prop('checked', true);
                 },
