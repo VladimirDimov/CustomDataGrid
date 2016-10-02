@@ -55,6 +55,7 @@ var spinnerInitialiser = (function (defaultSettings) {
     function renderSpinner(table) {
         var $tableBody = table.$table.find('tbody');
         // $tableBody.empty();
+        $tableBody.append($('<tr/>'));
         $tableBody.append(table.settings.$spinner);
     }
 
