@@ -146,6 +146,10 @@
       <Project>{62a8a8da-094b-4b41-b552-465964663860}</Project>
       <Name>Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Examples\Examples.csproj">
+      <Project>{59CAFB5E-96ED-4AFC-BAB7-0A227154C145}</Project>
+      <Name>Examples</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Choose>

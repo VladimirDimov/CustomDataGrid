@@ -1,10 +1,10 @@
-﻿using Moq;
-using System.Globalization;
-using System.Web.Mvc;
-using Server.Controllers;
-
-namespace UnitTests.Mocks.ActionExecutedContext
+﻿namespace UnitTests.Mocks.ActionExecutedContext
 {
+    using System.Globalization;
+    using System.Web.Mvc;
+    using Examples.Controllers;
+    using Moq;
+
     public static class ActionExecutedContextMocks
     {
         public static System.Web.Mvc.ActionExecutedContext GetActionExecutedContextMock(string returnValue)
@@ -42,6 +42,5 @@ namespace UnitTests.Mocks.ActionExecutedContext
 
             return filterContext;
         }
-
     }
 }

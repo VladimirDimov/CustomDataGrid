@@ -92,7 +92,6 @@
     <Compile Include="Expressions\FilterExpression.cs" />
     <Compile Include="Expressions\OrderByLambda.cs" />
     <Compile Include="Expressions\SelectPropertyExpression.cs" />
-    <Compile Include="Models\ConcatModel.cs" />
     <Compile Include="Models\Filter\FilterRequestModel.cs" />
     <Compile Include="Models\Request\RequestModel.cs" />
     <Compile Include="ProcessDataProviders\Contracts\IProcessData.cs" />
