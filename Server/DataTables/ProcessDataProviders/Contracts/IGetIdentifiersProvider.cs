@@ -1,4 +1,4 @@
-﻿namespace DataTables.ProcessDataProviders
+﻿namespace DataTables.ProcessDataProviders.Contracts
 {
     using System;
     using System.Linq;

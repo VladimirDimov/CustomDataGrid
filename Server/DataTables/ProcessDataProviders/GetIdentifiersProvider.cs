@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Contracts;
     using DataTables.Expressions;
     using Models.Request;
 

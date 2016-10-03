@@ -125,6 +125,7 @@
   <ItemGroup>
     <Compile Include="Tests\CommonProviders\HttpContextHelpersTests.cs" />
     <Compile Include="Helpers\DataCollectionsGenerator.cs" />
+    <Compile Include="Tests\GetIdentifiersProvider\GetIdentifiersProviderTests.cs" />
     <Compile Include="Tests\LambdaExpressions\OrderByLambdaTests.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ActionExecutedContextMocks.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ControllerMock.cs" />

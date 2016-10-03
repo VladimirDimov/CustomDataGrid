@@ -1,18 +1,18 @@
 ﻿namespace UnitTests.ProcessDataProviers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using DataTables.Models.Request;
     using DataTables.ProcessDataProviders;
     using Helpers;
     using Mocks.DataObjects;
     using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using DataTables.Models.Request;
-    class SortProviderTests
+
+    internal class SortProviderTests
     {
         #region ValidationTests
+
         [Test]
         public void ShouldThrowOfTypeWhenNoDataIsProvided()
         {
@@ -37,7 +37,7 @@
             });
         }
 
-        #endregion
+        #endregion ValidationTests
 
         [Test]
         public void ShouldReturnEmptyCollectionIfEmptyCollectionIsProvided()
