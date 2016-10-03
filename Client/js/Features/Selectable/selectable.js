@@ -38,7 +38,7 @@ var selectableInitialiser = (function () {
                 }
             }
 
-            console.log(seletedIdentifiers);
+            return seletedIdentifiers;
         },
 
         unselectAll: function (table) {

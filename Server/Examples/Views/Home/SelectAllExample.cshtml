@@ -72,29 +72,9 @@
                             <div class="fht-cell" style="width: 367px;">
                             </div>
                         </th>
-                        <th data-name="Actions">
-                            <div class="th-inner">Actions</div>
-                            <div class="fht-cell" style="width: 367px;">
-                            </div>
-                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr dt-template="edit">
-                        <td colspan="2">
-                            <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
-                        </td>
-                        <td>
-                            <input type="text" data-name="LastName" value="" class="td-inner form-control" />
-                        </td>
-                        <td>
-                            <input type="text" no-custom-Render data-name="Salary" value="" class="td-inner form-control" />
-                        </td>
-                        <td>
-                            <button dt-btn-update="info" dt-delay="250" class="btn btn-primary">Update</button>
-                            <button dt-btn-template="main" dt-delay="250" class="btn btn-default">Cancel</button>
-                        </td>
-                    </tr>
                     <tr dt-template="main">
                         <td>
                             <input class="selected" type="checkbox" name="name" value="" />
@@ -108,20 +88,6 @@
                         <td>
                             <div data-name="Salary"></div>
                         </td>
-                        <td>
-                            <button dt-btn-template="edit" dt-delay="250" class="btn btn-warning">Edit</button>
-                            <button dt-btn-template="info" dt-delay="250" class="btn btn-info">Info</button>
-                        </td>
-                    </tr>
-
-                    <tr dt-template="info">
-                        <td colspan="5">
-                            <div class="jumbotron">
-                                <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
-                                <p>Salary: <span data-name="Salary" /></p>
-                                <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
-                            </div>
-                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -130,9 +96,18 @@
             <div class="pull-left pagination-detail">
                 <span class="pagination-info">Showing 20 of <span number-of-rows /> rows</span>
             </div>
-            <div class="pull-right center pagination" dt-paginator="2" dt-paginator-length="7">
+            <div class="pull-right center pagination" dt-paginator="2">
             </div>
         </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="form-group">
+    <div class="form-group">
+        <textarea id="areaSelectedIdentifiers" rows="5" class="form-control col-md-12"></textarea>
+    </div>
+    <div class="btn-group">
+        <button id="btnGetSelected" class="btn btn-primary">Get Selected</button>
     </div>
 </div>
 
@@ -141,14 +116,6 @@
         var myTable = dataTable.init('#table', {
             ajax: {
                 url: '/home/GetData'
-            },
-            paging: {
-                enable: true,
-                pageSize: 20
-            },
-            spinner: {
-                enable: true, // default value is "true"
-                style: 2
             },
             selectable: {
                 identifier: 'Id',
@@ -167,13 +134,6 @@
                     render: function (data) {
                         return data + ' $';
                     }
-                }
-            },
-            editable: {
-                update: function (data, success, error) {
-                    debugger;
-                    success();
-                    //error();
                 }
             }
         });
@@ -197,6 +157,11 @@
             }
         });
 
-
+        $('#btnGetSelected').on('click', function () {
+            $('#areaSelectedIdentifiers').html('');
+            var selected = myTable.getSelected();
+            var firstSelected = selected.slice(0, 100);
+            $('#areaSelectedIdentifiers').html(firstSelected.join(', ') + (firstSelected.length < selected.length ? ', ...' : ''));
+        })
     </script>
 }

@@ -176,6 +176,7 @@
     <Content Include="Views\Home\SingleFilterExample.cshtml" />
     <Content Include="Views\Home\EditableExample.cshtml" />
     <Content Include="Views\Home\PaginatorTemplateExample.cshtml" />
+    <Content Include="Views\Home\SelectAllExample.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

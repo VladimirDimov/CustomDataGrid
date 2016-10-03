@@ -19,41 +19,46 @@ namespace Examples.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return this.View();
         }
 
         public ActionResult SingleFilterExample()
         {
-            return View();
+            return this.View();
         }
 
         public ActionResult EditableExample()
         {
-            return View();
+            return this.View();
         }
 
         public ActionResult FilterPerColumnExample()
         {
-            return View();
+            return this.View();
         }
 
         public ActionResult PaginatorTemplateExample()
         {
-            return View();
+            return this.View();
+        }
+
+        public ActionResult SelectAllExample()
+        {
+            return this.View();
         }
 
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
 
-            return View();
+            return this.View();
         }
 
         [DataTable]
         public ActionResult GetData()
         {
             var data = this.context.Employees.OrderBy(x => x.Id);
-            return View(data);
+            return this.View(data);
         }
     }
 }
