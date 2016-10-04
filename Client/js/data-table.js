@@ -23,10 +23,10 @@ window.dataTable = (function (selectable, sortable, dataLoader, filter,
             // Init objects
             configureEvents(this);
             configureStore(this);
-
+            // Init Features
             spinner.init(this, settings);
             filter.init(table);
-            sortable.init(table);
+            sortable.init(table, settings);
             editable.init(this, settings);
             selectable.init(this, settings);
             features.init(this);
