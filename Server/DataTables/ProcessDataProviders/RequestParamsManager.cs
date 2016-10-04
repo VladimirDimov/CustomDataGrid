@@ -1,6 +1,7 @@
 ﻿namespace DataTables.ProcessDataProviders
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Web.Mvc;
     using Contracts;
@@ -12,29 +13,43 @@
     /// <summary>
     /// Handles the passed params from the filter context
     /// </summary>
-    public class RequestParamsManager : IRequestParamsManager
+    internal class RequestParamsManager : IRequestParamsManager
     {
-        private JsonProvider jsonProvider;
+        private const string PageSize = "pageSize";
+        private const string Page = "page";
+        private const string OrderBy = "orderBy";
+        private const string Asc = "asc";
+        private const string IdentifierPropName = "identifierPropName";
+        private const string GetIdentifiers = "getIdentifiers";
+
+        private IJsonProvider jsonProvider;
         private IHttpContextHelpers httpContextHelpers;
 
+        [ExcludeFromCodeCoverage]
         public RequestParamsManager()
         {
             this.jsonProvider = new JsonProvider();
             this.httpContextHelpers = new HttpContextHelpers();
         }
 
+        public RequestParamsManager(IJsonProvider jsonProvider, IHttpContextHelpers httpContextHelpers)
+        {
+            this.jsonProvider = jsonProvider;
+            this.httpContextHelpers = httpContextHelpers;
+        }
+
         public RequestModel GetRequestModel(ActionExecutedContext filterContext)
         {
-            var pageSizeString = httpContextHelpers.GetRequestParameter("pageSize", filterContext);
+            var pageSizeString = httpContextHelpers.GetRequestParameter(PageSize, filterContext);
             var pageSize = int.Parse(pageSizeString);
-            var pageString = httpContextHelpers.GetRequestParameter("page", filterContext);
+            var pageString = httpContextHelpers.GetRequestParameter(Page, filterContext);
             var page = int.Parse(pageString);
             var filter = this.GetFilterDictionary(filterContext);
-            var orderBy = httpContextHelpers.GetRequestParameterOrDefault("orderBy", filterContext);
-            var ascString = httpContextHelpers.GetRequestParameter("asc", filterContext);
+            var orderBy = httpContextHelpers.GetRequestParameterOrDefault(OrderBy, filterContext);
+            var ascString = httpContextHelpers.GetRequestParameter(Asc, filterContext);
             var asc = bool.Parse(ascString);
-            var identifierPropName = httpContextHelpers.GetRequestParameterOrDefault("identifierPropName", filterContext);
-            var isGetIdentifiersString = httpContextHelpers.GetRequestParameter("getIdentifiers", filterContext);
+            var identifierPropName = httpContextHelpers.GetRequestParameterOrDefault(IdentifierPropName, filterContext);
+            var isGetIdentifiersString = httpContextHelpers.GetRequestParameter(GetIdentifiers, filterContext);
             var isGetIdentifiers = bool.Parse(isGetIdentifiersString);
 
             var data = (IOrderedQueryable<object>)filterContext.Controller.ViewData.Model;

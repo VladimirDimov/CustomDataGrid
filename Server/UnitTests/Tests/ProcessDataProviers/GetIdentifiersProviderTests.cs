@@ -52,16 +52,20 @@
             });
         }
 
-        //[Test]
-        //public void ShouldReturnProperResult()
-        //{
-        //    var requestModel = new RequestModel { GetIdentifiers = true, IdentifierPropName = "PropInt" };
-        //    var result = getIdentifiersProvider.Execute(data, requestModel, typeof(DataObject));
-        //    var dataAsList = data.ToList();
-        //    for (int i = 0; i < data.Count(); i++)
-        //    {
-        //        Assert.AreEqual(dataAsList[i], result)
-        //    }
-        //}
+        [Test]
+        public void ShouldReturnProperResult()
+        {
+            var requestModel = new RequestModel { GetIdentifiers = true, IdentifierPropName = "PropInt" };
+            var result = getIdentifiersProvider.Execute(data, requestModel, typeof(DataObject));
+            var dataAsList = data.ToList();
+
+            var counter = 0;
+            foreach (var item in result)
+            {
+                var expected = dataAsList[counter].PropInt;
+                Assert.AreEqual(expected, item);
+                counter++;
+            }
+        }
     }
 }

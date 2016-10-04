@@ -125,12 +125,14 @@
   <ItemGroup>
     <Compile Include="Tests\CommonProviders\HttpContextHelpersTests.cs" />
     <Compile Include="Helpers\DataCollectionsGenerator.cs" />
-    <Compile Include="Tests\GetIdentifiersProvider\GetIdentifiersProviderTests.cs" />
+    <Compile Include="Tests\DataTableTests.cs" />
+    <Compile Include="Tests\ProcessDataProviers\GetIdentifiersProviderTests.cs" />
     <Compile Include="Tests\LambdaExpressions\OrderByLambdaTests.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ActionExecutedContextMocks.cs" />
     <Compile Include="Mocks\ActionExecutedContext\ControllerMock.cs" />
     <Compile Include="Mocks\DataObjects\DataObject.cs" />
     <Compile Include="Tests\ProcessDataProviers\FilterProviderTests.cs" />
+    <Compile Include="Tests\ProcessDataProviers\RequestParamsManagerTests.cs" />
     <Compile Include="Tests\ProcessDataProviers\SortProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

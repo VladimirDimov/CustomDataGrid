@@ -37,3 +37,5 @@ using System.Runtime.InteropServices;
 
 // Expose internals for testing
 [assembly: InternalsVisibleTo("UnitTests")]
+[assembly: InternalsVisibleTo("Moq")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

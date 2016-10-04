@@ -5,6 +5,7 @@
     interface IJsonProvider
     {
         T Deserialize<T>(string json);
+
         JsonResult GetJsonResult(object data, JsonRequestBehavior jsonRequestBehavior = JsonRequestBehavior.AllowGet);
     }
 }

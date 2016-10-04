@@ -9,17 +9,6 @@
     /// </summary>
     public class DataTable : ActionFilterAttribute
     {
-        private ActionResult result;
-
-        public DataTable()
-        {
-        }
-
-        public override void OnResultExecuting(ResultExecutingContext filterContext)
-        {
-            this.result = filterContext.Result;
-        }
-
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             var engine = new Engine();
