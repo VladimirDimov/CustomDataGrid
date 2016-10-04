@@ -12,6 +12,7 @@
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             var engine = new Engine();
+
             try
             {
                 engine.Run(filterContext);
