@@ -1,9 +1,11 @@
 ﻿namespace DataTables
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Web.Mvc;
     using CommonProviders;
+    using CommonProviders.Contracts;
     using Models.Request;
     using ProcessDataProviders;
     using ProcessDataProviders.Contracts;
@@ -12,12 +14,27 @@
     /// </summary>
     internal class Engine
     {
-        private RequestParamsManager requestParamsManager;
+        private IRequestParamsManager requestParamsManager;
         private IProcessData filterProvider;
         private IProcessData sortProvider;
-        private GetIdentifiersProvider getIdentifiersProvider;
-        private JsonProvider jsonProvider;
+        private IGetIdentifiersProvider getIdentifiersProvider;
+        private IJsonProvider jsonProvider;
 
+        public Engine(
+            IRequestParamsManager requestParamsManager,
+            IProcessData filterProvider,
+            IProcessData sortProvider,
+            IGetIdentifiersProvider getIdentifiersProvider,
+            IJsonProvider jsonProvider)
+        {
+            this.requestParamsManager = requestParamsManager;
+            this.filterProvider = filterProvider;
+            this.sortProvider = sortProvider;
+            this.getIdentifiersProvider = getIdentifiersProvider;
+            this.jsonProvider = jsonProvider;
+        }
+
+        [ExcludeFromCodeCoverage]
         public Engine()
         {
             this.requestParamsManager = new RequestParamsManager();
@@ -47,7 +64,7 @@
             // Identifiers collection
             IQueryable identifiers = this.getIdentifiersProvider.Execute(sortedData, requestModel, dataGenericType);
 
-            // Paged Data
+            // Page Data
             var pageData = sortedData
                 .Skip((requestModel.Page - 1) * requestModel.PageSize)
                 .Take(requestModel.PageSize);

@@ -131,7 +131,6 @@ namespace UnitTests.Tests.ProcessDataProviers
 
             return valueProviderMock;
         }
-
     }
 
     public class TestController : Controller
