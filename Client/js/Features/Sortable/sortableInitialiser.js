@@ -5,7 +5,7 @@ var sortable = (function (dataLoader) {
     var _dtInner = 'dt-inner',
         _ascCssClasses = 'asc',
         _descCssClasses = 'desc',
-        _dtName = 'dt-name';
+        _dtName = 'data-name';
 
     return {
         init: function (table, settings) {
@@ -38,6 +38,7 @@ var sortable = (function (dataLoader) {
             var $target = $(this);
             var name = $target.attr(_dtName);
             var isAsc = (table.orderBy && table.orderBy.Name == name) ? !table.orderBy.Asc : true;
+
             table.orderBy = {
                 Name: name,
                 Asc: isAsc
