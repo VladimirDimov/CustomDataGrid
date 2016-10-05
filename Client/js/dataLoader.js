@@ -22,7 +22,8 @@ var dataLoader = (function () {
             } else {
                 getIdentifiers = false;
             }
-
+            debugger;
+            
             $.ajax({
                 url: table.settings.ajax.url,
                 dataType: 'json',

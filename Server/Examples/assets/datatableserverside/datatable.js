@@ -387,7 +387,10 @@ var paginatorTemplatesInitialiser = (function () {
         var page = table.store.currentPage || 1;
         var numberOfPages = Math.ceil(table.store.numberOfRows / table.settings.paging.pageSize)
         var start, end;
-        var length = storeTemplate.paginatorLength;
+        var length = Math.min(storeTemplate.paginatorLength, numberOfPages);
+        if (length == 0) {
+            length = 1; // Needed because the page container must not be removed completely. If there are no results one page wil be displayed
+        }
         var halfLength = Math.floor((length - 1) / 2);
         var currentPaginatorLength = Math.min(storeTemplate.paginatorLength, numberOfPages);
 
@@ -976,7 +979,8 @@ var dataLoader = (function () {
             } else {
                 getIdentifiers = false;
             }
-
+            debugger;
+            
             $.ajax({
                 url: table.settings.ajax.url,
                 dataType: 'json',
