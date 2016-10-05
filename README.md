@@ -292,3 +292,7 @@ Add a container element with tag `dt-paginator="template_number"` where `templat
 
 ```
 
+Result:
+
+![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/custom-example.png)
+
