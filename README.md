@@ -254,7 +254,14 @@ Add a container element with tag `dt-paginator="template_number"` where `templat
 ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-3.png)
 
 ####Using a custom paginator template
-// Description
+
+
+- The **paginator container element** must be marked with attribute `dt-template="paginator"`.
+- The **page container** must be marked with attribute `dt-paginator-page`. The **inner page container** which holds the number must be marked with attribute `dt-paginator-inner`.
+- The **previous page container** must be marked with an attribute `dt-paginator-prev`.
+- The **next page container** must be marked with an attribute `dt-paginator-next`.
+- The **first page container** must be marked with an attribute `dt-paginator-first`.
+- The **last page container** must be marked with an attribute `dt-paginator-last`.
 
 #####Example
 
@@ -277,7 +284,7 @@ Add a container element with tag `dt-paginator="template_number"` where `templat
             <li class="page-item active" dt-active dt-paginator-page>
                 <a class="page-link" href="#" dt-paginator-inner>2</a>
             </li>
-            <li class="page-item" dt-paginator-last="">
+            <li class="page-item" dt-paginator-last>
                 <a class="page-link" href="#">last</a>
             </li>
             <li class="page-item" dt-paginator-next>
