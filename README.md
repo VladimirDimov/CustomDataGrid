@@ -241,20 +241,54 @@ You can switch the templates through buttons with attribute `dt-btn-template="ta
 ####Using the predefined paginator templates
 Add a container element with tag `dt-paginator="template_number"` where `template-number` is the predefined template number. The following predefined templates can be used:
 
-1. `<div dt-paginator="1"></div>`
+######`<div dt-paginator="1"></div>`
 
 ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-1.png)
 
-2. `<div dt-paginator="2"></div>`
+######`<div dt-paginator="2"></div>`
 
 ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-2.png)
 
-3. `<div dt-paginator="3"></div>`
+######`<div dt-paginator="3"></div>`
 
 ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-3.png)
 
+####Using a custom paginator template
+// Description
+
 #####Example
+
 ```html
-<div dt-paginator="1"></div>
+<div class="pull-right center pagination" dt-template="paginator" data-paginator-length="5">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item" dt-paginator-prev>
+                <a class="page-link" href="#" aria-label="Previous" dt-paginator-prev>
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            <li class="page-item" dt-paginator-first>
+                <a class="page-link" href="#">first</a>
+            </li>
+            <li class="page-item" dt-paginator-page>
+                <a class="page-link" href="#" dt-paginator-inner>1</a>
+            </li>
+            <li class="page-item active" dt-active dt-paginator-page>
+                <a class="page-link" href="#" dt-paginator-inner>2</a>
+            </li>
+            <li class="page-item" dt-paginator-last="">
+                <a class="page-link" href="#">last</a>
+            </li>
+            <li class="page-item" dt-paginator-next>
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
 ```
 
