@@ -1,4 +1,4 @@
-#Custom Data Grid With Ajax Serversde Processing For.NET MVC
+#Custom Data Grid With Ajax Serverside Processing For.NET MVC
 
 ----------
 
