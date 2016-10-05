@@ -1,9 +1,9 @@
-#Data Table With Ajax Serversde Processing For.NET MVC
+#Custom Data Grid With Ajax Serversde Processing For.NET MVC
 
 ----------
 
 ##Description
-A simple data table. Uses Bootstrap styles. Supports paging, filtering, sorting and multiselect with server side processing.
+A simple data grid. Supports paging, advanced filtering, sorting and multiselect with server side processing.
 **This project is still under development!**
 
 ##Installation
