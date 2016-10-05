@@ -241,11 +241,17 @@ You can switch the templates through buttons with attribute `dt-btn-template="ta
 ####Using the predefined paginator templates
 Add a container element with tag `dt-paginator="template_number"` where `template-number` is the predefined template number. The following predefined templates can be used:
 
-1. ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-1.png)
+1. `<div dt-paginator="1"></div>`
 
-2. ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-2.png)
+![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-1.png)
 
-3. ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-3.png)
+2. `<div dt-paginator="2"></div>`
+
+![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-2.png)
+
+3. `<div dt-paginator="3"></div>`
+
+![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-3.png)
 
 #####Example
 ```html
