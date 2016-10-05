@@ -1,9 +1,10 @@
-#Custom Data Grid With Ajax Serverside Processing For.NET MVC
+#Easy Data Grid With Ajax Server-Side Processing For.NET MVC
 
 ----------
 
 ##Description
-A simple data grid. Supports paging, advanced filtering, sorting and multiselect with server side processing.
+Easy to use html data grid. Supports paging, advanced filtering, sorting and multiselect with server-side processing. Allows the usage of user defined styles.
+
 **This project is still under development!**
 
 ##Installation
@@ -235,3 +236,19 @@ You can switch the templates through buttons with attribute `dt-btn-template="ta
     </tr>
 </tbody>
 ```
+
+###Paginator
+####Using the predefined paginator templates
+Add a container element with tag `dt-paginator="template_number"` where `template-number` is the predefined template number. The following predefined templates can be used:
+
+1. ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-1.png)
+
+2. ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-2.png)
+
+3. ![alt tag](https://github.com/VladimirDimov/CustomDataGrid/blob/Paginator/Files/Documentation/img/paginator-templates/paginator-3.png)
+
+#####Example
+```html
+<div dt-paginator="1"></div>
+```
+

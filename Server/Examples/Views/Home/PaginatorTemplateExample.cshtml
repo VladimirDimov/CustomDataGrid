@@ -36,45 +36,14 @@
 
 
 <div id="table" class="bootstrap-table">
-    Big paginator without active page template
-    <div class="" dt-template="paginator" dt-paginator-length="10">
-        <nav aria-label="...">
-            <ul class="pagination pagination-lg">
-                <li class="page-item" dt-paginator-prev>
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                </li>
-                <li class="page-item" dt-paginator-first>
-                    <a class="page-link" href="#">first</a>
-                </li>
-                <li class="page-item" dt-paginator-page>
-                    <a dt-paginator-inner class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item" dt-paginator-last>
-                    <a class="page-link" href="#">last</a>
-                </li>
-                <li class="page-item" dt-paginator-next>
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    Predefined template 1:
+    <div dt-paginator="1"></div>
 
-    Small paginator with active page template
-    <div dt-template="paginator">
-        <ul class="pagination pagination-sm">
-            <li dt-paginator-page><a href="#" dt-paginator-inner>1</a></li>
-            <li dt-paginator-page dt-active class="active"><a href="#" dt-paginator-inner>2</a></li>
-            <li dt-paginator-page><a href="#" dt-paginator-inner>3</a></li>
-            <li dt-paginator-page><a href="#" dt-paginator-inner>4</a></li>
-            <li dt-paginator-page><a href="#" dt-paginator-inner>5</a></li>
-        </ul>
-    </div>
+    Predefined template 2:
+    <div dt-paginator="2"></div>
+
+    Predefined template 3:
+    <div dt-paginator="3"></div>
 
     <div class="fixed-table-toolbar">
         <div class="columns columns-right btn-group pull-right">
