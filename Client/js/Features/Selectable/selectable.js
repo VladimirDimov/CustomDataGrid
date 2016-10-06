@@ -98,7 +98,6 @@ var selectableInitialiser = (function () {
         table.store.selectable = {};
         table.store.selectable.identifiers = {};
         table.store.selectable.identifier = settings.selectable.identifier;
-        // table.store.selectable.identifiers = null;
         table.store.selectable.requestIdentifiersOnDataLoad = true;
         table.store.selectable.multi = settings.selectable.multi;
         table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
