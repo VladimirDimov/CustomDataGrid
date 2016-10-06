@@ -139,14 +139,15 @@
         });
 
         $('#dt-selectAll').on('click', function (e) {
-            e.preventDefault();
+            //e.preventDefault();
             var isChecked = $(e.target).is(':checked');
+            $(e.target).attr('checked', false);
             isChecked ?
             myTable.selectAll(function () {
                 $(e.target).prop('checked', true);
             }) :
             myTable.unselectAll(function () {
-                $(e.target).prop('checked', false);
+                $(e.target).attr('checked', false);
             });
         });
 
