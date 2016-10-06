@@ -1,14 +1,10 @@
 
-// var paginator = require('../js/Features/Paginator/paginator.js');
-// var selectable = require('../js/Features/Selectable/selectable.js');
 var tableRenderer = require('../js/renderer.js');
-// var q = require('../node_modules/q/q.js')
 
 var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, successCallback, errorCallback) {
             var getIdentifiers;
-            // var deferred = q.defer();
 
             // Execute onDataLoading events
             for (var index in table.events.onDataLoading) {
@@ -17,13 +13,8 @@ var dataLoader = (function () {
 
             var filter = formatFilterRequestValues(table.store.filter);
 
-            if (table.store.selectable) {
-                getIdentifiers = table.store.selectable.requestIdentifiersOnDataLoad && table.store.selectable.identifiers === null;
-            } else {
-                getIdentifiers = false;
-            }
-            debugger;
-            
+            getIdentifiers = false;
+
             $.ajax({
                 url: table.settings.ajax.url,
                 dataType: 'json',
@@ -53,7 +44,6 @@ var dataLoader = (function () {
                         table.events.onTableRendered[index](table);
                     }
 
-                    // deferred.resolve();
                     if (successCallback) successCallback(data);
                 },
                 error: function (err) {
@@ -61,8 +51,34 @@ var dataLoader = (function () {
                     if (errorCallback) errorCallback(err);
                 }
             });
+        },
 
-            // return deferred.promise;
+        loadIdentifiers: function (table, areSelected, success, error) {
+            var getIdentifiers = true;
+            var filter = formatFilterRequestValues(table.store.filter);
+
+            $.ajax({
+                url: table.settings.ajax.url,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: {
+                    identifierPropName: table.store.selectable ? table.store.selectable.identifier : null,
+                    getIdentifiers: getIdentifiers,
+                    page: 1,
+                    pageSize: 1,
+                    filter: JSON.stringify(filter),
+                    orderBy: null,
+                    asc: true
+                },
+                success: function (data) {
+                    initIdentifiers(table, data.identifiers, areSelected);
+                    if (success) success(table);
+                },
+                error: function (err) {
+                    table.$table.html(err.responseText);
+                    if (errorCallback) errorCallback(err);
+                }
+            });
         }
     };
 
@@ -103,7 +119,7 @@ var dataLoader = (function () {
         initIdentifiers(table, identifiers);
     }
 
-    function initIdentifiers(table, identifiers) {
+    function initIdentifiers(table, identifiers, areSelected) {
         if (!identifiers) {
             return;
         }
@@ -112,7 +128,7 @@ var dataLoader = (function () {
 
         for (var i = 0, l = identifiers.length; i < l; i += 1) {
             table.store.selectable.identifiers[identifiers[i]] = {
-                selected: false,
+                selected: areSelected,
             };
         }
     }

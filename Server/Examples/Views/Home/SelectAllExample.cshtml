@@ -138,9 +138,16 @@
             }
         });
 
-        $('#dt-selectAll').on('change', function (e) {
+        $('#dt-selectAll').on('click', function (e) {
+            e.preventDefault();
             var isChecked = $(e.target).is(':checked');
-            isChecked ? myTable.selectAll() : myTable.unselectAll();
+            isChecked ?
+            myTable.selectAll(function () {
+                $(e.target).prop('checked', true);
+            }) :
+            myTable.unselectAll(function () {
+                $(e.target).prop('checked', false);
+            });
         });
 
         $('.filterable .btn-filter').click(function () {

@@ -504,6 +504,7 @@ module.exports = paginatorTemplatesInitialiser;
 },{"../../../js/dataLoader.js":11,"./paginatorPredefinedTemplatesFactory.js":4,"./paginatorTemplate.js":5}],7:[function(require,module,exports){
 var validator = require('../../../js/validator.js');
 var defaultSettings = require('../../../js/defaultSettings.js');
+var dataLoader = require('../../../js/dataLoader.js');
 
 var selectableInitialiser = (function () {
     var selectable = {
@@ -545,7 +546,7 @@ var selectableInitialiser = (function () {
             return seletedIdentifiers;
         },
 
-        unselectAll: function (table) {
+        unselectAll: function (table, callback) {
             var numberOfModifiedRows = 0;
             var identifiers = table.store.selectable.identifiers;
             if (identifiers) {
@@ -558,17 +559,17 @@ var selectableInitialiser = (function () {
                 };
 
                 this.refreshPageSelection(table);
+                if (callback) callback();
 
                 return numberOfModifiedRows;
             }
         },
 
-        selectAll: function (table) {
-            if (table.store.selectable.identifiers) {
-                for (var prop in table.store.selectable.identifiers) {
-                    table.store.selectable.identifiers[prop].selected = true;
-                }
-            }
+        selectAll: function (table, callback) {
+            dataLoader.loadIdentifiers(table, true, function (table) {
+                selectable.refreshPageSelection(table);
+                if (callback) callback();
+            });
         },
 
         refreshPageSelection: function (table) {
@@ -599,21 +600,22 @@ var selectableInitialiser = (function () {
 
     function configure(table, settings) {
         table.store.selectable = {};
+        table.store.selectable.identifiers = {};
         table.store.selectable.identifier = settings.selectable.identifier;
-        table.store.selectable.identifiers = null;
+        // table.store.selectable.identifiers = null;
         table.store.selectable.requestIdentifiersOnDataLoad = true;
         table.store.selectable.multi = settings.selectable.multi;
         table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
     }
 
     function setFunctions(table) {
-        table.selectAll = function () {
-            selectable.selectAll(table);
+        table.selectAll = function (callback) {
+            selectable.selectAll(table, callback);
             selectable.refreshPageSelection(table);
         };
 
-        table.unselectAll = function () {
-            selectable.unselectAll(table);
+        table.unselectAll = function (callback) {
+            selectable.unselectAll(table, callback);
         };
     }
 
@@ -670,15 +672,11 @@ var selectableInitialiser = (function () {
     }
 
     function GetIdentifierObj(table, identifier) {
-        if (!table.store.selectable.identifiers) {
-            throw "There are no identifiers loaded to the data table";
+        if (table.store.selectable.identifiers[identifier] === undefined) {
+            table.store.selectable.identifiers[identifier] = {};
         }
 
         var identifierObj = table.store.selectable.identifiers[identifier];
-
-        if (!identifierObj) {
-            throw "Invalid identifier value: " + identifier;
-        }
 
         return identifierObj;
     }
@@ -692,7 +690,7 @@ var selectableInitialiser = (function () {
 })();
 
 module.exports = selectableInitialiser;
-},{"../../../js/defaultSettings.js":12,"../../../js/validator.js":15}],8:[function(require,module,exports){
+},{"../../../js/dataLoader.js":11,"../../../js/defaultSettings.js":12,"../../../js/validator.js":15}],8:[function(require,module,exports){
 var dataLoader = require('../../../js/dataLoader.js');
 
 var sortable = (function (dataLoader) {
@@ -956,16 +954,12 @@ window.dataTable = (function (selectable, sortable, dataLoader, filter,
 module.exports = window.dataTable;
 },{"../js/Features/AdditionalFeatures/additionalFeatures.js":1,"../js/Features/Editable/editable":2,"../js/Features/Filter/filterInitialiser.js":3,"../js/Features/PaginatorTemplates/paginatorTemplatesInitialiser.js":6,"../js/Features/Selectable/selectable.js":7,"../js/Features/Sortable/sortableInitialiser.js":8,"../js/Features/Spinners/spinnerInitialiser.js":9,"../js/dataLoader.js":11,"../js/renderer.js":13,"../js/settings.js":14,"../js/validator.js":15}],11:[function(require,module,exports){
 
-// var paginator = require('../js/Features/Paginator/paginator.js');
-// var selectable = require('../js/Features/Selectable/selectable.js');
 var tableRenderer = require('../js/renderer.js');
-// var q = require('../node_modules/q/q.js')
 
 var dataLoader = (function () {
     var dataLoader = {
         loadData: function (table, page, successCallback, errorCallback) {
             var getIdentifiers;
-            // var deferred = q.defer();
 
             // Execute onDataLoading events
             for (var index in table.events.onDataLoading) {
@@ -974,13 +968,8 @@ var dataLoader = (function () {
 
             var filter = formatFilterRequestValues(table.store.filter);
 
-            if (table.store.selectable) {
-                getIdentifiers = table.store.selectable.requestIdentifiersOnDataLoad && table.store.selectable.identifiers === null;
-            } else {
-                getIdentifiers = false;
-            }
-            debugger;
-            
+            getIdentifiers = false;
+
             $.ajax({
                 url: table.settings.ajax.url,
                 dataType: 'json',
@@ -1010,7 +999,6 @@ var dataLoader = (function () {
                         table.events.onTableRendered[index](table);
                     }
 
-                    // deferred.resolve();
                     if (successCallback) successCallback(data);
                 },
                 error: function (err) {
@@ -1018,8 +1006,34 @@ var dataLoader = (function () {
                     if (errorCallback) errorCallback(err);
                 }
             });
+        },
 
-            // return deferred.promise;
+        loadIdentifiers: function (table, areSelected, success, error) {
+            var getIdentifiers = true;
+            var filter = formatFilterRequestValues(table.store.filter);
+
+            $.ajax({
+                url: table.settings.ajax.url,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: {
+                    identifierPropName: table.store.selectable ? table.store.selectable.identifier : null,
+                    getIdentifiers: getIdentifiers,
+                    page: 1,
+                    pageSize: 1,
+                    filter: JSON.stringify(filter),
+                    orderBy: null,
+                    asc: true
+                },
+                success: function (data) {
+                    initIdentifiers(table, data.identifiers, areSelected);
+                    if (success) success(table);
+                },
+                error: function (err) {
+                    table.$table.html(err.responseText);
+                    if (errorCallback) errorCallback(err);
+                }
+            });
         }
     };
 
@@ -1060,7 +1074,7 @@ var dataLoader = (function () {
         initIdentifiers(table, identifiers);
     }
 
-    function initIdentifiers(table, identifiers) {
+    function initIdentifiers(table, identifiers, areSelected) {
         if (!identifiers) {
             return;
         }
@@ -1069,7 +1083,7 @@ var dataLoader = (function () {
 
         for (var i = 0, l = identifiers.length; i < l; i += 1) {
             table.store.selectable.identifiers[identifiers[i]] = {
-                selected: false,
+                selected: areSelected,
             };
         }
     }

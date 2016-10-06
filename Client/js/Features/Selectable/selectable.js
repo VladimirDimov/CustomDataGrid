@@ -1,5 +1,6 @@
 var validator = require('../../../js/validator.js');
 var defaultSettings = require('../../../js/defaultSettings.js');
+var dataLoader = require('../../../js/dataLoader.js');
 
 var selectableInitialiser = (function () {
     var selectable = {
@@ -41,7 +42,7 @@ var selectableInitialiser = (function () {
             return seletedIdentifiers;
         },
 
-        unselectAll: function (table) {
+        unselectAll: function (table, callback) {
             var numberOfModifiedRows = 0;
             var identifiers = table.store.selectable.identifiers;
             if (identifiers) {
@@ -54,17 +55,17 @@ var selectableInitialiser = (function () {
                 };
 
                 this.refreshPageSelection(table);
+                if (callback) callback();
 
                 return numberOfModifiedRows;
             }
         },
 
-        selectAll: function (table) {
-            if (table.store.selectable.identifiers) {
-                for (var prop in table.store.selectable.identifiers) {
-                    table.store.selectable.identifiers[prop].selected = true;
-                }
-            }
+        selectAll: function (table, callback) {
+            dataLoader.loadIdentifiers(table, true, function (table) {
+                selectable.refreshPageSelection(table);
+                if (callback) callback();
+            });
         },
 
         refreshPageSelection: function (table) {
@@ -95,21 +96,22 @@ var selectableInitialiser = (function () {
 
     function configure(table, settings) {
         table.store.selectable = {};
+        table.store.selectable.identifiers = {};
         table.store.selectable.identifier = settings.selectable.identifier;
-        table.store.selectable.identifiers = null;
+        // table.store.selectable.identifiers = null;
         table.store.selectable.requestIdentifiersOnDataLoad = true;
         table.store.selectable.multi = settings.selectable.multi;
         table.store.selectable.cssClasses = settings.selectable.cssClasses || 'active';
     }
 
     function setFunctions(table) {
-        table.selectAll = function () {
-            selectable.selectAll(table);
+        table.selectAll = function (callback) {
+            selectable.selectAll(table, callback);
             selectable.refreshPageSelection(table);
         };
 
-        table.unselectAll = function () {
-            selectable.unselectAll(table);
+        table.unselectAll = function (callback) {
+            selectable.unselectAll(table, callback);
         };
     }
 
@@ -166,15 +168,11 @@ var selectableInitialiser = (function () {
     }
 
     function GetIdentifierObj(table, identifier) {
-        if (!table.store.selectable.identifiers) {
-            throw "There are no identifiers loaded to the data table";
+        if (table.store.selectable.identifiers[identifier] === undefined) {
+            table.store.selectable.identifiers[identifier] = {};
         }
 
         var identifierObj = table.store.selectable.identifiers[identifier];
-
-        if (!identifierObj) {
-            throw "Invalid identifier value: " + identifier;
-        }
 
         return identifierObj;
     }
