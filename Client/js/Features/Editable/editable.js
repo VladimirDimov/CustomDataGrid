@@ -38,9 +38,14 @@ var editable = (function () {
             var rowData = table.store.pageData[identifier];
             table.settings.editable.update(
                 postData,
+                rowData,
                 // SUCCESS
                 function () {
                     for (var prop in postData) {
+                        if (rowData[prop] === undefined) {
+                            continue;
+                        }
+
                         rowData[prop] = postData[prop];
                     }
                 },

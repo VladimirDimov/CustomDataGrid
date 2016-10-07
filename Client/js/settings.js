@@ -61,12 +61,6 @@ var settings = (function (defaultSettings, validator) {
         },
         set columns(val) {
             if (!val) return;
-            for (var prop in val) {
-                if (val[prop].render) {
-                    validator.ValidateMustBeAFunction(val[prop].render, "columns." + prop + ".render()");
-                }
-            }
-
             this._columns = val;
         }
     };

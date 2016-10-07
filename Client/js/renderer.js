@@ -11,9 +11,18 @@ var renderer = (function (selectable) {
         },
 
         // Renders table cell. If there is a custom defined render function calls it first.
-        renderCell: function (table, colName, content, rowData) {
+        renderCell: function (table, colName, content, rowData, renderFunctionName) {
             if (table.settings && table.settings.columns && table.settings.columns[colName] && table.settings.columns[colName].render) {
-                return table.settings.columns[colName].render(content, rowData);
+                var renderFuncObj = table.settings.columns[colName].render;
+                if (typeof (renderFuncObj) === 'function') {
+                    return table.settings.columns[colName].render(content, rowData);
+                } else if (typeof (renderFuncObj) === 'object') {
+                    if (typeof table.settings.columns[colName].render[renderFunctionName] !== 'function') {
+                        throw 'Invalid render function: ' + renderFunctionName;
+                    }
+
+                    return table.settings.columns[colName].render[renderFunctionName](content, rowData);
+                }
             };
 
             return content;
@@ -30,9 +39,10 @@ var renderer = (function (selectable) {
                 for (var i = 0, l = $containers.length; i < l; i += 1) {
                     var $container = $($containers[i]);
                     var propName = $container.attr('data-name');
+                    var renderFunctionName = $container.attr('dt-render');
                     var propValue = rowData[propName];
                     var isNoCustomrRender = $container.attr('no-custom-render') !== undefined;
-                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData);
+                    var cellData = isNoCustomrRender ? propValue : renderer.renderCell(table, propName, propValue, rowData, renderFunctionName);
                     var attributeValue = $container.attr('value');
                     if (typeof attributeValue === typeof undefined || attributeValue === false) {
                         $container.html(cellData);

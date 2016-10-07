@@ -82,13 +82,14 @@
                 <tbody>
                     <tr dt-template="edit">
                         <td colspan="2">
+                            <input type="text" data-name="InvalidName" />
                             <input type="text" data-name="FirstName" value="" class="td-inner form-control" />
                         </td>
                         <td>
                             <input type="text" data-name="LastName" value="" class="td-inner form-control" />
                         </td>
                         <td>
-                            <input type="text" no-custom-Render data-name="Salary" value="" class="td-inner form-control" />
+                            <input type="text" no-custom-Render data-name="Salary" value="" class="td-inner form-control" dt-render="renderWithCurrency" />
                         </td>
                         <td>
                             <button dt-btn-update="info" dt-delay="250" class="btn btn-primary">Update</button>
@@ -106,7 +107,7 @@
                             <div data-name="FirstName"></div>
                         </td>
                         <td>
-                            <div data-name="Salary"></div>
+                            <div data-name="Salary" dt-render="renderWithoutCurrency"></div>
                         </td>
                         <td>
                             <button dt-btn-template="edit" dt-delay="250" class="btn btn-warning">Edit</button>
@@ -118,7 +119,7 @@
                         <td colspan="5">
                             <div class="jumbotron">
                                 <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
-                                <p>Salary: <span data-name="Salary" /></p>
+                                <p>Salary: <span data-name="Salary" dt-render="renderWithoutCurrency" /></p>
                                 <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
                             </div>
                         </td>
@@ -164,14 +165,21 @@
             },
             columns: {
                 Salary: {
-                    render: function (data) {
-                        return data + ' $';
+                    render: {
+                        // A function instead of an object may be provided!
+                        renderWithCurrency: function (data) {
+                            return data + ' $';
+                        },
+                        renderWithoutCurrency: function (data) {
+                            return data;
+                        }
                     }
                 }
             },
             editable: {
-                update: function (data, success, error) {
+                update: function (postData, rowData, success, error) {
                     debugger;
+                    rowData.Position = "hahhaha";
                     success();
                     //error();
                 }
