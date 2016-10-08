@@ -26,9 +26,11 @@ var editable = (function () {
         },
 
         updateRow: function (table, $row, templateName, functionName) {
+            debugger;
+
             var $inputs = $row.find('[data-name]'),
                 postData = {},
-                identifier = $row.attr('data-identifier'),
+                identifier = $row.attr('data-identifier') || $row.parentsUntil('[data-identifier]').parent().attr('data-identifier'),
                 postFunc;
 
             Array.prototype.forEach.call($inputs, function (el) {
@@ -60,6 +62,12 @@ var editable = (function () {
                     }
 
                     var $updatedRow = renderer.renderRow(table, rowData, templateName || 'main');
+
+                    var identifierAttr = $row.attr('data-identifier');
+                    if (identifierAttr === undefined || identifierAttr === false) {
+                        $row = $row.parentsUntil('[data-identifier]').parent();
+                    }
+
                     $row.html($updatedRow.html());
 
                     return postData;
@@ -84,11 +92,11 @@ var editable = (function () {
         });
 
         table.$table.on('click', '[dt-btn-post]', function (e) {
-            var $row = $(this).parentsUntil('tr').parent();
+            var $row = $(this).parentsUntil('tr, [dt-form]').parent();
             var updateArgs = $(this).attr('dt-btn-post').split(' ');
             var redirectToTemplate = updateArgs[0];
             var functionName = updateArgs[1];
-            editable.updateRow(table, $row, redirectToTemplate, functionName);
+            editable.updateRow(table, $row, redirectToTemplate, functionName, true);
         });
     }
 
