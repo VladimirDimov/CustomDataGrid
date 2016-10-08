@@ -50,7 +50,7 @@ var editable = (function () {
                 postData,
                 rowData,
                 // SUCCESS
-                function () {
+                function (postData) {
                     for (var prop in postData) {
                         if (rowData[prop] === undefined) {
                             continue;
@@ -58,15 +58,16 @@ var editable = (function () {
 
                         rowData[prop] = postData[prop];
                     }
+
+                    var $updatedRow = renderer.renderRow(table, rowData, templateName || 'main');
+                    $row.html($updatedRow.html());
+
+                    return postData;
                 },
                 // ERROR
                 function () {
                     // Igonore error.
                 });
-            var $updatedRow = renderer.renderRow(table, rowData, templateName || 'main');
-            $row.html($updatedRow.html());
-
-            return postData;
         }
     };
 
