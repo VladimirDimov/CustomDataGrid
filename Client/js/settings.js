@@ -89,7 +89,6 @@ var settings = (function (defaultSettings, validator) {
 
     function setCustomEditable(editable) {
         if (!editable) return;
-        validator.ValidateMustBeAFunction(editable.update);
         this.editable = Object.create(Object.prototype);
         this.editable.update = editable.update;
     }

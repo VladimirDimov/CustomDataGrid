@@ -66,18 +66,28 @@ var editable = (function () {
             var $allRows = table.$table.find('tr');
         },
 
-        updateRow: function (table, $row, template) {
-            var $inputs = $row.find('[data-name]');
-            var postData = {};
-            var identifier = $row.attr('data-identifier');
+        updateRow: function (table, $row, templateName, functionName) {
+            var $inputs = $row.find('[data-name]'),
+                postData = {},
+                identifier = $row.attr('data-identifier'),
+                postFunc;
+
             Array.prototype.forEach.call($inputs, function (el) {
                 var $el = $(el);
                 var curColName = $el.attr('data-name');
                 postData[curColName] = $el.prop('value') || $el.html();
             });
 
+            if (typeof table.settings.editable.update === 'function') {
+                postFunc = table.settings.editable.update;
+            } else if (typeof table.settings.editable.update === 'object') {
+                postFunc = table.settings.editable.update[functionName];
+            } else {
+                throw 'Invalid post function typeof ' + typeof table.settings.editable.update;
+            }
+
             var rowData = table.store.pageData[identifier];
-            table.settings.editable.update(
+            postFunc(
                 postData,
                 rowData,
                 // SUCCESS
@@ -94,7 +104,7 @@ var editable = (function () {
                 function () {
                     // Igonore error.
                 });
-            var $updatedRow = renderer.renderRow(table, rowData, template || 'main');
+            var $updatedRow = renderer.renderRow(table, rowData, templateName || 'main');
             $row.html($updatedRow.html());
 
             return postData;
@@ -103,7 +113,6 @@ var editable = (function () {
 
     function configureSettings(table, settings) {
         if (!settings.editable) return;
-        validator.ValidateMustBeAFunction(settings.editable.update);
         table.settings.editable = Object.create(Object.prototype);
         table.settings.editable.update = settings.editable.update;
     }
@@ -114,9 +123,12 @@ var editable = (function () {
             editable.renderEditRow(table, $row);
         });
 
-        table.$table.on('click', '[dt-btn-update]', function (e) {
+        table.$table.on('click', '[dt-btn-post]', function (e) {
             var $row = $(this).parentsUntil('tr').parent();
-            editable.updateRow(table, $row, $(this).attr('dt-btn-update'));
+            var updateArgs = $(this).attr('dt-btn-post').split(' ');
+            var redirectToTemplate = updateArgs[0];
+            var functionName = updateArgs[1];
+            editable.updateRow(table, $row, redirectToTemplate, functionName);
         });
     }
 
@@ -1344,7 +1356,6 @@ var settings = (function (defaultSettings, validator) {
 
     function setCustomEditable(editable) {
         if (!editable) return;
-        validator.ValidateMustBeAFunction(editable.update);
         this.editable = Object.create(Object.prototype);
         this.editable.update = editable.update;
     }
