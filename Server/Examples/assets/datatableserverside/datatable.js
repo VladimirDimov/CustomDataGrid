@@ -1224,7 +1224,7 @@ var renderer = (function (selectable) {
         },
 
         RenderTableBody: function (table, data) {
-            var $tbody = table.$table.find('tbody').empty();
+            var $tbody = table.$table.find('[dt-body], tbody').empty();
             var buffer = [];
             for (var row = 0; row < data.length; row++) {
                 var rowData = data[row];
@@ -1238,7 +1238,7 @@ var renderer = (function (selectable) {
 
     function setTemplates(table) {
         table.store.templates = {};
-        var $templatesOrigin = table.$table.find('table[dt-table] tr[dt-template]');
+        var $templatesOrigin = table.$table.find('[dt-body] [dt-template], tbody [dt-template]');
         $templatesOrigin.remove();
         var $templates = $templatesOrigin.clone();
         if ($templates.length != 0) {
