@@ -17,6 +17,7 @@ window.dataTable = (function (selectable, sortable, dataLoader, filter,
     var table = {
         init: function (selector, settings) {
             this._$table = $(selector).first();
+            this._$table.hide();
 
             // Settings
             this._settings = settingsExternal.init(settings);
@@ -32,6 +33,8 @@ window.dataTable = (function (selectable, sortable, dataLoader, filter,
             features.init(this);
             renderer.init(this);
             paginatorTemplate.init(table, settings);
+
+            this._$table.show();
 
             executeOnTableInitializingEvents(this);
 
