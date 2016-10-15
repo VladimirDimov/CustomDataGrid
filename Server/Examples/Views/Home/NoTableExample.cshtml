@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "SingleFilterExample";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="table" class="bootstrap-table" dt-table>
+
+    <div>
+        <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
+            <div class="table table-hover JColResizer">
+                <div dt-body>
+                    <div dt-template="main">
+                        <div class="jumbotron" dt-body>
+                            <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
+                            <p>Salary: <span data-name="Salary" dt-render="renderWithoutCurrency" /></p>
+                            <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fixed-table-pagination" style="display: block;">
+            <div class="pull-left pagination-detail">
+                <span class="pagination-info">Showing 20 of <span number-of-rows /> rows</span>
+            </div>
+            <div class="pull-right center pagination" dt-paginator="3" dt-paginator-length="8">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetData'
+            },
+            paging: {
+                enable: true,
+                pageSize: 20
+            },
+            spinner: {
+                enable: true, // default value is "true"
+                style: 2,
+                opacity: 0.2,
+                width: '200px'
+            },
+            selectable: {
+                identifier: 'Id',
+                enable: true,
+                multi: true,
+                cssClasses: 'active'
+            },
+            sortable: {
+                //enabled: true,
+                //ascCssClasses: 'asc',
+                //descCssClasses: 'desc'
+            }
+        });
+    </script>
+}

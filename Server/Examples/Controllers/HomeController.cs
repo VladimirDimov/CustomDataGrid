@@ -47,10 +47,13 @@ namespace Examples.Controllers
             return this.View();
         }
 
+        public ActionResult NoTableExample()
+        {
+            return this.View();
+        }
+
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
-
             return this.View();
         }
 
