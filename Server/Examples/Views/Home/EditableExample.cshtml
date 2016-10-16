@@ -121,6 +121,12 @@
                                 <h1><span data-name="FirstName"></span> <span data-name="LastName"></span></h1>
                                 <p>Salary: <span data-name="Salary" dt-render="renderWithoutCurrency" /></p>
                                 <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
+                                <div dt-foreach="Notes">
+                                    <div>
+                                        <span dt-foreach-item="Title">Title</span> : 
+                                        <span dt-foreach-item="Content">Content</span>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>

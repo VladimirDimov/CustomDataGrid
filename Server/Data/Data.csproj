@@ -57,6 +57,7 @@
     <Compile Include="ApplicationDbContext.cs" />
     <Compile Include="Employee.cs" />
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

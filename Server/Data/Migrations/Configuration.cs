@@ -1,7 +1,7 @@
 namespace Data.Migrations
 {
     using System;
-    using System.Data.Entity;
+    using System.Collections.Generic;
     using System.Data.Entity.Migrations;
     using System.Diagnostics;
     using System.Linq;
@@ -29,6 +29,7 @@ namespace Data.Migrations
                 var cities = RandomGen.Gen.Random.Text.Words();
                 var salaries = RandomGen.Gen.Random.Numbers.Integers(100, 1000);
                 var dates = RandomGen.Gen.Random.Time.Dates(new DateTime(2000, 1, 1), new DateTime(2016, 1, 1));
+                var texts = RandomGen.Gen.Random.Text.Words();
 
                 for (int cityNum = 0; cityNum < 10; cityNum++)
                 {
@@ -36,6 +37,17 @@ namespace Data.Migrations
                     for (int i = 0; i < NumberOfEmployees / 10; i++)
                     {
                         counter++;
+
+                        var notes = new List<Note>();
+                        for (int k = 0; k < 10; k++)
+                        {
+                            notes.Add(new Note
+                            {
+                                Title = $"Note {k + 1}",
+                                Content = texts()
+                            });
+                        }
+
                         context.Employees.Add(new Employee
                         {
                             FirstName = firstNames(),
@@ -43,7 +55,8 @@ namespace Data.Migrations
                             Occupation = city,
                             Position = cities(),
                             Salary = salaries(),
-                            StartDate = dates()
+                            StartDate = dates(),
+                            Notes = notes
                         });
 
                         if (counter % 1000 == 0)
