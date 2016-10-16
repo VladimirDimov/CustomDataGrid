@@ -64,10 +64,10 @@ var renderer = (function (selectable) {
                     for (var j = 0, lj = propArr.length; j < lj; j += 1) {
                         var currentArrObject = propArr[j];
                         var $foreachTemplateToAdd = $foreachTemplate.clone();
-                        var $foreachItemContainers = $foreachTemplateToAdd.find('[dt-foreach-item]');
+                        var $foreachItemContainers = $foreachTemplateToAdd.find('[dt-foreach-name]');
                         for (var k = 0, lk = $foreachItemContainers.length; k < lk; k += 1) {
-                            var $itemContainer = $($foreachItemContainers[i]);
-                            var itemPropName = $itemContainer.attr('dt-foreach-item');
+                            var $itemContainer = $($foreachItemContainers[k]);
+                            var itemPropName = $itemContainer.attr('dt-foreach-name');
                             var attributeValue = $itemContainer.attr('value');
                             var itemValue = currentArrObject[itemPropName];
                             if (typeof attributeValue === typeof undefined || attributeValue === false) {

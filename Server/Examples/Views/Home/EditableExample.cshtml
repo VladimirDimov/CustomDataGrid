@@ -45,7 +45,7 @@
             <input data-columnNames="Id FirstName Salary" filter="cs" class="form-control" type="text" placeholder="Search">
         </div>
     </div>
-    <div class="fixed-table-container" style="height: 500px; padding-bottom: 40px;">
+    <div class="fixed-table-container" style="height: 700px; padding-bottom: 40px;">
         <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
             <table dt-table class="table table-hover JColResizer">
                 <thead>
@@ -123,8 +123,8 @@
                                 <p><a dt-btn-template="main" class="btn btn-primary btn-lg" href="#" role="button">Return</a></p>
                                 <div dt-foreach="Notes">
                                     <div>
-                                        <span dt-foreach-item="Title">Title</span> : 
-                                        <span dt-foreach-item="Content">Content</span>
+                                        <span dt-foreach-name="Title">Title</span> : 
+                                        <span dt-foreach-name="Content">Content</span>
                                     </div>
                                 </div>
                             </div>
