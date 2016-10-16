@@ -1204,6 +1204,35 @@ var renderer = (function (selectable) {
                 }
 
                 $row = table.store.templates[templateName].$template.clone();
+
+                var $foreachContainers = $row.find('[dt-foreach]');
+                for (var i = 0, l = $foreachContainers.length; i < l; i += 1) {
+                    var $container = $($foreachContainers[i]);
+                    var $foreachTemplate = $container.contents().clone();
+                    $container.contents().empty();
+                    var outerPropName = $container.attr('dt-foreach');
+                    var propArr = rowData[outerPropName];
+
+                    for (var j = 0, lj = propArr.length; j < lj; j += 1) {
+                        var currentArrObject = propArr[j];
+                        var $foreachTemplateToAdd = $foreachTemplate.clone();
+                        var $foreachItemContainers = $foreachTemplateToAdd.find('[dt-foreach-item]');
+                        for (var k = 0, lk = $foreachItemContainers.length; k < lk; k += 1) {
+                            var $itemContainer = $($foreachItemContainers[i]);
+                            var itemPropName = $itemContainer.attr('dt-foreach-item');
+                            var attributeValue = $itemContainer.attr('value');
+                            var itemValue = currentArrObject[itemPropName];
+                            if (typeof attributeValue === typeof undefined || attributeValue === false) {
+                                $itemContainer.html(itemValue);
+                            } else {
+                                $itemContainer.attr('value', itemValue);
+                            }
+                        }
+
+                        $container.append($foreachTemplateToAdd);
+                    }
+                }
+
             } else {
                 // If there is no main template provided the renderer will render the cells directly into the td elements
                 $row = $('<tr>');
@@ -1250,6 +1279,8 @@ var renderer = (function (selectable) {
                 var template = {};
                 template.$template = $el;
                 template.$containers = $el.find('[data-name]');
+                var $foreachContainers = $el.find('[dt-foreach]');
+                template.foreachContainers = [];
                 table.store.templates[$el.attr('dt-template')] = template;
                 $el.removeAttr('dt-template');
             });
