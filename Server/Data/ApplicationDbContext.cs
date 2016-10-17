@@ -15,5 +15,13 @@ namespace Data
         {
             return new ApplicationDbContext();
         }
+
+        protected virtual void InitializeDatabase()
+        {
+            if (!Database.Exists())
+            {
+                Database.Initialize(true);
+            }
+        }
     }
 }
