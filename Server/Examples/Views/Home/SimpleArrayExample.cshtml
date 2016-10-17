@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "SingleFilterExample";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .filterable {
+        margin-top: 15px;
+    }
+
+        .filterable .panel-heading .pull-right {
+            margin-top: -20px;
+        }
+
+        .filterable .filters input[disabled] {
+            background-color: transparent;
+            border: none;
+            cursor: auto;
+            box-shadow: none;
+            padding: 0;
+            height: auto;
+        }
+
+            .filterable .filters input[disabled]::-webkit-input-placeholder {
+                color: #333;
+            }
+
+            .filterable .filters input[disabled]::-moz-placeholder {
+                color: #333;
+            }
+
+            .filterable .filters input[disabled]:-ms-input-placeholder {
+                color: #333;
+            }
+</style>
+
+
+<div id="table" class="bootstrap-table">
+    <div class="fixed-table-toolbar">
+        <div class="columns columns-right btn-group pull-right">
+            <button class="btn btn-default" type="button" name="toggle" title="Toggle">
+                <i class="glyphicon glyphicon-list-alt icon-list-alt">
+                </i>
+            </button>
+            <div class="keep-open btn-group" title="Columns">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <i class="glyphicon glyphicon-th icon-th">
+                    </i> <span class="caret">
+                    </span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="id" value="0" checked="checked"> ID
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="name" value="1" checked="checked"> Item Name
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" data-field="price" value="2" checked="checked"> Item Price
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="pull-right search">
+            <input data-columnNames="" filter="cs" class="form-control" type="text" placeholder="Search">
+        </div>
+    </div>
+    <div class="fixed-table-container" style="height: 367px; padding-bottom: 40px;">
+        <div class="fixed-table-header fixed-table-body" style="margin-right: 0px;">
+            <table class="table table-hover JColResizer">
+                <thead>
+                    <tr>
+                        <th tabindex="0">
+                            <div class="th-inner th-inner">Name</div>
+                            <div class="fht-cell" style="width: 175px;">
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody dt-body>
+                    <tr dt-template="main">
+                        <td data-name="Name"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="fixed-table-pagination" style="display: block;">
+            <div class="pull-left pagination-detail">
+                <span class="pagination-info">Showing 20 of <span number-of-rows /> rows</span>
+            </div>
+            <div class="pull-right center pagination" dt-paginator="3" dt-paginator-length="8">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var myTable = dataTable.init('#table', {
+            ajax: {
+                url: '/home/GetNames'
+            },
+            paging: {
+                enable: true,
+                pageSize: 10
+            },
+            spinner: {
+                enable: true, // default value is "true"
+                style: 2,
+                opacity: 0.2,
+                width: '200px'
+            },
+            columns: {
+                Name: {
+                    render: function (cellData, rowData) {
+                        return rowData;
+                    }
+                }
+            }
+        });
+    </script>
+}

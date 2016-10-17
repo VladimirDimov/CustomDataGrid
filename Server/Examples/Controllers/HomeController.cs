@@ -57,11 +57,26 @@ namespace Examples.Controllers
             return this.View();
         }
 
+        public ActionResult SimpleArrayExample()
+        {
+            return this.View();
+        }
+
         [DataTable]
         public ActionResult GetData()
         {
             var data = this.context.Employees.OrderBy(x => x.Id);
             return this.View(data);
+        }
+
+        [DataTable]
+        public ActionResult GetNames()
+        {
+            var names = this.context.Employees
+                .OrderBy(x => x.Id)
+                .Select(x => x.FirstName + " " + x.LastName);
+
+            return this.View(names);
         }
     }
 }
