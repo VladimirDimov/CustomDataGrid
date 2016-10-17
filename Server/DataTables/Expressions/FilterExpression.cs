@@ -193,7 +193,15 @@
             }
 
             // x.Name
-            var namePropExpr = Expression.Property(xExpr, prop);
+            Expression namePropExpr = null;
+            if (string.IsNullOrEmpty(prop))
+            {
+                namePropExpr = xExpr;
+            } else
+            {
+                namePropExpr = Expression.Property(xExpr, prop);
+            }
+
             // Contains
             var containsMethodInfo = typeof(string).GetMethod("Contains", new Type[] { typeof(string) });
             // ToString()
