@@ -37,36 +37,6 @@
 
 <div id="table" class="bootstrap-table">
     <div class="fixed-table-toolbar">
-        <div class="columns columns-right btn-group pull-right">
-            <button class="btn btn-default" type="button" name="toggle" title="Toggle">
-                <i class="glyphicon glyphicon-list-alt icon-list-alt">
-                </i>
-            </button>
-            <div class="keep-open btn-group" title="Columns">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    <i class="glyphicon glyphicon-th icon-th">
-                    </i> <span class="caret">
-                    </span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <label>
-                            <input type="checkbox" data-field="id" value="0" checked="checked"> ID
-                        </label>
-                    </li>
-                    <li>
-                        <label>
-                            <input type="checkbox" data-field="name" value="1" checked="checked"> Item Name
-                        </label>
-                    </li>
-                    <li>
-                        <label>
-                            <input type="checkbox" data-field="price" value="2" checked="checked"> Item Price
-                        </label>
-                    </li>
-                </ul>
-            </div>
-        </div>
         <div class="pull-right search">
             <input data-columnNames="" filter="cs" class="form-control" type="text" placeholder="Search">
         </div>
@@ -103,19 +73,23 @@
 @section Scripts {
     <script>
         var myTable = dataTable.init('#table', {
+
             ajax: {
                 url: '/home/GetNames'
             },
+
             paging: {
                 enable: true,
                 pageSize: 10
             },
+
             spinner: {
                 enable: true, // default value is "true"
                 style: 2,
                 opacity: 0.2,
                 width: '200px'
             },
+
             columns: {
                 Name: {
                     render: function (cellData, rowData) {
@@ -123,6 +97,7 @@
                     }
                 }
             }
+
         });
     </script>
 }
